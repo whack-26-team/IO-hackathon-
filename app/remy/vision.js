@@ -15,7 +15,7 @@ export function createVision({ video, canvas, request, actions, context, speak, 
       canvas.height = Math.round(video.videoHeight * scale);
       canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
       const step = actions.currentStep();
-      const result = await request('/api/vision/look', { image: canvas.toDataURL('image/jpeg', 0.65), step: step ? JSON.stringify(step) : '' }, 25000);
+      const result = await request('/api/vision/look', { image: canvas.toDataURL('image/jpeg', 0.65), step: step || null }, 25000);
       if (!running || run !== generation || !alive()) return;
       if (now() - started > 5000) {
         context('[CAMERA STALE] Latest image analysis arrived too late. Do not rely on previous visuals.');
