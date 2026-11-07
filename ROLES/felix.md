@@ -1,3 +1,5 @@
+> **📌 New tasks (C4–C5):** demo mode, pitch slides, rehearsal and the backup video. See your new GitHub issue and [`docs/TEAM-TODO.md`](../docs/TEAM-TODO.md). You own `app/demo/` and `docs/pitch/`.
+
 > ⚠️ **Handed over:** Matthew has taken over the app screens, design, demo and pitch from C3 onwards
 > (issues #10, #11, #12 and the design in #52). Felix's C0–C2 work (screens, timers, icon, iPhone fixes) is merged.
 > This file is kept for reference.
