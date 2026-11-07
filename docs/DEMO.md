@@ -1,4 +1,4 @@
-# REMY demo script (about 3 minutes)
+# REMY demo script (about 3 minutes 10)
 
 Owner: Matthew. Part of #11. **Draft:** written before the first real-Remy test, so
 re-check every "Remy says" line after that test and change anything he doesn't do.
@@ -107,13 +107,20 @@ slow and exaggerated: this is staged, never fast.
 **Talker:**
 > "Ignore him and it escalates. Insult him and he bites back."
 
-### 2:45 · Close (Talker, 15 s)
-> "Live voice, live eyes, timers from real cooking data, and food-safety facts that
-> never come from AI guesses. REMY: a chef in your pocket who actually watches."
-
+### 2:45 · The verdict (10 s)
 **Phone** taps **Stop**.
 - The **goodbye screen**: Remy signs off out loud in his attitude (Savage: "Bloody hell, we
-  survived. Plate it and get out of my kitchen."), then the app returns to the start screen by itself.
+  survived. Plate it and get out of my kitchen.").
+- Under him, the **recap**: the dish, timers, safety saves and roasts, and **Remy's score out
+  of 10** (Savage, after a roast: something like "4/10. A fish could cook better than you.").
+
+**Talker** reads the score out as the punchline:
+> "And at the end he gives you a score. Apparently a fish could do better."
+
+### 2:55 · Close (Talker, 15 s)
+While the recap is still up (it stays 8 seconds, then the app goes back to the start by itself):
+> "Live voice, live eyes, timers from real cooking data, and food-safety facts that
+> never come from AI guesses. REMY: a chef in your pocket who actually watches."
 
 ---
 
