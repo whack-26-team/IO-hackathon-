@@ -52,6 +52,7 @@ $("start-btn").addEventListener("click", async () => {
       audio: true,
     });
     $("camera").srcObject = state.stream;
+    fitCamera();
   } catch (e) {
     showBubble({ text: "I can't see anything! Allow camera and microphone access, then try again.", severity: "urgent" });
     setStatus({ status: "error", message: "No camera" });
@@ -234,3 +235,28 @@ function isEstimate(label) {
   const step = state.recipe?.steps.find((s) => s.timer?.label === label);
   return !!step?.timer?.estimate;
 }
+
+// ---------- camera always fills the screen ----------
+// iPhone Safari doesn't always apply "object-fit: cover" to a live camera video, which
+// leaves a black border. So we do the maths ourselves: make the video big enough to cover
+// the whole screen (cropping the edges, like a phone's camera app) and centre it.
+function fitCamera() {
+  const video = $("camera");
+  const box = $("cook-screen");
+  const sw = box.clientWidth, sh = box.clientHeight;      // screen size
+  const vw = video.videoWidth, vh = video.videoHeight;    // camera picture size
+  if (!sw || !sh || !vw || !vh) return;                    // not ready yet; we'll be called again
+  const scale = Math.max(sw / vw, sh / vh);                // "cover": the bigger of the two
+  const w = Math.ceil(vw * scale), h = Math.ceil(vh * scale);
+  Object.assign(video.style, {
+    width: `${w}px`, height: `${h}px`,
+    left: `${Math.floor((sw - w) / 2)}px`, top: `${Math.floor((sh - h) / 2)}px`,
+  });
+}
+// Re-check whenever anything could change the sizes:
+const camera = $("camera");
+camera.addEventListener("loadedmetadata", fitCamera); // camera told us its size
+camera.addEventListener("resize", fitCamera);         // camera size changed (e.g. phone rotated)
+window.addEventListener("resize", fitCamera);         // screen size changed
+window.addEventListener("orientationchange", () => setTimeout(fitCamera, 300)); // iPhone reports late
+document.addEventListener("visibilitychange", () => { if (!document.hidden) setTimeout(fitCamera, 300); }); // back from another app
