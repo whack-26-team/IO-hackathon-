@@ -282,3 +282,17 @@ button { font: inherit; color: inherit; cursor: pointer; }
 #debug { position: fixed; z-index: 50; left: 8px; right: 8px; top: calc(8px + var(--safe-top)); background: rgba(0,0,0,.85); color: #0f0;
   font: 11px/1.4 var(--mono); padding: 8px 10px; border-radius: 8px; white-space: pre-wrap; pointer-events: none; }
 #safe-probe { position: fixed; visibility: hidden; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+
+/* Goodbye screen: Remy signs off, then the start screen comes back by itself */
+.goodbye { position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px; padding: calc(24px + var(--safe-top)) 24px calc(24px + var(--safe-bottom)); text-align: center; cursor: pointer; }
+.goodbye.hidden { display: none; }
+.goodbye-bubble { position: relative; max-width: 340px; background: #fff; border: var(--line); border-radius: 20px; box-shadow: 5px 5px 0 var(--ink);
+  padding: 16px 20px; font-weight: 800; font-size: 24px; line-height: 1.2; color: var(--ink); animation: pop .3s ease-out; }
+.goodbye-bubble::after { content: ""; position: absolute; left: 50%; bottom: -14px; width: 22px; height: 22px; background: inherit;
+  border-right: var(--line); border-bottom: var(--line); transform: translateX(-50%) rotate(45deg); }
+.goodbye-face { width: 150px; margin-top: 14px; animation: pop .4s ease-out; }
+.goodbye-hint { margin-top: 10px; font-family: var(--mono); font-size: 12px; letter-spacing: .5px; color: var(--muted); }
+html[data-mode="savage"] .goodbye-hint { color: #d9c7b8; }
+html[data-mode="savage"] .goodbye-bubble { background: var(--tomato); color: var(--cream); }
+html[data-mode="gentle"] .goodbye-bubble { background: #cfe4f6; }
