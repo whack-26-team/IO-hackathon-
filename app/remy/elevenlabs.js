@@ -108,8 +108,9 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', stream, v
     status('connecting', 'Connecting Remy’s voice…');
     try {
       if (!brain) {
-        // ?lite=1 on the page address: Remy without the roast library, to test whether size/content stops the call
-        const lite = typeof location !== 'undefined' && new URLSearchParams(location.search).has('lite');
+        // Lite by default (Matthew, to save ElevenLabs credits): Remy's instructions leave out the big
+        // roast/insult library, so every reply costs fewer tokens. ?full=1 on the page address = everything.
+        const lite = !(typeof location !== 'undefined' && new URLSearchParams(location.search).has('full'));
         brain = await request('/api/brain', { mode, ...(recipe?.id ? { recipe_id: recipe.id } : {}), ...(lite ? { lite: true } : {}) });
         if (!brain.instructions || !Array.isArray(brain.tools)) throw new Error('Server did not provide Remy’s instructions.');
         actions.configure(brain);
