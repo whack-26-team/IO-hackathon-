@@ -28,7 +28,10 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .screen { min-height: 100dvh; }
 
 /* ================= START SCREEN ================= */
-#start-screen { display: flex; flex-direction: column; gap: 10px; min-height: 100dvh;
+/* Pinned to the real screen edges, like the cooking screen: 100dvh is sometimes too short in iPhone
+   home-screen apps, which left a strip of the wrong colour at the bottom. Scrolls on tiny screens. */
+#start-screen { position: fixed; inset: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  display: flex; flex-direction: column; gap: 10px;
   padding: calc(22px + var(--safe-top)) calc(18px + var(--safe-right)) calc(14px + var(--safe-bottom)) calc(18px + var(--safe-left));
   background: var(--cream) var(--utensils); transition: background-color .25s, color .25s; }
 #start-screen > * { width: 100%; max-width: 440px; margin-left: auto; margin-right: auto; }

@@ -37,6 +37,8 @@ function applyMode(mode) {
   setUse(face, m.face);
   face.style.animation = "none"; void face.offsetWidth; face.style.animation = ""; // replay the pop
   document.querySelector('meta[name="theme-color"]').setAttribute("content", m.page);
+  // the page behind everything (seen during iPhone bounce/rotation) matches too
+  document.documentElement.style.background = document.body.style.background = m.page;
 }
 const checkedMode = () => document.querySelector('input[name="mode"]:checked').value;
 
