@@ -272,4 +272,14 @@ def index():
     return FileResponse(APP_DIR / "index.html")
 
 
+@app.middleware("http")
+async def always_fresh_app(request: Request, call_next):
+    """Phones (Safari especially) can keep showing an old copy of the app's files for a long time.
+    'no-cache' makes them check for a newer version every time (they still reuse an unchanged file)."""
+    response = await call_next(request)
+    if not request.url.path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-cache"
+    return response
+
+
 app.mount("/", StaticFiles(directory=APP_DIR), name="app")
