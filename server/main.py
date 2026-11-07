@@ -94,12 +94,31 @@ straight away, e.g. "Yes, chef?" or "I'm here.", then help with whatever they as
 your name. Only a safety alert comes first."""
 
 
+SAVAGE_ONLY = ("nicknames", "camera_reminders", "ignoring_remy", "comebacks", "savage_insult_bank")
+
+
+def roasts_for_mode(data: dict, mode: str) -> dict:
+    """Only the selected attitude's lines (keeps Remy's instructions short: the voice service has
+    to carry all of it). Savage-only sections are dropped for Gentle and Honest."""
+    def pick(node):
+        if isinstance(node, dict):
+            if set(node) & {"gentle", "honest", "savage"}:
+                return {k: pick(v) for k, v in node.items() if k == mode or k not in ("gentle", "honest", "savage")}
+            return {k: pick(v) for k, v in node.items()}
+        return node
+    out = pick(data)
+    if mode != "savage":
+        for key in SAVAGE_ONLY:
+            out.pop(key, None)
+    return out
+
+
 def build_instructions(recipe: dict | None, mode: str) -> str:
     """Glue Pranav's personality files + Matthew's recipe/knowledge into one prompt."""
     core = _read_text(BRAIN_DIR / "instructions.md")
     personality = _read_text(BRAIN_DIR / "personality" / f"{mode}.md")
     roasts = BRAIN_DIR / "personality" / "roasts.json"
-    roast_text = json.dumps(_read_json(roasts), ensure_ascii=False) if roasts.exists() else "{}"
+    roast_text = json.dumps(roasts_for_mode(_read_json(roasts), mode), ensure_ascii=False) if roasts.exists() else "{}"
     cook_times = json.dumps(_read_json(BRAIN_DIR / "knowledge" / "cook-times.json"), ensure_ascii=False)
     safety = json.dumps(_read_json(BRAIN_DIR / "knowledge" / "food-safety.json"), ensure_ascii=False)
 
