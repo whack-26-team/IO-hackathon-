@@ -1,0 +1,25 @@
+name: 🚧 I'm blocked / need help
+description: Ask a teammate for help. Shows up on the checkpoint tracker.
+labels: [blocked]
+body:
+  - type: input
+    id: issue
+    attributes:
+      label: Which task is blocked?
+      placeholder: "#9"
+    validations:
+      required: true
+  - type: dropdown
+    id: who
+    attributes:
+      label: Who do you need?
+      options: [Matthew, Felix, Ahmed, Pranav, Anyone]
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What's stopping you?
+      description: What you tried, any error messages (never paste API keys)
+    validations:
+      required: true
