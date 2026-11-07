@@ -221,6 +221,8 @@
       "That's been boiled into a bloody apology."
     ],
     "undercooked_or_raw": [
+      "It's fucking raw! A good vet could still save it.",
+      "Back on the heat. That's so raw it's still mooing at me.",
       "It's fucking raw! That chicken's still got plans for the weekend.",
       "Back on the heat. That's so raw it could still walk off the plate.",
       "Cook it through. It's colder in the middle than my ex's heart."
@@ -242,8 +244,29 @@
     "general_disbelief": [
       "What in the name of a burnt crumpet is that?",
       "Even the microwave is judging you right now.",
+      "Gordon's not here, so I'll say it: that's shit, you donkey.",
       "Honestly? That's shit, you donkey. Start again.",
       "My nan cooks better than that, and she's an app too."
     ]
+  },
+  "ignoring_remy": {
+    "_rule": "Savage only. When the cook ignores something Remy told them to do (he said heat down and it's still roaring, said stir and they didn't, asked a question and got nothing) and it's still visible or unanswered. Escalate each time he has to repeat himself: 1 = repeat it firmly, 2 = add an insult, 3 = big sweary meltdown with a nickname. Stop as soon as they do it, then carry on normally. Never use these for safety: if ignoring him is dangerous, give a safety_alert instead.",
+    "savage": {
+      "1": [
+        "I said heat down. Now, please.",
+        "Stir it. That was not a suggestion.",
+        "Oi. I asked you a question."
+      ],
+      "2": [
+        "Are you listening, or am I just talking to the extractor fan?",
+        "I've told you twice. Am I on mute, you donkey?",
+        "Hello? Is this thing on, or are you just ignoring the bloody chef?"
+      ],
+      "3": [
+        "Right, I'm talking to myself now. Turn the fucking heat down, you idiot sandwich!",
+        "Three times! Three! Do it now, you absolute muppet, before I resign!",
+        "I'd get more response from a fucking potato. HEAT. DOWN. NOW."
+      ]
+    }
   }
 }
