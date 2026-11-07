@@ -25,12 +25,20 @@ priority over personality examples. The exact core prefix has an automated test.
 The configured ElevenLabs agent is `agent_9201m6v41z1he9eshw97vkqbyyvn` (public ID,
 not a secret), with a response-returning client tool named `remy_action` and two
 required string arguments: `action`, `arguments_json`. Tool timeout: 25 seconds.
-The GPT-6 Luna / Eric primary voice remains in place. ElevenLabs also has a
-secondary voice labeled `Savage` using its Marcus British male library voice.
+The published agent uses Eleven Realtime v1 Max with Eric as its primary voice.
+The previous GPT-6 Luna setting is stored for Custom mode but does not apply
+while Realtime mode is selected. ElevenLabs also has a secondary voice labeled
+`Savage` using its Marcus British male library voice.
 The published prompt requests `<Savage>...</Savage>` speech tags only when the
 selected mode is Savage after the screen's 18+ opt-in; Gentle and Honest use Eric.
 This is an original chef voice, not a Gordon Ramsay impersonation. Check the
 audible voice switch on a phone before treating it as verified.
+
+The current ElevenLabs settings use patient turn eagerness, background voice
+detection on, and Ignore Default Personality off. Realtime Max keeps the system
+prompt, voices, tools, and turn settings, but costs more per token than Mini.
+Check its actual response delay, kitchen-noise behaviour, and usage during the
+real phone cook-along before deciding whether to keep Max.
 
 ## Current limits and owner handoffs
 
@@ -59,9 +67,8 @@ ambiguous durations, stale camera results, disconnects and session lifecycle.
 FastAPI smoke checks passed for all three `/api/brain` modes, static modules and
 recipe lookup. These use fake speech/vision sessions, not real model calls.
 
-The live target is https://remy-2wc2.onrender.com. At this checkpoint it still
-serves the old OpenAI adapter; deployment of this branch remains necessary.
-After deployment, open it on the phone, choose Gentle, untick Pretend Remy,
+The live target is https://remy-2wc2.onrender.com. Its `/remy/live.js` currently
+serves the ElevenLabs adapter. Open it on the phone, choose Gentle, untick Pretend Remy,
 and start cooking. Test:
 
 1. Ask what ingredients Remy can see; show a new ingredient and check freshness.
