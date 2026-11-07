@@ -1,199 +1,241 @@
-/* Owner: Felix */
+/* Owner: Matthew (taken over from Felix). Design: docs/design/start.html + draft.html (#52) */
 :root {
-  --bg: #111;
-  --fg: #fff;
-  --muted: #aaa;
-  --accent: #ff6a1a;
-  --info: #2d7dff;
-  --warning: #ffb020;
-  --urgent: #ff3030;
-  --ok: #2ecc71;
-  --panel: rgba(0, 0, 0, 0.62);
+  /* colours */
+  --cream: #fff4e0; --paper: #f7f2e8; --ink: #1a1a1a; --tomato: #e8432c; --butter: #ffd166;
+  --sky: #eaf3fb; --sky-2: #c9e2f6; --mint: #2a9d8f; --night: #2a1714; --muted: #6b6b6b;
+  --steel-1: #d7dadd; --steel-2: #8d9297;
+  /* the sticker look: thick ink outline + hard offset shadow */
+  --line: 3px solid var(--ink); --shadow: 4px 4px 0 var(--ink);
+  --font: "Bricolage Grotesque", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
   /* iPhone notch / home bar space (0 on laptops) */
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
+  /* faint kitchen utensils behind the start screen */
+  --utensils: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90' fill='none' stroke='%231a1a1a' stroke-opacity='.07' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M12 8v22M8 8v8a4 4 0 0 0 8 0V8M12 30v14'/%3E%3Cpath d='M58 10c6 0 8 8 8 14s-3 8-8 8V48'/%3E%3Ccircle cx='30' cy='66' r='12'/%3E%3Cpath d='M42 66h14'/%3E%3Cpath d='M70 60l12 12M76 56c4 4 4 8 0 12'/%3E%3C/svg%3E");
+  --utensils-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90' fill='none' stroke='%23fff4e0' stroke-opacity='.07' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M12 8v22M8 8v8a4 4 0 0 0 8 0V8M12 30v14'/%3E%3Cpath d='M58 10c6 0 8 8 8 14s-3 8-8 8V48'/%3E%3Ccircle cx='30' cy='66' r='12'/%3E%3Cpath d='M42 66h14'/%3E%3Cpath d='M70 60l12 12M76 56c4 4 4 8 0 12'/%3E%3C/svg%3E");
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 /* Locked to the screen size like a real app: no double-tap zoom (touch-action),
    no rubber-band bounce (overscroll-behavior), no iPhone text resizing. */
 html { touch-action: manipulation; overscroll-behavior: none; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
-html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); overscroll-behavior: none;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-button { font: inherit; cursor: pointer; }
-
+html, body { margin: 0; height: 100%; background: var(--cream); color: var(--ink); overscroll-behavior: none; font-family: var(--font); }
+button { font: inherit; color: inherit; cursor: pointer; }
 .hidden { display: none !important; }
 .screen { min-height: 100dvh; }
 
-/* ---------- start screen ---------- */
-#start-screen { display: flex; flex-direction: column; gap: 16px; max-width: 480px; margin: 0 auto;
-  padding: calc(28px + var(--safe-top)) calc(20px + var(--safe-right)) calc(24px + var(--safe-bottom)) calc(20px + var(--safe-left)); }
-.start-icon { width: 72px; height: 72px; border-radius: 18px; }
-.logo { font-size: 60px; line-height: 1; margin: 0; letter-spacing: 4px; color: var(--accent); }
-.tagline { margin: -6px 0 4px; color: var(--muted); font-size: 17px; }
+/* ================= START SCREEN ================= */
+#start-screen { display: flex; flex-direction: column; gap: 10px; min-height: 100dvh;
+  padding: calc(22px + var(--safe-top)) calc(18px + var(--safe-right)) calc(14px + var(--safe-bottom)) calc(18px + var(--safe-left));
+  background: var(--cream) var(--utensils); transition: background-color .25s, color .25s; }
+#start-screen > * { width: 100%; max-width: 440px; margin-left: auto; margin-right: auto; }
+.wordmark { text-align: center; font-weight: 800; font-size: 40px; letter-spacing: -1px; line-height: 1; }
+.wordmark small { display: block; font-size: 14px; letter-spacing: 0; font-weight: 600; color: var(--muted); margin-top: 3px; }
 
-.modes { border: 0; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
-.modes legend { font-weight: 700; font-size: 18px; margin-bottom: 10px; padding: 0; }
-.mode-card { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 16px;
-  background: #1c1c1c; border: 2px solid #2a2a2a; transition: border-color .15s, background .15s, transform .1s; }
-.mode-card:active { transform: scale(0.98); }
-.mode-card input { position: absolute; opacity: 0; pointer-events: none; } /* the card is the button */
-.mode-card .emoji { font-size: 34px; }
-.mode-card b { display: block; font-size: 19px; }
-.mode-card small { display: block; color: var(--muted); font-size: 14px; margin-top: 2px; }
-.mode-card:has(input:checked) { border-color: var(--accent); background: #2a1a10; }
-.mode-card.savage:has(input:checked) { border-color: var(--urgent); background: #2a1010; }
-.mode-card:has(input:focus-visible) { outline: 2px solid var(--fg); outline-offset: 2px; }
-.age { font-style: normal; font-size: 12px; background: var(--urgent); color: #fff; padding: 2px 6px;
-  border-radius: 6px; vertical-align: middle; margin-left: 4px; }
+/* Remy greets you: fixed height so nothing below moves when the attitude changes */
+.hero { display: flex; flex-direction: column; align-items: center; height: 196px; }
+.greeting { width: 100%; max-width: 300px; min-height: 66px; display: flex; align-items: center; justify-content: center;
+  text-align: center; background: #fff; border: var(--line); border-radius: 18px; box-shadow: var(--shadow);
+  padding: 9px 14px; font-weight: 800; font-size: 18px; line-height: 1.15; position: relative; transition: background .25s, transform .25s; }
+.greeting::after { content: ""; position: absolute; bottom: -13px; left: 50%; width: 20px; height: 20px; background: inherit;
+  border-right: var(--line); border-bottom: var(--line); transform: translateX(-50%) rotate(45deg); }
+.hero-face { width: 150px; margin-top: 6px; animation: pop .3s ease-out; }
 
-.big-btn { font-size: 22px; font-weight: 800; padding: 18px; border: 0; border-radius: 16px;
-  background: var(--accent); color: #000; box-shadow: 0 6px 24px rgba(255, 106, 26, .35); }
-.big-btn:active { transform: scale(0.98); }
-.ghost-btn { font-size: 17px; padding: 14px; border-radius: 14px; background: none; color: var(--fg); border: 1px solid #555; }
-.how { margin: -4px 0 0; text-align: center; color: var(--fg); font-size: 16px; }
-.toggle { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 15px; }
-.toggle input { width: 20px; height: 20px; }
-.small-print { font-size: 13px; line-height: 1.5; color: var(--muted); margin: 0; }
+.modes { border: 0; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 9px; }
+.modes legend { font-weight: 800; font-size: 17px; margin-bottom: 9px; padding: 0; }
+.mode-bar { display: flex; align-items: center; gap: 10px; background: #fff; color: var(--ink); border: 2.5px solid var(--ink);
+  border-radius: 16px; box-shadow: 3px 3px 0 var(--ink); padding: 6px 12px 6px 8px; transition: transform .1s, box-shadow .1s, background .2s; }
+.mode-bar:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+.mode-bar input { position: absolute; opacity: 0; pointer-events: none; } /* the bar is the button */
+.mode-bar .face { width: 52px; flex: none; }
+.mode-bar .txt { flex: 1; min-width: 0; }
+.mode-bar b { display: block; font-size: 18px; }
+.mode-bar small { display: block; font-size: 13px; color: #555; }
+.mode-bar .tick { width: 24px; height: 24px; flex: none; border-radius: 50%; border: 2.5px solid var(--ink); background: #fff; }
+.mode-bar:has(input:checked) { box-shadow: 5px 5px 0 var(--ink); transform: translate(-1px, -1px); }
+.mode-bar:has(input:checked) .tick { background: var(--ink); box-shadow: inset 0 0 0 4px var(--butter); }
+.mode-bar:has(input:focus-visible) { outline: 3px solid var(--tomato); outline-offset: 2px; }
+.age { font-family: var(--mono); font-style: normal; font-size: 10px; background: var(--tomato); color: #fff; padding: 2px 5px;
+  border-radius: 4px; vertical-align: 3px; margin-left: 2px; }
 
-/* 18+ pop-up */
-.dialog-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, .7); display: flex;
-  align-items: center; justify-content: center; padding: 20px; z-index: 20; }
-.dialog { background: #1c1c1c; border: 2px solid var(--urgent); border-radius: 20px; padding: 22px;
-  max-width: 400px; animation: pop .2s ease-out; }
-.dialog h2 { margin: 0 0 8px; }
-.dialog-buttons { display: flex; flex-direction: column-reverse; gap: 10px; margin-top: 16px; }
-.dialog .big-btn { background: var(--urgent); color: #fff; box-shadow: none; font-size: 19px; }
+.go { display: block; width: 100%; border: var(--line); border-radius: 18px; box-shadow: 5px 5px 0 var(--ink); background: var(--tomato);
+  color: var(--cream); font-weight: 800; font-size: 26px; padding: 16px; transition: transform .1s, box-shadow .1s; }
+.go:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--ink); }
+#start-btn { margin-top: 18px; }
+.ghost { width: 100%; background: transparent; border: 2.5px solid currentColor; border-radius: 16px; padding: 13px; font-weight: 700; font-size: 17px; }
+.start-foot { margin-top: auto !important; padding-top: 10px; display: flex; flex-direction: column; align-items: center; gap: 6px;
+  font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+.link { background: none; border: 0; padding: 0; text-decoration: underline; text-underline-offset: 2px; color: var(--ink); font-family: var(--mono); font-size: 11.5px; }
+.pretend { display: flex; align-items: center; gap: 6px; }
+.pretend input { width: 16px; height: 16px; accent-color: var(--tomato); }
 
-/* ---------- cooking screen ---------- */
+/* --- the page per attitude --- */
+.mode-gentle { background-color: var(--sky) !important; }
+.mode-gentle .greeting, .mode-gentle .mode-bar:has(input:checked) { background: var(--sky-2); }
+.mode-gentle .mode-bar:has(input:checked) .tick { box-shadow: inset 0 0 0 4px var(--sky-2); }
+.mode-honest .mode-bar:has(input:checked) { background: var(--butter); }
+.mode-savage { background-color: var(--night) !important; background-image: var(--utensils-light) !important; color: var(--cream); }
+.mode-savage .wordmark small, .mode-savage .start-foot { color: #c9b8a6; }
+.mode-savage .link { color: var(--cream); }
+.mode-savage .greeting { background: var(--tomato); color: var(--cream); transform: rotate(-2deg); }
+.mode-savage .mode-bar:has(input:checked) { background: var(--tomato); color: var(--cream); }
+.mode-savage .mode-bar:has(input:checked) small { color: var(--cream); }
+.mode-savage .mode-bar:has(input:checked) .tick { background: var(--cream); box-shadow: inset 0 0 0 4px var(--tomato); }
+.mode-savage .mode-bar:has(input:checked) .age { background: var(--ink); }
+.mode-savage .go { background: var(--butter); color: var(--ink); }
+
+/* --- pop-ups (18+, safety info) --- */
+.dialog-backdrop { position: fixed; inset: 0; background: rgba(26, 26, 26, .6); display: flex; align-items: center;
+  justify-content: center; padding: 20px; z-index: 20; }
+.dialog { background: var(--cream); color: var(--ink); border: var(--line); border-radius: 22px; box-shadow: 7px 7px 0 var(--ink);
+  padding: 22px; max-width: 380px; width: 100%; animation: pop .2s ease-out; text-align: center; }
+.dialog.savage { background: var(--night); color: var(--cream); border-color: var(--ink); }
+.dialog h2 { margin: 0 0 8px; font-size: 26px; }
+.dialog p { margin: 6px 0; line-height: 1.35; }
+.dialog-face { width: 120px; margin: -70px auto 0; display: block; }
+.dialog-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+.dialog .go { font-size: 20px; padding: 13px; }
+.dialog.savage .go { background: var(--butter); color: var(--ink); }
+.safety-points { text-align: left; padding: 0; margin: 4px 0 0; list-style: none; display: grid; gap: 8px; font-size: 15px; line-height: 1.35; }
+
+/* ================= COOKING SCREEN ================= */
 /* Pinned to the real screen edges. (100dvh is sometimes too short in iPhone home-screen apps.) */
-#cook-screen { position: fixed; inset: 0; overflow: hidden; background: #000; }
+#cook-screen { position: fixed; inset: 0; overflow: hidden; background: #000; color: var(--ink); }
 /* The camera video is sized by fitCamera() in app.js so it always covers the screen.
    These values are just the starting point before the camera reports its size. */
 #camera { position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; background: #000;
   max-width: none; max-height: none; }
 
-.top-bar { position: absolute; top: 0; left: 0; right: 0; display: flex; gap: 8px; align-items: center;
-  padding: calc(10px + var(--safe-top)) calc(14px + var(--safe-right)) 8px calc(14px + var(--safe-left)); z-index: 2; }
-.status, .badge { background: var(--panel); padding: 7px 12px; border-radius: 999px; font-size: 14px;
-  white-space: nowrap; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-.status { display: flex; align-items: center; gap: 7px; min-width: 0; overflow: hidden; }
-#status-text { overflow: hidden; text-overflow: ellipsis; }
-.status .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); flex: none; }
-.status.live .dot { background: var(--ok); }
-.status.connecting .dot { background: var(--warning); animation: pulse 1s infinite; }
-.status.error .dot { background: var(--urgent); }
-/* "Remy is speaking": three bouncing bars instead of the dot */
-.status .bars { display: none; gap: 2px; align-items: center; height: 14px; flex: none; }
-.status .bars i { width: 3px; height: 100%; background: var(--accent); border-radius: 2px; animation: talk .8s infinite ease-in-out; }
-.status .bars i:nth-child(2) { animation-delay: .15s; }
-.status .bars i:nth-child(3) { animation-delay: .3s; }
-.status.remy-speaking { background: rgba(255, 106, 26, .25); outline: 1px solid var(--accent); }
-.status.remy-speaking .dot { display: none; }
-.status.remy-speaking .bars { display: flex; }
-.stop-btn { margin-left: auto; flex: none; background: var(--panel); color: var(--fg); border: 1px solid #555;
-  border-radius: 999px; padding: 7px 16px; font-size: 14px; }
-
-/* timers: a row of cards under the top bar; wraps if there are lots */
-.timers { position: absolute; top: calc(56px + var(--safe-top)); left: calc(14px + var(--safe-left));
-  right: calc(14px + var(--safe-right)); display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; z-index: 2; }
-.timer { background: var(--panel); border-radius: 16px; padding: 8px 10px 6px; width: 150px;
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 2px solid transparent; animation: pop .25s ease-out; }
-.timer .label { font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.timer .time { font-size: 32px; line-height: 1.1; font-variant-numeric: tabular-nums; font-weight: 800; }
-.timer .bar { height: 4px; background: rgba(255, 255, 255, .15); border-radius: 2px; overflow: hidden; margin: 4px 0 6px; }
-.timer .bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .25s linear; }
+/* steel rail across the top; timer tickets hang from it */
+.rail { position: absolute; z-index: 3; top: 0; left: 0; right: 0; height: calc(14px + var(--safe-top));
+  background: linear-gradient(var(--steel-1), var(--steel-2)); border-bottom: 2.5px solid var(--ink); }
+.timers { position: absolute; z-index: 2; top: calc(14px + var(--safe-top)); right: calc(10px + var(--safe-right)); left: calc(10px + var(--safe-left));
+  display: flex; flex-direction: row-reverse; flex-wrap: wrap; gap: 8px; align-items: flex-start; pointer-events: none; }
+.timer { pointer-events: auto; width: 126px; background: var(--paper); border: 2.5px solid var(--ink); border-top: 0; box-shadow: var(--shadow);
+  padding: 7px 9px 12px; text-align: center; animation: drop .35s ease-out; transform: rotate(var(--tilt, 1deg));
+  /* torn-paper bottom edge */
+  -webkit-mask: linear-gradient(#000 0 0) top/100% calc(100% - 6px) no-repeat, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom/10px 6px repeat-x;
+          mask: linear-gradient(#000 0 0) top/100% calc(100% - 6px) no-repeat, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom/10px 6px repeat-x; }
+.timer:nth-child(even) { --tilt: -2deg; }
+.timer .label { font-family: var(--mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.timer .time { font-weight: 800; font-size: 34px; line-height: 1.05; font-variant-numeric: tabular-nums; }
+.timer .bar { height: 6px; border: 1.5px solid var(--ink); border-radius: 3px; overflow: hidden; margin: 5px 0 7px; background: #fff; }
+.timer .bar i { display: block; height: 100%; width: 0; background: var(--tomato); transition: width .25s linear; }
 .timer .controls { display: flex; gap: 4px; }
-.timer .controls button { flex: 1; background: rgba(255, 255, 255, .12); color: var(--fg); border: 0;
-  border-radius: 9px; padding: 7px 0; font-size: 14px; font-weight: 700; }
-.timer .controls .x.sure { flex: 2; background: var(--urgent); }
-/* the "check" moment: amber */
-.timer.check { border-color: var(--warning); }
-.timer.check .time { color: var(--warning); }
-.timer.check .bar i { background: var(--warning); }
-/* finished: red, pulsing */
-.timer.done { background: var(--urgent); border-color: #fff; animation: pulse 1s infinite; }
-.timer.done .label { color: #fff; }
-.timer.done .time { color: #fff; }
+.timer .controls button { flex: 1; background: #fff; border: 2px solid var(--ink); border-radius: 8px; padding: 4px 0; font-size: 13px; font-weight: 800; }
+.timer .controls .x.sure { flex: 2; background: var(--tomato); color: var(--cream); }
+.timer.check { background: var(--butter); }                 /* "check it now" moment */
+.timer.check .label { color: var(--ink); }
+.timer.done { background: var(--tomato); color: var(--cream); animation: pulse 1s infinite; }
+.timer.done .label { color: var(--cream); }
 .timer.done .bar { display: none; }
 .timer.updated { animation: bump .4s ease-out; }
 
-.bottom { position: absolute; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; gap: 10px; z-index: 2;
-  padding: 12px calc(14px + var(--safe-right)) calc(14px + var(--safe-bottom)) calc(14px + var(--safe-left)); }
+.top-bar { position: absolute; z-index: 2; left: 0; right: 0; display: flex; gap: 6px; align-items: center;
+  top: calc(var(--rail-space, 128px) + var(--safe-top)); padding: 0 calc(12px + var(--safe-right)) 0 calc(12px + var(--safe-left)); }
+#cook-screen:not(:has(.timer)) .top-bar { --rail-space: 24px; }   /* no timers yet: chips sit near the top */
+.chip { background: var(--cream); border: 2.5px solid var(--ink); border-radius: 10px; box-shadow: 3px 3px 0 var(--ink);
+  padding: 4px 9px; font-weight: 800; font-size: 13px; white-space: nowrap; }
+.status { display: flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden; }
+#status-text { overflow: hidden; text-overflow: ellipsis; }
+.status .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex: none; }
+.status.live .dot { background: var(--mint); }
+.status.connecting .dot { background: var(--butter); animation: pulse 1s infinite; }
+.status.error .dot { background: var(--tomato); }
+/* "Remy is speaking": three bouncing bars instead of the dot */
+.status .bars { display: none; gap: 2px; align-items: center; height: 13px; flex: none; }
+.status .bars i { width: 3px; height: 100%; background: var(--tomato); border-radius: 2px; animation: talk .8s infinite ease-in-out; }
+.status .bars i:nth-child(2) { animation-delay: .15s; } .status .bars i:nth-child(3) { animation-delay: .3s; }
+.status.remy-speaking .dot { display: none; }
+.status.remy-speaking .bars { display: flex; }
+.stop { margin-left: auto; flex: none; background: var(--tomato); color: var(--cream); }
 
-/* tip bubble, coloured by severity */
-.bubble { background: var(--panel); border-left: 8px solid var(--info); border-radius: 16px;
-  padding: 12px 14px; font-size: 19px; line-height: 1.3; animation: pop .25s ease-out;
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-.bubble.info { border-color: var(--info); }
-.bubble.warning { border-color: var(--warning); background: rgba(60, 40, 0, .78); }
-.bubble.urgent { border-color: var(--urgent); background: rgba(70, 0, 0, .82); font-weight: 700; }
-.bubble.warning::before { content: "⚠️ "; }
-.bubble.urgent::before { content: "❗ "; }
-/* roast: big and shaking, worse at each level (but never as strong as the safety alert) */
-.bubble.roast { border: 3px solid var(--accent); border-left-width: 8px; background: rgba(40, 18, 5, .85);
-  font-weight: 800; font-size: 22px; animation: shake .45s; }
-.bubble.roast::before { content: "🔥 "; }
-.bubble.roast.level-2 { font-size: 25px; animation: shake .45s 2; }
-.bubble.roast.level-3 { font-size: 28px; animation: shake-hard .5s 3; transform-origin: center;
-  box-shadow: 0 0 24px rgba(255, 106, 26, .6); }
-.bubble.roast.level-3::before { content: "🔥🔥🔥 "; }
+.bottom { position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; gap: 10px;
+  padding: 0 calc(12px + var(--safe-right)) calc(12px + var(--safe-bottom)) calc(12px + var(--safe-left)); }
 
-/* recipe panel */
-.panel { background: var(--panel); border-radius: 16px; padding: 10px 14px;
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-.no-recipe { text-align: center; font-size: 18px; font-weight: 600; padding: 16px; animation: pulse 2.5s infinite; }
-.recipe { max-height: 34dvh; overflow: auto; }
+/* Remy's speech: his face sits on top of the bubble */
+.speech { position: relative; padding-top: 64px; animation: pop .25s ease-out; }
+.cook-face { position: absolute; top: 0; left: 6px; width: 96px; z-index: 1; transition: transform .2s; }
+.bubble { position: relative; background: var(--cream); border: var(--line); border-radius: 18px; box-shadow: 5px 5px 0 var(--ink);
+  padding: 10px 14px 12px; font-weight: 800; font-size: 20px; line-height: 1.15; }
+.bubble::before { content: ""; position: absolute; top: -15px; left: 96px; width: 20px; height: 20px; background: inherit;
+  border-left: var(--line); border-top: var(--line); transform: skewX(-25deg) rotate(20deg); }
+.bubble .who { display: block; padding-left: 92px; min-height: 14px;  /* clear of Remy's face */ font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--tomato); margin-bottom: 3px; }
+.speech.warning .bubble { background: var(--butter); }
+.speech.warning .who::after { content: " · heads up"; }
+.speech.urgent .bubble { background: #ffb4a3; }
+.speech.urgent .who { color: var(--ink); }
+.speech.urgent .who::after { content: " · now"; }
+/* roast: tomato, tilted, shakes harder at each level (never as strong as the safety alert) */
+.speech.roast .bubble { background: var(--tomato); color: var(--cream); font-size: 22px; transform: rotate(-1.5deg); animation: shake .45s; }
+.speech.roast .who { color: var(--butter); }
+.speech.roast .cook-face { transform: rotate(-8deg); }
+.speech.roast.level-2 .bubble { font-size: 24px; animation: shake .45s 2; }
+.speech.roast.level-3 .bubble { font-size: 26px; animation: shake-hard .5s 3; }
+
+/* recipe panel: ink strip at the bottom */
+.panel { background: var(--ink); color: var(--cream); border-radius: 16px; padding: 10px 14px; }
+.no-recipe { text-align: center; font-size: 17px; font-weight: 700; padding: 14px; animation: pulse 2.5s infinite; }
+.recipe { max-height: 32dvh; overflow: auto; }
 .recipe > summary { list-style: none; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px;
   position: sticky; top: -10px; background: inherit; padding: 2px 0 6px; }
 .recipe > summary::-webkit-details-marker { display: none; }
 .recipe-title { font-weight: 800; font-size: 17px; flex: 1 1 100%; }
-.step-summary { font-weight: 700; color: var(--accent); }
-.step-summary::after { content: " ▾"; color: var(--muted); }
+.step-summary { font-weight: 800; color: var(--butter); }
+.step-summary::after { content: " ▾"; color: #9a9a9a; }
 .recipe:not([open]) .step-summary::after { content: " ▸"; }
-.tag { font-size: 12px; padding: 2px 8px; border-radius: 999px; font-weight: 700; }
-.tag.checked { background: var(--ok); color: #000; }
-.tag.ai { background: #7b5cff; color: #fff; }
+.tag { font-family: var(--mono); font-size: 10px; letter-spacing: .5px; padding: 2px 7px; border-radius: 6px; font-weight: 600; text-transform: uppercase; }
+.tag.checked { background: var(--mint); color: #fff; }
+.tag.ai { background: var(--sky-2); color: var(--ink); }
 .tag.unchecked { background: #444; color: #ddd; }
 .safety { list-style: none; padding: 0; margin: 4px 0; }
-.safety li { background: rgba(255, 176, 32, .18); border-radius: 8px; padding: 6px 8px; font-size: 14px; font-weight: 600; }
+.safety li { background: rgba(255, 209, 102, .18); border-radius: 8px; padding: 6px 8px; font-size: 14px; font-weight: 600; }
 .ingredients { margin: 6px 0; font-size: 15px; }
-.ingredients summary { color: var(--muted); font-weight: 600; }
+.ingredients summary { color: #b9b9b9; font-weight: 700; }
 .ingredients ul { margin: 4px 0; padding-left: 20px; }
 .steps { list-style: none; padding: 0; margin: 4px 0 0; }
-.steps li { display: flex; gap: 10px; align-items: flex-start; margin: 8px 0; color: var(--muted); font-size: 16px; line-height: 1.35; }
+.steps li { display: flex; gap: 10px; align-items: flex-start; margin: 8px 0; color: #a9a9a9; font-size: 15.5px; line-height: 1.35; }
 .steps .mark { flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
-  font-size: 13px; font-weight: 800; background: #333; color: #ccc; }
-.steps li.current { color: var(--fg); font-weight: 600; }
-.steps li.current .mark { background: var(--accent); color: #000; }
-.steps li.done { text-decoration: line-through; opacity: .7; }
-.steps li.done .mark { background: var(--ok); color: #000; }
+  font-size: 12px; font-weight: 800; background: #333; color: #ccc; }
+.steps li.current { color: var(--cream); font-weight: 700; }
+.steps li.current .mark { background: var(--butter); color: var(--ink); }
+.steps li.done { text-decoration: line-through; opacity: .65; }
+.steps li.done .mark { background: var(--mint); color: #fff; }
 
-/* SAFETY ALERT: solid red, full screen, on top of everything. Always stronger than roasts. */
-.alert { position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center;
-  justify-content: center; gap: 12px; text-align: center; background: rgba(210, 0, 0, .94); color: #fff;
-  padding: calc(24px + var(--safe-top)) 24px calc(24px + var(--safe-bottom)); animation: alert-in .25s ease-out, alert-flash 1s .25s infinite; }
-.alert-icon { font-size: 80px; line-height: 1; animation: bump .6s infinite; }
-.alert-text { font-size: 38px; font-weight: 900; line-height: 1.15; text-shadow: 0 2px 8px rgba(0, 0, 0, .4); }
-.alert-hint { font-size: 14px; opacity: .8; margin-top: 12px; }
+/* SAFETY ALERT: on top of everything, no jokes. Grey camera, alarmed Remy, clear instruction. */
+.alert { position: absolute; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center;
+  padding: calc(24px + var(--safe-top)) 20px calc(24px + var(--safe-bottom));
+  background: rgba(20, 20, 20, .72); -webkit-backdrop-filter: grayscale(1); backdrop-filter: grayscale(1); animation: fade .2s ease-out; }
+.alert-card { width: 100%; max-width: 380px; background: var(--tomato); color: var(--cream); border: 4px solid var(--ink);
+  border-radius: 24px; box-shadow: 8px 8px 0 var(--ink); padding: 18px 18px 20px; text-align: center; animation: alert-in .25s ease-out; }
+.alert-face { width: 116px; margin: -78px auto 4px; display: block; animation: bump .6s infinite; }
+.alert-text { font-size: 34px; font-weight: 800; line-height: 1.05; text-transform: uppercase; }
+.alert-hint { font-family: var(--mono); font-size: 12px; margin-top: 14px; opacity: .9; }
 
 @keyframes pulse { 50% { opacity: 0.55; } }
-@keyframes pop { from { transform: scale(.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-@keyframes bump { 50% { transform: scale(1.08); } }
+@keyframes pop { from { transform: scale(.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes drop { from { transform: translateY(-30px) rotate(var(--tilt, 1deg)); } to { transform: translateY(0) rotate(var(--tilt, 1deg)); } }
+@keyframes bump { 50% { transform: scale(1.06); } }
+@keyframes fade { from { opacity: 0; } }
 @keyframes talk { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
-@keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
-@keyframes shake-hard { 20% { transform: translateX(-10px) rotate(-2deg); } 40% { transform: translateX(10px) rotate(2deg); }
-  60% { transform: translateX(-8px) rotate(-1deg); } 80% { transform: translateX(8px) rotate(1deg); } }
-@keyframes alert-in { from { opacity: 0; transform: scale(1.1); } to { opacity: 1; transform: scale(1); } }
-@keyframes alert-flash { 50% { background: rgba(140, 0, 0, .96); } }
+@keyframes shake { 25% { transform: translateX(-6px) rotate(-1.5deg); } 75% { transform: translateX(6px) rotate(-1.5deg); } }
+@keyframes shake-hard { 20% { transform: translateX(-10px) rotate(-3deg); } 40% { transform: translateX(10px) rotate(1deg); }
+  60% { transform: translateX(-8px) rotate(-2deg); } 80% { transform: translateX(8px) rotate(0deg); } }
+@keyframes alert-in { from { opacity: 0; transform: scale(1.08); } to { opacity: 1; transform: scale(1); } }
 
 /* small phones (iPhone SE): squeeze things a little */
 @media (max-height: 700px) {
-  .logo { font-size: 48px; }
-  .start-icon { display: none; }
-  .mode-card { padding: 10px 14px; }
-  .timer .time { font-size: 26px; }
-  .recipe { max-height: 30dvh; }
+  .wordmark { font-size: 32px; }
+  .hero { height: 158px; }
+  .hero-face { width: 96px; margin-top: 6px; }
+  .greeting { font-size: 16px; min-height: 56px; }
+  .mode-bar { padding-top: 3px; padding-bottom: 3px; }
+  .mode-bar .face { width: 42px; }
+  .go { font-size: 22px; padding: 12px; }
+  .timer .time { font-size: 28px; }
+  .recipe { max-height: 28dvh; }
 }

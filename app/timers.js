@@ -1,4 +1,4 @@
-// Owner: Felix
+// Owner: Matthew (taken over from Felix)
 // The phone runs the timers, not the AI. AI can't count time reliably.
 // Events in:  timer_start {id, label, seconds, check_at}, timer_cancel {id}
 // Events out: timer_check {id, label}, timer_done {id, label}  (passed on to Remy)

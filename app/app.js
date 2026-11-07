@@ -1,4 +1,4 @@
-// Owner: Felix
+// Owner: Matthew (taken over from Felix). Design: docs/design/ (#52)
 // The screen. It only talks to "Remy" through events (see docs/CONTRACT.md),
 // so pretend Remy (remy/mock.js) and real Remy (remy/live.js) are interchangeable.
 
@@ -16,27 +16,53 @@ const state = { recipe: null, mode: "honest", remy: null, stream: null, cooking:
 document.addEventListener("gesturestart", (e) => e.preventDefault());
 document.addEventListener("touchmove", (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
 
-const MODE_NAMES = { gentle: "😇 Gentle", honest: "😏 Honest", savage: "🤬 Savage" };
+const MODE_NAMES = { gentle: "Gentle", honest: "Honest", savage: "Savage" };
+
+// Each attitude has its own Remy, greeting and page colour (docs/design/start.html)
+const MODES = {
+  gentle: { greeting: "Take your time, chef. I've got you.", face: "f-gentle", page: "#eaf3fb" },
+  honest: { greeting: "Evening, chef. What are we making tonight?", face: "f-sus", page: "#fff4e0" },
+  savage: { greeting: "Go on then. Impress me.", face: "f-savage", page: "#2a1714" },
+};
+const setUse = (svg, id) => svg.querySelector("use").setAttribute("href", `#${id}`);
 
 // ---------- start screen ----------
+
+function applyMode(mode) {
+  const m = MODES[mode];
+  const screen = $("start-screen");
+  screen.className = `screen mode-${mode}`;
+  $("greeting").textContent = m.greeting;
+  const face = $("hero-face");
+  setUse(face, m.face);
+  face.style.animation = "none"; void face.offsetWidth; face.style.animation = ""; // replay the pop
+  document.querySelector('meta[name="theme-color"]').setAttribute("content", m.page);
+}
+const checkedMode = () => document.querySelector('input[name="mode"]:checked').value;
 
 // Savage needs an 18+ "yes" first. If they say no, go back to Honest.
 document.querySelectorAll('input[name="mode"]').forEach((el) =>
   el.addEventListener("change", () => {
-    if (el.value === "savage" && el.checked) $("age-dialog").classList.remove("hidden");
+    if (!el.checked) return;
+    applyMode(el.value);
+    if (el.value === "savage") $("age-dialog").classList.remove("hidden");
   })
 );
 $("age-yes").addEventListener("click", () => $("age-dialog").classList.add("hidden"));
 $("age-no").addEventListener("click", () => {
   document.querySelector('input[value="honest"]').checked = true;
+  applyMode("honest");
   $("age-dialog").classList.add("hidden");
 });
+$("safety-link").addEventListener("click", () => $("safety-dialog").classList.remove("hidden"));
+$("safety-ok").addEventListener("click", () => $("safety-dialog").classList.add("hidden"));
+applyMode(checkedMode()); // the browser may remember the last choice after a reload
 
 $("start-btn").addEventListener("click", async () => {
   // This tap is important: iPhones only allow sound and mic after a tap.
   // Unlock sound FIRST, before any waiting, or the iPhone forgets the tap.
   unlockSound();
-  state.mode = document.querySelector('input[name="mode"]:checked').value;
+  state.mode = checkedMode();
   state.recipe = null; // no recipe yet: Remy asks what you're cooking
   state.cooking = true;
 
@@ -84,7 +110,7 @@ function stopCooking() {
   clearTimeout(showBubble.t);
   hideAlert();
   pendingRoast = null;
-  $("bubble").className = "bubble hidden";
+  $("speech").className = "speech hidden";
   $("cook-screen").classList.add("hidden");
   $("start-screen").classList.remove("hidden");
 }
@@ -111,7 +137,7 @@ function wireRemy(remy) {
 
 function setStatus({ status, message }) {
   const pill = $("status");
-  pill.className = `status ${status}`;
+  pill.className = `chip status ${status}`;  // keep the chip look
   $("status-text").textContent = status === "remy-speaking" ? "Remy is speaking" : (message || status);
   if (status === "stopped") stopCooking();
 }
@@ -121,14 +147,26 @@ function setStatus({ status, message }) {
 // How long each kind of bubble stays up (ms). Urgent stays longest.
 const BUBBLE_MS = { info: 9000, warning: 12000, urgent: 15000, roast: 8000 };
 
+// Remy's face while he talks: his everyday face for the attitude, a raised eyebrow
+// for warnings, and fury (with steam in Savage) for roasts.
+function faceFor(severity) {
+  if (severity === "roast") return state.mode === "savage" ? "f-savage" : "f-fury";
+  if (severity === "warning" || severity === "urgent") return "f-sus";
+  return state.mode === "gentle" ? "f-gentle" : "f-watch";
+}
+
 function showBubble({ text, severity = "info", level }) {
-  const b = $("bubble");
-  b.className = "bubble";       // reset, then force the browser to notice,
-  void b.offsetWidth;           // so the pop/shake animation replays every time
-  b.className = `bubble ${severity}` + (level ? ` level-${level}` : "");
-  b.textContent = text;
+  const sp = $("speech");
+  sp.className = "speech";      // reset, then force the browser to notice,
+  void sp.offsetWidth;          // so the pop/shake animation replays every time
+  sp.className = `speech ${severity}` + (level ? ` level-${level}` : "");
+  $("bubble-text").textContent = text;
+  const face = $("cook-face");
+  const id = faceFor(severity);
+  setUse(face, id);
+  face.setAttribute("viewBox", id === "f-savage" ? "-28 -12 156 116" : "-18 -12 136 116"); // room for the steam
   clearTimeout(showBubble.t);
-  showBubble.t = setTimeout(() => b.classList.add("hidden"), BUBBLE_MS[severity] || 9000);
+  showBubble.t = setTimeout(() => sp.classList.add("hidden"), BUBBLE_MS[severity] || 9000);
 }
 
 // Safety beats comedy: a roast that arrives during a safety alert waits until it's gone.
@@ -147,8 +185,8 @@ function showAlert(text) {
   $("alert-text").textContent = text;
   const f = $("alert-flash");
   f.classList.remove("hidden");
-  // hide whatever bubble was up (e.g. a joke) so nothing competes with the alert
-  $("bubble").classList.add("hidden");
+  // hide whatever Remy was saying (e.g. a joke) so nothing competes with the alert
+  $("speech").classList.add("hidden");
   beep("alert");
   if (navigator.vibrate) navigator.vibrate([300, 100, 300]); // Android only; iPhones ignore this
   clearTimeout(showAlert.t);
