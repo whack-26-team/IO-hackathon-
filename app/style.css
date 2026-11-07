@@ -22,7 +22,14 @@
 /* Locked to the screen size like a real app: no double-tap zoom (touch-action),
    no rubber-band bounce (overscroll-behavior), no iPhone text resizing. */
 html { touch-action: manipulation; overscroll-behavior: none; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
-html, body { margin: 0; height: 100%; background: var(--cream); color: var(--ink); overscroll-behavior: none; font-family: var(--font); }
+html, body { margin: 0; height: 100%; color: var(--ink); overscroll-behavior: none; font-family: var(--font); }
+/* The page BEHIND the app also has the colour + utensil pattern, so any edge the iPhone shows past
+   the app (under the home bar, behind Safari's toolbar, during bounce) looks the same. */
+html { background: var(--cream) var(--utensils); }
+html[data-mode="gentle"] { background: var(--sky) var(--utensils); }
+html[data-mode="savage"] { background: var(--night) var(--utensils-light); }
+html[data-mode="cooking"] { background: #000; }
+body { background: transparent; }
 button { font: inherit; color: inherit; cursor: pointer; }
 .hidden { display: none !important; }
 .screen { min-height: 100dvh; }
@@ -67,9 +74,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .go { display: block; width: 100%; border: var(--line); border-radius: 18px; box-shadow: 5px 5px 0 var(--ink); background: var(--tomato);
   color: var(--cream); font-weight: 800; font-size: 26px; padding: 16px; transition: transform .1s, box-shadow .1s; }
 .go:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--ink); }
-#start-btn { margin-top: 18px; }
+#start-btn { margin-top: auto; }   /* pushed down to just above the footer */
 .ghost { width: 100%; background: transparent; border: 2.5px solid currentColor; border-radius: 16px; padding: 13px; font-weight: 700; font-size: 17px; }
-.start-foot { margin-top: auto !important; padding-top: 10px; display: flex; flex-direction: column; align-items: center; gap: 6px;
+.start-foot { margin-top: 0 !important; padding-top: 12px; display: flex; flex-direction: column; align-items: center; gap: 6px;
   font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
 .link { background: none; border: 0; padding: 0; text-decoration: underline; text-underline-offset: 2px; color: var(--ink); font-family: var(--mono); font-size: 11.5px; }
 .pretend { display: flex; align-items: center; gap: 6px; }
