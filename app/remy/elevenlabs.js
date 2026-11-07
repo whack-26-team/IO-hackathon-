@@ -83,11 +83,19 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', stream, v
     // Keep screen timers visible when voice fails. "stopped" clears Felix's timers.
     status('error', message);
   }
-  function lost(run) {
+  let lastDrop = '';  // why ElevenLabs hung up last time, shown if we give up
+  function why(details) {
+    if (!details) return '';
+    if (typeof details === 'string') return details;
+    return [details.reason, details.closeCode, details.closeReason, details.message, details.error?.message]
+      .filter(v => v !== undefined && v !== null && v !== '').join(' · ');
+  }
+  function lost(run, details) {
     if (run !== generation || !active) return;
+    if (details) { lastDrop = why(details).slice(0, 140); console.error('[Remy] voice dropped:', details); }
     void disconnect().then(() => {
       if (!active || page.hidden) return;
-      if (++attempts > 2 || now() >= deadline) return exhausted('Voice disconnected. Timers remain on screen; Stop and Start to reconnect.');
+      if (++attempts > 2 || now() >= deadline) return exhausted(`Voice disconnected${lastDrop ? ` (${lastDrop})` : ''}. Timers remain on screen; Stop and Start to reconnect.`);
       status('connecting', 'Voice dropped. Reconnecting…');
       reconnectTimer = schedule(connect, attempts * 1500);
     });
@@ -141,8 +149,8 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', stream, v
           status(speaking ? 'remy-speaking' : 'live', speaking ? 'Remy is speaking' : 'Listening');
           if (!speaking) flush();
         },
-        onDisconnect: () => lost(run),
-        onError: () => lost(run),
+        onDisconnect: (details) => lost(run, details),
+        onError: (message, extra) => lost(run, extra ? { message: `${message}`, error: extra } : message),
       });
       if (run !== generation || !alive()) { await session.endSession(); return; }
       conversation = session; connecting = false;
