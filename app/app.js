@@ -10,6 +10,12 @@ import { createLiveRemy } from "./remy/live.js";
 const $ = (id) => document.getElementById(id);
 const state = { recipe: null, mode: "honest", remy: null, stream: null, cooking: false };
 
+// ---------- no zooming ----------
+// Safari on iPhone ignores "user-scalable=no" in index.html, so we also block the
+// pinch gesture here. Zooming by accident mid-cook makes everything hard to read.
+document.addEventListener("gesturestart", (e) => e.preventDefault());
+document.addEventListener("touchmove", (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+
 const MODE_NAMES = { gentle: "😇 Gentle", honest: "😏 Honest", savage: "🤬 Savage" };
 
 // ---------- start screen ----------
