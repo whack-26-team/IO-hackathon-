@@ -27,9 +27,9 @@ Only create a branch when the task changes files. Check-in-only tasks (e.g. the 
 | #7 | `felix/c0-7-run-skeleton` |
 | #8 | `felix/c1-8-iphone-check` |
 | #9 | `felix/c2-9-app-screens` |
-| #10 | `felix/c3-10-real-remy` |
-| #11 | `felix/c4-11-polish-demo` |
-| #12 | `felix/c5-12-video-pitch` |
+| #10 | `matthew/c3-10-real-remy` (taken over from Felix) |
+| #11 | `matthew/c4-11-polish-demo` (taken over from Felix) |
+| #12 | `matthew/c5-12-video-pitch` (taken over from Felix) |
 | #13 | `ahmed/c0-13-voice-route` |
 | #14 | `ahmed/c1-14-voice-test` |
 | #15 | `ahmed/c2-15-voice-connection` |
