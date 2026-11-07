@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REMY directions v2</title>
+<!-- Design exploration for issue #52 (Matthew). Not part of the app: Felix builds the chosen one in app/. -->
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=IBM+Plex+Mono:wght@400;600&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&display=swap" rel="stylesheet">
+<style>
+  :root { --page: #ebe7df; --ink: #1a1a1a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font-family: "IBM Plex Mono", ui-monospace, monospace; padding: 28px 16px 40px; }
+  h1 { font-family: "Barlow Condensed", sans-serif; font-weight: 800; font-size: 34px; margin: 0; letter-spacing: .5px; }
+  .intro { margin: 2px 0 26px; font-size: 13px; color: #555; }
+  .dir { margin-bottom: 34px; }
+  .dir h2 { font-family: "Barlow Condensed", sans-serif; font-size: 24px; margin: 0; }
+  .dir p { margin: 2px 0 14px; font-size: 12.5px; color: #555; max-width: 900px; }
+  .row { display: flex; gap: 22px; flex-wrap: wrap; align-items: flex-start; }
+  .phone { width: 300px; height: 650px; border-radius: 38px; border: 8px solid #111; overflow: hidden; position: relative;
+    box-shadow: 0 14px 30px rgba(0,0,0,.22); background: #000; }
+  .cam { position: absolute; inset: 0; background:
+      radial-gradient(circle at 52% 46%, transparent 0 34%, #262626 34.5% 41%, transparent 41.5%),
+      radial-gradient(circle at 46% 42%, #c98a3d 0 5%, transparent 5.5%),
+      radial-gradient(circle at 58% 49%, #b8742c 0 4.5%, transparent 5%),
+      radial-gradient(circle at 50% 54%, #8a4b1c 0 4%, transparent 4.5%),
+      radial-gradient(circle at 42% 52%, #d9a24f 0 3.5%, transparent 4%),
+      radial-gradient(circle at 60% 40%, #2a170b 0 3.5%, transparent 4%),
+      radial-gradient(circle at 52% 46%, #474745 0 34%, transparent 34.5%),
+      linear-gradient(160deg, #6b6158, #3d3732); }
+  .phone > *:not(.cam) { position: absolute; z-index: 1; }
+  .caption { width: 300px; font-size: 11.5px; color: #555; margin-top: 8px; }
+
+  /* ================= A · THE PASS (ticket rail) ================= */
+  .pass .cam::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.55), transparent 28%, transparent 60%, rgba(0,0,0,.6)); }
+  .rail { top: 0; left: 0; right: 0; height: 18px; background: linear-gradient(#c9ccd0, #8d9297 60%, #6c7075);
+    box-shadow: 0 2px 4px rgba(0,0,0,.5); }
+  .bar { top: 26px; left: 12px; right: 12px; display: flex; justify-content: space-between; align-items: center;
+    font-size: 10px; color: #f6f3ea; letter-spacing: 1.5px; text-transform: uppercase; }
+  .bar .live::before { content: ""; display: inline-block; width: 7px; height: 7px; background: #e8432c; border-radius: 50%; margin-right: 6px; animation: blink 1.2s infinite; }
+  .bar .stop { border: 1px solid #f6f3ea; padding: 3px 8px; }
+  .ticket { background: #f6f3ea; color: var(--ink); padding: 10px 12px 12px; box-shadow: 0 3px 8px rgba(0,0,0,.35);
+    /* zig-zag torn bottom edge */
+    -webkit-mask: linear-gradient(#000 0 0) top/100% calc(100% - 6px) no-repeat, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom/12px 6px repeat-x;
+            mask: linear-gradient(#000 0 0) top/100% calc(100% - 6px) no-repeat, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom/12px 6px repeat-x; }
+  .clip { width: 26px; height: 14px; background: linear-gradient(#d7dadd, #8d9297); border-radius: 2px; position: absolute; top: -8px; left: 50%; transform: translateX(-50%); }
+  .t-timer { top: 8px; right: 14px; width: 112px; text-align: center; transform: rotate(1.5deg); }
+  .t-timer2 { top: 8px; right: 134px; width: 92px; text-align: center; transform: rotate(-2deg); }
+  .ticket .k { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: #6b6b6b; display: flex; justify-content: space-between; }
+  .ticket .big { font-family: "Barlow Condensed", sans-serif; font-weight: 800; font-size: 36px; line-height: 1; margin-top: 2px; }
+  .ticket hr { border: 0; border-top: 1px dashed #b9b4a8; margin: 6px 0; }
+  .t-roast { left: 14px; right: 22px; bottom: 74px; transform: rotate(-1.2deg); }
+  .t-roast .line { font-family: "Barlow Condensed", sans-serif; font-weight: 800; font-size: 25px; line-height: 1.02; text-transform: uppercase; margin-top: 4px; }
+  .t-roast .line em { font-style: normal; background: #e8432c; color: #f6f3ea; padding: 0 4px; }
+  .tape { left: 12px; bottom: 18px; background: #1a1a1a; color: #f6f3ea; font-size: 11px; letter-spacing: 1px; padding: 8px 10px;
+    text-transform: uppercase; box-shadow: 0 2px 0 #000, inset 0 1px 0 rgba(255,255,255,.15); max-width: 276px; line-height: 1.35; }
+  .tape b { background: #e8432c; padding: 1px 5px; margin-right: 6px; }
+  /* alert: the "86" stamp */
+  .pass.alert .cam { filter: grayscale(1) brightness(.5); }
+  .stamp { top: 210px; left: 26px; right: 26px; border: 6px solid #e8432c; color: #e8432c; text-align: center; padding: 14px 10px; transform: rotate(-6deg);
+    font-family: "Barlow Condensed", sans-serif; font-weight: 800; text-transform: uppercase; background: rgba(246,243,234,.94); }
+  .stamp .h { font-size: 54px; line-height: .9; letter-spacing: 1px; }
+  .stamp .s { font-size: 21px; color: #1a1a1a; margin-top: 6px; }
+  @keyframes blink { 50% { opacity: .25; } }
+
+  /* ================= B · REMY (the character) ================= */
+  .rm { --cream: #fff4e0; --tomato: #e8432c; --mint: #2a9d8f; --ink: #1a1a1a; }
+  .rm .cam { filter: saturate(1.1); }
+  .rm .bar2 { top: 14px; left: 12px; right: 12px; display: flex; justify-content: flex-end; gap: 6px; font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 12px; }
+  .chip { background: var(--cream); border: 2.5px solid var(--ink); border-radius: 10px; padding: 4px 9px; box-shadow: 3px 3px 0 var(--ink); }
+  .chip.stop { background: var(--tomato); color: var(--cream); }
+  .face { top: 48px; left: 12px; width: 92px; }
+  .dial { top: 52px; right: 14px; width: 92px; height: 92px; border-radius: 50%; background: var(--cream); border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--ink);
+    display: grid; place-items: center; text-align: center; font-family: "Bricolage Grotesque", sans-serif; }
+  .dial::before { content: ""; position: absolute; inset: 7px; border-radius: 50%; background: conic-gradient(var(--tomato) 0 78%, transparent 78%); -webkit-mask: radial-gradient(circle, transparent 60%, #000 61%); mask: radial-gradient(circle, transparent 60%, #000 61%); }
+  .dial b { font-size: 22px; font-weight: 800; line-height: 1; }
+  .dial small { font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; display: block; }
+  .speech { left: 12px; right: 12px; bottom: 88px; background: var(--cream); border: 3px solid var(--ink); border-radius: 18px; padding: 12px 14px;
+    box-shadow: 5px 5px 0 var(--ink); font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 21px; line-height: 1.12; }
+  .speech::before { content: ""; position: absolute; top: -17px; left: 34px; width: 22px; height: 22px; background: var(--cream);
+    border-left: 3px solid var(--ink); border-top: 3px solid var(--ink); transform: skewX(-25deg) rotate(20deg); }
+  .speech .who { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--tomato); display: block; margin-bottom: 3px; }
+  .step2 { left: 12px; right: 12px; bottom: 16px; background: var(--ink); color: var(--cream); border-radius: 14px; padding: 9px 12px;
+    font-family: "Bricolage Grotesque", sans-serif; font-weight: 500; font-size: 13px; }
+  .step2 b { color: #ffd166; margin-right: 6px; }
+  .sheet { display: flex; gap: 14px; background: #fff4e0; border: 3px solid #1a1a1a; border-radius: 22px; padding: 16px 18px; box-shadow: 6px 6px 0 #1a1a1a; }
+  .sheet figure { margin: 0; text-align: center; font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 12px; }
+  .sheet svg { width: 92px; display: block; }
+</style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <!-- Remy: one head, swappable brows + mouth = expressions -->
+      <g id="head">
+        <path d="M24 44 C16 44 12 36 18 30 C16 20 28 14 36 20 C40 10 60 10 64 20 C72 14 84 20 82 30 C88 36 84 44 76 44 Z" fill="#fff" stroke="#1a1a1a" stroke-width="3.5" stroke-linejoin="round"/>
+        <rect x="24" y="40" width="52" height="10" rx="2" fill="#e8432c" stroke="#1a1a1a" stroke-width="3.5"/>
+        <path d="M20 58 C20 48 30 48 50 48 C70 48 80 48 80 58 L80 70 C80 88 66 98 50 98 C34 98 20 88 20 70 Z" fill="#ffd9a8" stroke="#1a1a1a" stroke-width="3.5"/>
+        <path d="M44 76 C46 80 54 80 56 76" fill="none" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="30" cy="80" r="4" fill="#f5a37a" opacity=".7"/><circle cx="70" cy="80" r="4" fill="#f5a37a" opacity=".7"/>
+      </g>
+    </defs>
+  </svg>
+
+  <h1>REMY: two directions, v2</h1>
+  <p class="intro">Built from real kitchen things and a real character, instead of generic app cards and emoji.</p>
+
+  <!-- ===================== A ===================== -->
+  <section class="dir">
+    <h2>A · "The Pass": the restaurant ticket rail</h2>
+    <p>Remy's comments print out like order tickets on thermal paper, timers are tickets clipped to a steel rail, and steps are label-maker tape. A safety alert is a red kitchen stamp. Paper cream, ink black, one tomato red, typewriter type and condensed headlines. Feels like a real kitchen, not an app.</p>
+    <div class="row">
+      <div>
+        <div class="phone pass"><div class="cam"></div>
+          <div class="rail"></div>
+          <div class="ticket t-timer2"><div class="clip"></div><div class="k"><span>#02</span><span>Garlic</span></div><div class="big">0:48</div></div>
+          <div class="ticket t-timer"><div class="clip"></div><div class="k"><span>#01</span><span>Rigatoni</span></div><div class="big">8:42</div></div>
+          <div class="bar" style="top:118px"><span class="live">Remy · watching</span><span class="stop">Stop</span></div>
+          <div class="ticket t-roast"><div class="k"><span>Remy · Honest</span><span>19:42</span></div><hr>
+            <div class="line">That garlic is <em>charcoal.</em> Bin it, chef.</div></div>
+          <div class="tape"><b>3/6</b>Warm the oil, medium-low. Garlic in gently.</div>
+        </div>
+        <div class="caption">Cooking: timers hang on the rail, Remy's line prints as a ticket.</div>
+      </div>
+      <div>
+        <div class="phone pass alert"><div class="cam"></div>
+          <div class="rail"></div>
+          <div class="ticket t-timer"><div class="clip"></div><div class="k"><span>#01</span><span>Rigatoni</span></div><div class="big">8:31</div></div>
+          <div class="stamp"><div class="h">Off the heat!</div><div class="s">Oil is smoking</div></div>
+          <div class="tape"><b>Safety</b>Never use water on an oil fire. Lid on, heat off.</div>
+        </div>
+        <div class="caption">Safety alert: the camera goes grey, and a red stamp says what to do.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== B ===================== -->
+  <section class="dir">
+    <h2>B · "Remy": a drawn character</h2>
+    <p>A drawn chef face, not emoji, whose eyebrows and mouth change with the moment. Flat colours, thick ink outlines and hard offset shadows, like a sticker. The timer is a kitchen dial. Playful, but with a real visual identity Felix can build in SVG.</p>
+    <div class="row">
+      <div>
+        <div class="phone rm"><div class="cam"></div>
+          <div class="bar2"><span class="chip">Honest</span><span class="chip stop">Stop</span></div>
+          <svg class="face" viewBox="0 0 100 104"><use href="#head"/>
+            <path d="M28 62 L42 66" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/><path d="M72 62 L58 66" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="38" cy="72" r="3.5" fill="#1a1a1a"/><circle cx="62" cy="72" r="3.5" fill="#1a1a1a"/>
+            <path d="M40 88 C46 83 54 83 60 88" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/></svg>
+          <div class="dial"><div><small>Rigatoni</small><b>8:42</b></div></div>
+          <div class="speech"><span class="who">Remy</span>That garlic is officially charcoal. Bin it, chef.</div>
+          <div class="step2"><b>3/6</b>Warm the oil on medium-low, garlic in gently.</div>
+        </div>
+        <div class="caption">Cooking: Remy frowns, the speech bubble has a hard shadow, the dial counts down.</div>
+      </div>
+      <div class="sheet">
+        <figure><svg viewBox="0 0 100 104"><use href="#head"/><path d="M30 64 Q37 60 44 64" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M56 64 Q63 60 70 64" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><circle cx="38" cy="72" r="3.5" fill="#1a1a1a"/><circle cx="62" cy="72" r="3.5" fill="#1a1a1a"/><path d="M42 86 C46 89 54 89 58 86" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/></svg>Watching</figure>
+        <figure><svg viewBox="0 0 100 104"><use href="#head"/><path d="M30 66 L44 66" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/><path d="M56 61 Q63 56 70 60" fill="none" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/><path d="M33 72 L43 72" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><circle cx="62" cy="72" r="3.5" fill="#1a1a1a"/><path d="M42 87 L58 85" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/></svg>Suspicious</figure>
+        <figure><svg viewBox="0 0 100 104"><use href="#head"/><path d="M27 60 L44 67" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round"/><path d="M73 60 L56 67" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round"/><circle cx="38" cy="73" r="3.5" fill="#1a1a1a"/><circle cx="62" cy="73" r="3.5" fill="#1a1a1a"/><path d="M38 90 Q50 80 62 90 Q50 96 38 90 Z" fill="#1a1a1a"/></svg>Furious</figure>
+        <figure><svg viewBox="0 0 100 104"><use href="#head"/><path d="M30 62 Q37 58 44 62" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M56 62 Q63 58 70 62" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M33 73 Q38 68 43 73" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M57 73 Q62 68 67 73" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M38 84 Q50 96 62 84 Z" fill="#fff" stroke="#1a1a1a" stroke-width="3"/></svg>Proud</figure>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
