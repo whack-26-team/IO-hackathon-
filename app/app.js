@@ -248,15 +248,36 @@ function fitCamera() {
   if (!sw || !sh || !vw || !vh) return;                    // not ready yet; we'll be called again
   const scale = Math.max(sw / vw, sh / vh);                // "cover": the bigger of the two
   const w = Math.ceil(vw * scale), h = Math.ceil(vh * scale);
+  const key = `${sw}x${sh}:${vw}x${vh}`;
+  if (video.dataset.fit === key) return; // already the right size
+  video.dataset.fit = key;
   Object.assign(video.style, {
     width: `${w}px`, height: `${h}px`,
     left: `${Math.floor((sw - w) / 2)}px`, top: `${Math.floor((sh - h) / 2)}px`,
   });
 }
+// When the phone rotates, the iPhone reports it late and in pieces (screen first, camera
+// picture a moment later). So after anything changes we re-check on EVERY screen refresh
+// for 2 seconds, which catches each size change the moment it happens.
+function fitCameraForAWhile() {
+  fitCamera();
+  const until = performance.now() + 2000;
+  if (fitCameraForAWhile.running) { fitCameraForAWhile.until = until; return; }
+  fitCameraForAWhile.running = true;
+  fitCameraForAWhile.until = until;
+  (function loop() {
+    fitCamera();
+    if (performance.now() < fitCameraForAWhile.until) requestAnimationFrame(loop);
+    else fitCameraForAWhile.running = false;
+  })();
+}
+
 // Re-check whenever anything could change the sizes:
 const camera = $("camera");
-camera.addEventListener("loadedmetadata", fitCamera); // camera told us its size
-camera.addEventListener("resize", fitCamera);         // camera size changed (e.g. phone rotated)
-window.addEventListener("resize", fitCamera);         // screen size changed
-window.addEventListener("orientationchange", () => setTimeout(fitCamera, 300)); // iPhone reports late
-document.addEventListener("visibilitychange", () => { if (!document.hidden) setTimeout(fitCamera, 300); }); // back from another app
+camera.addEventListener("loadedmetadata", fitCameraForAWhile); // camera told us its size
+camera.addEventListener("resize", fitCameraForAWhile);         // camera picture changed shape (rotation)
+window.addEventListener("resize", fitCameraForAWhile);         // screen size changed
+window.addEventListener("orientationchange", fitCameraForAWhile);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) fitCameraForAWhile(); }); // back from another app
+// Watches the cooking screen's own size directly, which doesn't wait for the late events above
+new ResizeObserver(fitCameraForAWhile).observe($("cook-screen"));
