@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Remy · Voice test</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #151913; color: #f3f1e8; }
+    body { max-width: 650px; margin: auto; padding: 24px; }
+    h1 { font-size: 3rem; margin-bottom: 8px; } p { line-height: 1.6; }
+    label { display: block; margin: 18px 0 6px; }
+    input, select, button { font: inherit; padding: 13px; border-radius: 10px; border: 1px solid #59604e; }
+    input, select { width: 100%; box-sizing: border-box; background: #242b20; color: inherit; }
+    button { cursor: pointer; margin: 18px 8px 0 0; background: #d2ef9a; color: #17200d; }
+    button:disabled { opacity: .4; cursor: default; }
+    #status { padding: 16px; background: #293322; border-radius: 12px; }
+    #transcript { padding: 0; list-style: none; }
+    #transcript li { padding: 14px; margin: 8px 0; background: #22291f; border-radius: 10px; white-space: pre-wrap; }
+    small { color: #c2c7b9; } a { color: #d2ef9a; }
+  </style>
+</head>
+<body>
+  <a href="/">← Cooking app</a>
+  <h1>Meet Remy.</h1>
+  <p>A short test of voice, interruptions, and personality. This page sends microphone audio to ElevenLabs. It does not use your camera.</p>
+  <label for="agent">ElevenLabs agent ID</label>
+  <input id="agent" placeholder="agent_…" autocomplete="off" spellcheck="false">
+  <small>Copy the agent ID from ElevenLabs. Never enter an API key. The agent must currently allow public conversations.</small>
+  <label for="recipe">Recipe</label><select id="recipe"><option value="">General cooking chat</option></select>
+  <label for="mode">Personality</label>
+  <select id="mode"><option value="gentle">Gentle</option><option value="honest" selected>Honest</option><option value="savage">Savage — adult, opt-in humour</option></select>
+  <p><small>Calls use your allowance. Each test stops after two minutes, or when you leave this page. Only press Start when ready to speak.</small></p>
+  <button id="start">Start voice test</button><button id="stop" disabled>Stop</button>
+  <p id="status" role="status">Ready. Camera not connected.</p>
+  <p id="timing"></p>
+  <ol id="transcript" aria-live="polite" aria-label="Conversation transcript"></ol>
+  <details><summary>What to try</summary><p>Say “I have eggs, bread and ten minutes.” Interrupt Remy with “Wait, I don’t have butter.” Ask it to be quieter, then ask what it can see. It should be honest that the camera is not connected.</p></details>
+  <script type="module" src="./voice-test.js"></script>
+</body>
+</html>
