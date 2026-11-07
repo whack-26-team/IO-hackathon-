@@ -325,3 +325,24 @@ window.addEventListener("orientationchange", fitCameraForAWhile);
 document.addEventListener("visibilitychange", () => { if (!document.hidden) fitCameraForAWhile(); }); // back from another app
 // Watches the cooking screen's own size directly, which doesn't wait for the late events above
 new ResizeObserver(fitCameraForAWhile).observe($("cook-screen"));
+
+// ---------- ?debug=1: show what the phone reports (for screen-size problems) ----------
+if (new URLSearchParams(location.search).has("debug")) {
+  const probe = Object.assign(document.createElement("div"), { id: "safe-probe" });
+  const box = Object.assign(document.createElement("div"), { id: "debug" });
+  document.body.append(probe, box);
+  const show = () => {
+    const p = getComputedStyle(probe);
+    const bd = document.getElementById("backdrop").getBoundingClientRect();
+    box.textContent = [
+      `window   ${innerWidth} x ${innerHeight}`,
+      `screen   ${screen.width} x ${screen.height}`,
+      `visual   ${Math.round(visualViewport?.width ?? 0)} x ${Math.round(visualViewport?.height ?? 0)}`,
+      `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
+      `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
+      `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
+      `version  v71`,
+    ].join("\n");
+  };
+  show(); addEventListener("resize", show); setInterval(show, 1000);
+}
