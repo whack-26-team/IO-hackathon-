@@ -40,6 +40,7 @@ the events above (minutes → seconds).
 | `GET /api/health` | | `{ ok, openai_key_set, model }` |
 | `GET /api/recipes` | | `[{ id, title, summary, checked_by_human, steps }]` (steps = count) |
 | `GET /api/recipes/{id}` | | full recipe (shape below) |
+| `POST /api/brain` | `{ recipe_id, mode }` | `{ instructions, tools, recipe, mode, max_minutes }`: Remy's brain for **any** voice route, no AI key needed |
 | `POST /api/session` | `{ recipe_id, mode: "gentle" \| "honest" \| "savage" }` | `{ client_secret, expires_at, model, max_minutes, recipe, mode }` · `503` if no OpenAI key |
 
 ## 5. Recipe file shape (`remy-brain/recipes/<id>.json`)

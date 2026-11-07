@@ -25,13 +25,20 @@ should appear over the next ~25 seconds.
 ⚠️ Never put the key anywhere else: not in GitHub, not in chat.
 
 ## 4. Open it on an iPhone
-The iPhone only allows the camera on **https** links:
-```bash
-cloudflared tunnel --url http://localhost:8000
-```
-(Install: https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/)
-It prints a `https://….trycloudflare.com` link. Open that in **Safari** on the iPhone.
-To install it as an app: **Share → Add to Home Screen**.
+The iPhone only allows the camera on **https** links. One command gives you one, with a QR code:
+1. Install **cloudflared** (free, no account): Mac `brew install cloudflared` ·
+   Windows `winget install --id Cloudflare.cloudflared` ·
+   [Linux](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/)
+2. Run:
+   ```bash
+   python tools/share.py
+   ```
+3. It prints a `https://….trycloudflare.com` link and a QR code. Scan it with the iPhone camera, or
+   open the link in **Safari**. To install it as an app: **Share → Add to Home Screen**.
+
+The link changes every restart, so post the new one in the team chat. It only works while your
+laptop is on. (A permanent link comes at C4, issue #5.) Only share it with the team, because
+anyone with the link can use our AI credits.
 
 ## 5. Daily git routine
 ```bash

@@ -6,6 +6,7 @@ What it does:
   * serves the app (the `app/` folder) so the phone opens one link
   * GET  /api/recipes        -> list of recipes
   * GET  /api/recipes/{id}   -> one full recipe
+  * POST /api/brain          -> Remy's instructions + actions for ANY voice route
   * POST /api/session        -> a short-lived pass for the live OpenAI call,
                                 with Remy's instructions already built in
   * GET  /api/health         -> quick "is it running and is the key set?" check
@@ -118,6 +119,25 @@ def get_recipe(recipe_id: str):
 class SessionRequest(BaseModel):
     recipe_id: str
     mode: str = "honest"
+
+
+@app.post("/api/brain")
+def get_brain(req: SessionRequest):
+    """Remy's full instructions + actions for ANY voice route (no AI key needed).
+
+    /api/session is the OpenAI-specific shortcut. Other routes (phone voice + a cheap
+    vision model, Gemini Live, …) call this and pass the result to their own AI.
+    """
+    if req.mode not in MODES:
+        raise HTTPException(400, f"mode must be one of {MODES}")
+    recipe = load_recipe(req.recipe_id)
+    return {
+        "instructions": build_instructions(recipe, req.mode),
+        "tools": load_tools(),
+        "recipe": recipe,
+        "mode": req.mode,
+        "max_minutes": SESSION_MINUTES,
+    }
 
 
 @app.post("/api/session")
