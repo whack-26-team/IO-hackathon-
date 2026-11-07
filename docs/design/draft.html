@@ -80,9 +80,10 @@
   .mode.on { background: var(--butter); box-shadow: 5px 5px 0 var(--ink); transform: translate(-1px, -1px); }
   .mode .age { font-family: "IBM Plex Mono", monospace; font-size: 9px; background: var(--tomato); color: #fff; padding: 2px 5px; border-radius: 4px; margin-left: 4px; vertical-align: 2px; }
   .go { margin-top: auto; background: var(--tomato); color: var(--cream); border: var(--line); border-radius: 16px; box-shadow: 5px 5px 0 var(--ink);
-    font-weight: 800; font-size: 22px; padding: 15px; text-align: center; }
-  .hint { text-align: center; font-size: 13px; font-weight: 700; }
-  .fine { font-family: "IBM Plex Mono", monospace; font-size: 9.5px; color: #666; line-height: 1.4; text-align: center; }
+    font-weight: 800; font-size: 23px; padding: 13px 14px 12px; text-align: center; line-height: 1.1; }
+  .go small { display: block; font-size: 12px; white-space: nowrap; font-weight: 600; opacity: .9; margin-top: 3px; }
+  .fine { font-family: "IBM Plex Mono", monospace; font-size: 10px; color: #6b6b6b; text-align: center; margin-top: 2px; }
+  .fine u { text-decoration-thickness: 1.5px; text-underline-offset: 2px; color: var(--ink); }
 
   /* ---------- 4. alert ---------- */
   .alert .cam { filter: grayscale(1) brightness(.45); }
@@ -122,16 +123,15 @@
     <div class="shot">
       <div class="phone start"><div class="inner">
         <div class="brand"><svg class="face" viewBox="0 0 100 104"><use href="#f-watch"/></svg>
-          <div><h2>REMY</h2><p>Your live AI chef.<br>It watches. It judges. It helps.</p></div></div>
+          <div><h2>REMY</h2><p>Your live AI chef.<br>Watches. Judges. Helps.</p></div></div>
         <div class="pick">Pick Remy's attitude</div>
         <div class="mode"><svg viewBox="0 0 100 104"><use href="#f-proud"/></svg><div><b>Gentle</b><small>Patient teacher. Never mean.</small></div></div>
         <div class="mode on"><svg viewBox="0 0 100 104"><use href="#f-sus"/></svg><div><b>Honest</b><small>Cheeky. Tells it straight.</small></div></div>
         <div class="mode"><svg viewBox="0 0 100 104"><use href="#f-fury"/></svg><div><b>Savage<span class="age">18+</span></b><small>Furious TV-chef. Swears.</small></div></div>
-        <div class="go">Start cooking</div>
-        <div class="hint">Then just tell Remy what you're making 🎤</div>
-        <div class="fine">Nothing is recorded or saved · Use your own judgment<br>with knives, hot oil and meat temperatures</div>
+        <div class="go">Start cooking<small>🎤 then tell Remy what you're making</small></div>
+        <div class="fine">🔒 Nothing is recorded · <u>Safety info ›</u></div>
       </div></div>
-      <div class="label">1 · Start: each attitude has its own Remy face</div>
+      <div class="label">1 · Start: a Remy face per attitude, one clean button</div>
     </div>
 
     <!-- 2. COOKING -->
