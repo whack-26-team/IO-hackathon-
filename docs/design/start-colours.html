@@ -1,0 +1,215 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REMY gentle vs honest colours</title>
+<!-- Start screen for issue #52 (Matthew): greeting (idea 1) + utensil pattern (idea 3) + stacked attitude bars. Not part of the app. -->
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #fff4e0; --paper: #f7f2e8; --ink: #1a1a1a; --tomato: #e8432c; --butter: #ffd166; --mint: #2a9d8f; --skin: #ffd9a8;
+    --steel-1: #d7dadd; --steel-2: #8d9297;
+    --shadow: 4px 4px 0 var(--ink); --line: 3px solid var(--ink);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #e9e4da; color: var(--ink); font-family: "Bricolage Grotesque", system-ui, sans-serif; padding: 28px 16px 40px; }
+  h1 { font-size: 30px; font-weight: 800; margin: 0; }
+  .intro { margin: 2px 0 22px; font-size: 14px; color: #555; }
+  .row { display: flex; gap: 22px; flex-wrap: wrap; }
+  .shot { width: 300px; }
+  .label { font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #666; margin: 10px 2px 0; }
+  .phone { width: 300px; height: 650px; border-radius: 38px; border: 8px solid #111; overflow: hidden; position: relative;
+    box-shadow: 0 14px 30px rgba(0,0,0,.22); background: #000; }
+  .phone > * { position: absolute; z-index: 1; }
+  .cam { inset: 0; z-index: 0; background:
+      radial-gradient(circle at 52% 50%, transparent 0 34%, #262626 34.5% 41%, transparent 41.5%),
+      radial-gradient(circle at 46% 46%, #c98a3d 0 5%, transparent 5.5%),
+      radial-gradient(circle at 58% 53%, #b8742c 0 4.5%, transparent 5%),
+      radial-gradient(circle at 50% 58%, #8a4b1c 0 4%, transparent 4.5%),
+      radial-gradient(circle at 42% 56%, #d9a24f 0 3.5%, transparent 4%),
+      radial-gradient(circle at 60% 44%, #2a170b 0 3.5%, transparent 4%),
+      radial-gradient(circle at 52% 50%, #474745 0 34%, transparent 34.5%),
+      linear-gradient(160deg, #6b6158, #3d3732); }
+
+  /* ---------- shared pieces ---------- */
+  .chip { background: var(--cream); border: 2.5px solid var(--ink); border-radius: 10px; padding: 4px 9px; box-shadow: 3px 3px 0 var(--ink);
+    font-weight: 800; font-size: 12px; white-space: nowrap; }
+  .chip.stop { background: var(--tomato); color: var(--cream); }
+  .chip.live::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); margin-right: 5px; vertical-align: 1px; }
+
+  /* A's ticket rail, restyled to match B (ink outline + hard shadow) */
+  .rail { top: 0; left: 0; right: 0; height: 16px; background: linear-gradient(var(--steel-1), var(--steel-2)); border-bottom: 2.5px solid var(--ink); }
+  .ticket { background: var(--paper); border: 2.5px solid var(--ink); border-top: 0; box-shadow: var(--shadow); padding: 7px 10px 10px; text-align: center;
+    -webkit-mask: linear-gradient(#000 0 0) top/100% calc(100% - 6px) no-repeat, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom/10px 6px repeat-x;
+            mask: linear-gradient(#000 0 0) top/100% calc(100% - 6px) no-repeat, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom/10px 6px repeat-x; }
+  .ticket .k { font-family: "IBM Plex Mono", monospace; font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase; color: #6b6b6b; display: flex; justify-content: space-between; gap: 6px; }
+  .ticket .big { font-weight: 800; font-size: 34px; line-height: 1; margin-top: 3px; font-variant-numeric: tabular-nums; }
+  .ticket .bar { height: 5px; border: 1.5px solid var(--ink); border-radius: 3px; margin-top: 6px; background: linear-gradient(90deg, var(--tomato) var(--p), transparent var(--p)); }
+  .ticket.check { background: var(--butter); }
+  .ticket.check .k { color: var(--ink); }
+  .t1 { top: 16px; right: 12px; width: 112px; transform: rotate(1.5deg); }
+  .t2 { top: 16px; right: 130px; width: 96px; transform: rotate(-2deg); }
+
+  .face { width: 84px; }
+  .speech { left: 12px; right: 12px; background: var(--cream); border: var(--line); border-radius: 18px; padding: 11px 14px 13px;
+    box-shadow: 5px 5px 0 var(--ink); font-weight: 800; font-size: 21px; line-height: 1.12; }
+  .speech::before { content: ""; position: absolute; top: -16px; left: 96px; width: 22px; height: 22px; background: inherit;
+    border-left: var(--line); border-top: var(--line); transform: skewX(-25deg) rotate(20deg); }
+  .speech .who { font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--tomato); display: block; margin-bottom: 4px; }
+  .speech.roast { background: var(--tomato); color: var(--cream); font-size: 24px; transform: rotate(-1.5deg); }
+  .speech.roast .who { color: var(--butter); }
+  .steps { left: 12px; right: 12px; bottom: 14px; background: var(--ink); color: var(--cream); border-radius: 14px; padding: 9px 12px; font-size: 13px; line-height: 1.3; }
+  .steps b { color: var(--butter); margin-right: 6px; }
+  .steps .tag { float: right; font-family: "IBM Plex Mono", monospace; font-size: 9px; letter-spacing: 1px; background: var(--mint); color: #fff; padding: 2px 6px; border-radius: 5px; margin-left: 6px; }
+
+  /* ---------- 1. start screen ---------- */
+  .start { background: var(--cream); }
+  .start .inner { inset: 0; padding: 30px 18px 18px; display: flex; flex-direction: column; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand .face { width: 76px; }
+  .brand h2 { margin: 0; font-size: 50px; font-weight: 800; line-height: .9; letter-spacing: -1px; }
+  .brand p { margin: 4px 0 0; font-size: 13px; color: #555; line-height: 1.25; }
+  .pick { font-weight: 800; font-size: 15px; margin-top: 4px; }
+  .mode { display: flex; align-items: center; gap: 10px; background: #fff; border: 2.5px solid var(--ink); border-radius: 14px; padding: 6px 10px;
+    box-shadow: 3px 3px 0 var(--ink); }
+  .mode svg { width: 46px; flex: none; }
+  .mode b { font-size: 17px; display: block; }
+  .mode small { font-size: 12px; color: #555; }
+  .mode.on { background: var(--butter); box-shadow: 5px 5px 0 var(--ink); transform: translate(-1px, -1px); }
+  .mode .age { font-family: "IBM Plex Mono", monospace; font-size: 9px; background: var(--tomato); color: #fff; padding: 2px 5px; border-radius: 4px; margin-left: 4px; vertical-align: 2px; }
+  .go { margin-top: auto; background: var(--tomato); color: var(--cream); border: var(--line); border-radius: 16px; box-shadow: 5px 5px 0 var(--ink);
+    font-weight: 800; font-size: 23px; padding: 13px 14px 12px; text-align: center; line-height: 1.1; }
+  .go small { display: block; font-size: 12px; white-space: nowrap; font-weight: 600; opacity: .9; margin-top: 3px; }
+  .fine { font-family: "IBM Plex Mono", monospace; font-size: 10px; color: #6b6b6b; text-align: center; margin-top: 2px; }
+  .fine u { text-decoration-thickness: 1.5px; text-underline-offset: 2px; color: var(--ink); }
+
+  /* ---------- 4. alert ---------- */
+  .alert .cam { filter: grayscale(1) brightness(.45); }
+  .alert-card { top: 150px; left: 18px; right: 18px; background: var(--tomato); color: var(--cream); border: 4px solid var(--ink); border-radius: 22px;
+    box-shadow: 7px 7px 0 var(--ink); padding: 16px 16px 18px; text-align: center; }
+  .alert-card .face { width: 92px; margin: -64px auto 4px; display: block; }
+  .alert-card h3 { margin: 0; font-size: 40px; line-height: .95; font-weight: 800; text-transform: uppercase; }
+  .alert-card p { margin: 8px 0 0; font-size: 16px; font-weight: 700; }
+  .alert-card .do { margin-top: 12px; background: var(--cream); color: var(--ink); border: 3px solid var(--ink); border-radius: 12px; padding: 8px; font-size: 13px; font-weight: 700; }
+
+  .start .inner { gap: 10px; }
+  .go.only { font-size: 25px; padding: 17px; margin-top: 18px; }  /* small gap under the attitudes */
+  .fs .fine { margin-top: auto; }  /* footer stays at the bottom */
+  .fine { margin-top: 0; }
+  /* 1: Remy greets you */
+  .hero { display: flex; flex-direction: column; align-items: center; gap: 4px; margin: 2px 0 6px; }
+  .hero .bubble { background: #fff; border: 3px solid var(--ink); border-radius: 16px; box-shadow: 4px 4px 0 var(--ink);
+    padding: 9px 13px; font-weight: 800; font-size: 17px; line-height: 1.15; text-align: center; position: relative; max-width: 240px; }
+  .hero .bubble::after { content: ""; position: absolute; bottom: -12px; left: 50%; width: 18px; height: 18px; background: #fff;
+    border-right: 3px solid var(--ink); border-bottom: 3px solid var(--ink); transform: translateX(-50%) rotate(45deg); }
+  .hero svg { width: 118px; margin-top: 6px; }
+  .wordmark { font-weight: 800; font-size: 34px; letter-spacing: -1px; line-height: 1; text-align: center; }
+  .wordmark small { display: block; font-size: 12px; letter-spacing: 0; font-weight: 600; color: #666; margin-top: 2px; }
+  .modes-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .m { background: #fff; border: 2.5px solid var(--ink); border-radius: 14px; box-shadow: 3px 3px 0 var(--ink); padding: 6px 4px 7px; text-align: center; }
+  .m svg { width: 40px; display: block; margin: 0 auto 2px; }
+  .m b { font-size: 14px; display: block; }
+  .m small { font-size: 10px; color: #555; }
+  .m.on { background: var(--butter); box-shadow: 5px 5px 0 var(--ink); transform: translate(-1px,-1px); }
+  .m.on.sav { background: var(--tomato); color: var(--cream); }
+  .m.on.sav small { color: var(--cream); }
+  .m .age { font-family: "IBM Plex Mono", monospace; font-size: 8px; background: var(--tomato); color: #fff; padding: 1px 4px; border-radius: 3px; }
+  .m.on.sav .age { background: var(--ink); }
+  .start.savage { background: #2a1714; color: var(--cream); }
+  .start.savage .wordmark small, .start.savage .fine { color: #c9b8a6; }
+  .start.savage .fine u { color: var(--cream); }
+  .start.savage .bubble { background: var(--tomato); color: var(--cream); transform: rotate(-2deg); }
+  .start.savage .bubble::after { background: var(--tomato); }
+  .start.savage .go { background: var(--butter); color: var(--ink); }
+  .start.savage .m:not(.on) { color: var(--ink); }
+  /* 2: tonight's tickets */
+  .start .rail2 { position: absolute; top: 0; left: 0; right: 0; height: 16px; background: linear-gradient(var(--steel-1), var(--steel-2)); border-bottom: 2.5px solid var(--ink); z-index: 2; }
+  .tix { display: flex; gap: 7px; justify-content: center; margin: -14px -6px 4px; }
+  .tk { background: var(--paper); border: 2.5px solid var(--ink); border-top: 0; box-shadow: 3px 3px 0 var(--ink); padding: 18px 6px 9px; text-align: center; width: 60px;
+    -webkit-mask: linear-gradient(#000 0 0) top/100% calc(100% - 5px) no-repeat, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom/9px 5px repeat-x;
+            mask: linear-gradient(#000 0 0) top/100% calc(100% - 5px) no-repeat, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom/9px 5px repeat-x; }
+  .tk:nth-child(1) { transform: rotate(-3deg); } .tk:nth-child(2) { transform: rotate(2deg); margin-top: 6px; } .tk:nth-child(3) { transform: rotate(-1deg); } .tk:nth-child(4) { transform: rotate(3deg); margin-top: 4px; background: var(--butter); }
+  .tk span { font-size: 22px; display: block; }
+  .tk b { font-family: "IBM Plex Mono", monospace; font-size: 8.5px; letter-spacing: .5px; text-transform: uppercase; }
+  .brand.small h2 { font-size: 42px; }
+  .brand.small .face { width: 62px; }
+  /* 3: how it works */
+  .start.pattern { background-color: var(--cream);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90' fill='none' stroke='%231a1a1a' stroke-opacity='.07' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M12 8v22M8 8v8a4 4 0 0 0 8 0V8M12 30v14'/%3E%3Cpath d='M58 10c6 0 8 8 8 14s-3 8-8 8V48'/%3E%3Ccircle cx='30' cy='66' r='12'/%3E%3Cpath d='M42 66h14'/%3E%3Cpath d='M70 60l12 12M76 56c4 4 4 8 0 12'/%3E%3C/svg%3E"); }
+  .how { display: flex; gap: 6px; justify-content: space-between; margin: 2px 0 4px; }
+  .how div { flex: 1; background: #fff; border: 2.5px solid var(--ink); border-radius: 12px; box-shadow: 3px 3px 0 var(--ink); padding: 7px 4px; text-align: center; font-weight: 800; font-size: 12px; }
+  .how div:nth-child(1) { transform: rotate(-2deg); } .how div:nth-child(3) { transform: rotate(2deg); }
+  .how span { font-size: 22px; display: block; margin-bottom: 1px; }
+  .mode.compact { padding: 4px 10px; } .mode.compact svg { width: 38px; } .mode.compact b { font-size: 15px; } .mode.compact small { font-size: 11px; }
+
+  .fs { background-color: var(--cream); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90' fill='none' stroke='%231a1a1a' stroke-opacity='.07' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M12 8v22M8 8v8a4 4 0 0 0 8 0V8M12 30v14'/%3E%3Cpath d='M58 10c6 0 8 8 8 14s-3 8-8 8V48'/%3E%3Ccircle cx='30' cy='66' r='12'/%3E%3Cpath d='M42 66h14'/%3E%3Cpath d='M70 60l12 12M76 56c4 4 4 8 0 12'/%3E%3C/svg%3E"); }
+  .fs.savage { background-color: #2a1714; color: var(--cream); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90' fill='none' stroke='%23fff4e0' stroke-opacity='.07' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M12 8v22M8 8v8a4 4 0 0 0 8 0V8M12 30v14'/%3E%3Cpath d='M58 10c6 0 8 8 8 14s-3 8-8 8V48'/%3E%3Ccircle cx='30' cy='66' r='12'/%3E%3Cpath d='M42 66h14'/%3E%3Cpath d='M70 60l12 12M76 56c4 4 4 8 0 12'/%3E%3C/svg%3E"); }
+  .fs .inner { gap: 9px; padding-top: 26px; }
+  .fs .wordmark { font-size: 30px; }
+  .fs .hero { margin: 0 0 2px; height: 172px; justify-content: flex-start; }  /* fixed: bars never move between attitudes */
+  .fs .hero svg { width: 96px; margin-top: 4px; }
+  .fs.savage .hero svg { width: 150px; margin-top: -6px; }  /* wider drawing (steam), same head size */
+  .fs.gentle .hero svg { width: 100px; }
+  .fs .hero .bubble { font-size: 16px; padding: 8px 12px; min-height: 62px; width: 240px; display: flex; align-items: center; justify-content: center; }
+  /* fixed size: nothing jumps when you switch attitude */
+  .bars { display: flex; flex-direction: column; gap: 8px; }
+  .bars .mode { padding: 5px 10px; gap: 10px; }
+  .bars .mode svg { width: 40px; }
+  .bars .mode b { font-size: 16px; }
+  .bars .mode small { font-size: 11.5px; }
+  .bars .mode .tick { margin-left: auto; width: 22px; height: 22px; border-radius: 50%; border: 2.5px solid var(--ink); background: #fff; flex: none; }
+  .bars .mode.on .tick { background: var(--ink); box-shadow: inset 0 0 0 4px var(--butter); }
+  /* per-mode theme */
+  .fs.gentle .mode.on { background: #bfe6dc; }
+  .fs.gentle .mode.on .tick { box-shadow: inset 0 0 0 4px #bfe6dc; }
+  .fs.gentle .bubble { background: #bfe6dc; } .fs.gentle .bubble::after { background: #bfe6dc; }
+  .fs.savage .wordmark small, .fs.savage .fine { color: #c9b8a6; } .fs.savage .fine u { color: var(--cream); }
+  .fs.savage .mode:not(.on) { color: var(--ink); }
+  .fs.savage .mode.on { background: var(--tomato); color: var(--cream); } .fs.savage .mode.on small { color: var(--cream); }
+  .fs.savage .mode.on .tick { background: var(--cream); box-shadow: inset 0 0 0 4px var(--tomato); }
+  .fs.savage .mode.on .age { background: var(--ink); }
+  .fs.savage .bubble { background: var(--tomato); color: var(--cream); transform: rotate(-2deg); } .fs.savage .bubble::after { background: var(--tomato); }
+  .fs.savage .go { background: var(--butter); color: var(--ink); }
+</style><style>
+  .opts { display: flex; flex-wrap: wrap; gap: 26px 34px; }
+  .opt h3 { margin: 0 0 2px; font-size: 18px; } .opt p { margin: 0 0 10px; font-size: 12.5px; color: #555; }
+  .pair { display: flex; gap: 14px; } .pair .label { margin-top: 6px; }
+  .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; border: 1.5px solid #1a1a1a; vertical-align: -1px; margin-right: 4px; }
+  /* option 1: soft mint page */
+  .fs.gentle.g-mint { background-color: #e8f6f1; }
+  /* option 2: soft sky page */
+  .fs.gentle.g-sky { background-color: #eaf3fb; }
+  .fs.gentle.g-sky .bubble, .fs.gentle.g-sky .bubble::after, .fs.gentle.g-sky .mode.on { background: #c9e2f6; }
+  .fs.gentle.g-sky .mode.on .tick { box-shadow: inset 0 0 0 4px #c9e2f6; }
+  /* option 3: soft lavender page */
+  .fs.gentle.g-lav { background-color: #f1edfa; }
+  .fs.gentle.g-lav .bubble, .fs.gentle.g-lav .bubble::after, .fs.gentle.g-lav .mode.on { background: #ddd3f5; }
+  .fs.gentle.g-lav .mode.on .tick { box-shadow: inset 0 0 0 4px #ddd3f5; }
+  /* option 4: Honest on a butter page */
+  .fs.honest.h-butter { background-color: #ffe9a8; }
+  .fs.honest.h-butter .mode.on { background: #ffc94a; } .fs.honest.h-butter .mode.on .tick { box-shadow: inset 0 0 0 4px #ffc94a; }
+</style></head><body><svg width="0" height="0" style="position:absolute">
+    <defs>
+      <g id="head">
+        <path d="M24 44 C16 44 12 36 18 30 C16 20 28 14 36 20 C40 10 60 10 64 20 C72 14 84 20 82 30 C88 36 84 44 76 44 Z" fill="#fff" stroke="#1a1a1a" stroke-width="3.5" stroke-linejoin="round"/>
+        <rect x="24" y="40" width="52" height="10" rx="2" fill="#e8432c" stroke="#1a1a1a" stroke-width="3.5"/>
+        <path d="M20 58 C20 48 30 48 50 48 C70 48 80 48 80 58 L80 70 C80 88 66 98 50 98 C34 98 20 88 20 70 Z" fill="#ffd9a8" stroke="#1a1a1a" stroke-width="3.5"/>
+        <path d="M44 77 C46 81 54 81 56 77" fill="none" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="30" cy="80" r="4" fill="#f5a37a" opacity=".7"/><circle cx="70" cy="80" r="4" fill="#f5a37a" opacity=".7"/>
+      </g>
+      <g id="f-watch"><use href="#head"/><path d="M30 63 Q37 59 44 63" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M56 63 Q63 59 70 63" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><circle cx="38" cy="71" r="3.5" fill="#1a1a1a"/><circle cx="62" cy="71" r="3.5" fill="#1a1a1a"/><path d="M42 87 C46 90 54 90 58 87" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/></g>
+      <g id="f-sus"><use href="#head"/><path d="M30 66 L44 66" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/><path d="M56 61 Q63 56 70 60" fill="none" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/><path d="M33 72 L43 72" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><circle cx="62" cy="72" r="3.5" fill="#1a1a1a"/><path d="M42 88 L58 86" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/></g>
+      <g id="f-fury"><use href="#head"/><path d="M27 60 L44 67" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round"/><path d="M73 60 L56 67" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round"/><circle cx="38" cy="73" r="3.5" fill="#1a1a1a"/><circle cx="62" cy="73" r="3.5" fill="#1a1a1a"/><path d="M38 90 Q50 80 62 90 Q50 96 38 90 Z" fill="#1a1a1a"/></g>
+      <g id="f-proud"><use href="#head"/><path d="M30 62 Q37 58 44 62" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M56 62 Q63 58 70 62" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M33 73 Q38 68 43 73" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M57 73 Q62 68 67 73" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M38 84 Q50 96 62 84 Z" fill="#fff" stroke="#1a1a1a" stroke-width="3"/></g>
+
+      <!-- accessories: a halo for Gentle, steam from the ears for Savage -->
+      <g id="acc-halo"><ellipse cx="50" cy="2" rx="26" ry="7" fill="none" stroke="#1a1a1a" stroke-width="7"/><ellipse cx="50" cy="2" rx="26" ry="7" fill="none" stroke="#ffd166" stroke-width="3.5"/></g>
+      <g id="acc-steam">
+        <!-- cartoon steam: puffs grow as they blow out of each ear, plus little speed lines -->
+        <g fill="#1a1a1a" stroke="#1a1a1a" stroke-width="7"><circle cx="17" cy="73" r="4.5"/><circle cx="9" cy="64" r="6"/><circle cx="13" cy="59" r="5"/><circle cx="-2" cy="50" r="8"/><circle cx="-10" cy="43" r="7.5"/><circle cx="2" cy="40" r="7"/><circle cx="-6" cy="33" r="6"/></g><g fill="#fff"><circle cx="17" cy="73" r="4.5"/><circle cx="9" cy="64" r="6"/><circle cx="13" cy="59" r="5"/><circle cx="-2" cy="50" r="8"/><circle cx="-10" cy="43" r="7.5"/><circle cx="2" cy="40" r="7"/><circle cx="-6" cy="33" r="6"/></g><g fill="#1a1a1a" stroke="#1a1a1a" stroke-width="7"><circle cx="83" cy="73" r="4.5"/><circle cx="91" cy="64" r="6"/><circle cx="87" cy="59" r="5"/><circle cx="102" cy="50" r="8"/><circle cx="110" cy="43" r="7.5"/><circle cx="98" cy="40" r="7"/><circle cx="106" cy="33" r="6"/></g><g fill="#fff"><circle cx="83" cy="73" r="4.5"/><circle cx="91" cy="64" r="6"/><circle cx="87" cy="59" r="5"/><circle cx="102" cy="50" r="8"/><circle cx="110" cy="43" r="7.5"/><circle cx="98" cy="40" r="7"/><circle cx="106" cy="33" r="6"/></g>
+        <g stroke="#1a1a1a" stroke-width="3" stroke-linecap="round" fill="none"><path d="M-16 56 L-22 58"/><path d="M-18 46 L-25 46"/><path d="M116 56 L122 58"/><path d="M118 46 L125 46"/></g>
+      </g>
+      <g id="acc-flush"><!-- angry red flush over the face --><path d="M22 60 C22 52 32 52 50 52 C68 52 78 52 78 60 L78 70 C78 86 65 96 50 96 C35 96 22 86 22 70 Z" fill="#e8432c" opacity=".28"/></g>
+      <g id="f-gentle"><use href="#f-proud"/><use href="#acc-halo"/></g>
+      <g id="f-savage"><use href="#acc-steam"/><use href="#f-fury"/></g>
+      <!-- alarmed: no comedy, wide eyes, flat mouth (safety alerts only) -->
+      <g id="f-alarm"><use href="#head"/><path d="M29 59 Q37 55 45 60" fill="none" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/><path d="M55 60 Q63 55 71 59" fill="none" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/><circle cx="38" cy="71" r="5.5" fill="#fff" stroke="#1a1a1a" stroke-width="3"/><circle cx="62" cy="71" r="5.5" fill="#fff" stroke="#1a1a1a" stroke-width="3"/><circle cx="38" cy="71" r="2.2" fill="#1a1a1a"/><circle cx="62" cy="71" r="2.2" fill="#1a1a1a"/><ellipse cx="50" cy="89" rx="6" ry="4.5" fill="#1a1a1a"/></g>
+    </defs>
+  </svg><h1>REMY: Gentle vs Honest colours</h1><p class="intro">Four ways to make Gentle and Honest clearly different. Savage stays dark.</p><div class="opts"><div class="opt"><h3><span class="swatch" style="background:#e8f6f1"></span>1 · Gentle: soft mint</h3><p>Pale mint page: calm and fresh. Honest stays cream.</p><div class="pair"><div class="shot"><div class="phone start fs gentle g-mint"><div class="inner"><div class="wordmark">REMY<small>your live AI chef</small></div><div class="hero"><div class="bubble">Take your time, chef. I've got you.</div><svg viewBox="-4 -12 108 116"><use href="#f-gentle"/></svg></div><div class="pick">Pick Remy's attitude</div><div class="bars"><div class="mode on"><svg viewBox="-4 -12 108 116"><use href="#f-gentle"/></svg><div><b>Gentle</b><small>Patient. Never mean.</small></div><span class="tick"></span></div><div class="mode"><svg viewBox="0 0 100 104"><use href="#f-sus"/></svg><div><b>Honest</b><small>Cheeky. Tells it straight.</small></div><span class="tick"></span></div><div class="mode"><svg viewBox="-28 -12 156 116"><use href="#f-savage"/></svg><div><b>Savage<span class="age">18+</span></b><small>Furious TV-chef. Swears.</small></div><span class="tick"></span></div></div><div class="go only">Start cooking</div><div class="fine">🔒 Nothing is recorded · <u>Safety info ›</u></div></div></div><div class="label">Gentle</div></div><div class="shot"><div class="phone start fs honest "><div class="inner"><div class="wordmark">REMY<small>your live AI chef</small></div><div class="hero"><div class="bubble">Evening, chef. What are we making tonight?</div><svg viewBox="0 0 100 104"><use href="#f-sus"/></svg></div><div class="pick">Pick Remy's attitude</div><div class="bars"><div class="mode"><svg viewBox="-4 -12 108 116"><use href="#f-gentle"/></svg><div><b>Gentle</b><small>Patient. Never mean.</small></div><span class="tick"></span></div><div class="mode on"><svg viewBox="0 0 100 104"><use href="#f-sus"/></svg><div><b>Honest</b><small>Cheeky. Tells it straight.</small></div><span class="tick"></span></div><div class="mode"><svg viewBox="-28 -12 156 116"><use href="#f-savage"/></svg><div><b>Savage<span class="age">18+</span></b><small>Furious TV-chef. Swears.</small></div><span class="tick"></span></div></div><div class="go only">Start cooking</div><div class="fine">🔒 Nothing is recorded · <u>Safety info ›</u></div></div></div><div class="label">Honest</div></div></div></div><div class="opt"><h3><span class="swatch" style="background:#eaf3fb"></span>2 · Gentle: soft sky blue</h3><p>Pale sky page: dreamy and angelic, goes with the halo. Honest stays cream.</p><div class="pair"><div class="shot"><div class="phone start fs gentle g-sky"><div class="inner"><div class="wordmark">REMY<small>your live AI chef</small></div><div class="hero"><div class="bubble">Take your time, chef. I've got you.</div><svg viewBox="-4 -12 108 116"><use href="#f-gentle"/></svg></div><div class="pick">Pick Remy's attitude</div><div class="bars"><div class="mode on"><svg viewBox="-4 -12 108 116"><use href="#f-gentle"/></svg><div><b>Gentle</b><small>Patient. Never mean.</small></div><span class="tick"></span></div><div class="mode"><svg viewBox="0 0 100 104"><use href="#f-sus"/></svg><div><b>Honest</b><small>Cheeky. Tells it straight.</small></div><span class="tick"></span></div><div class="mode"><svg viewBox="-28 -12 156 116"><use href="#f-savage"/></svg><div><b>Savage<span class="age">18+</span></b><small>Furious TV-chef. Swears.</small></div><span class="tick"></span></div></div><div class="go only">Start cooking</div><div class="fine">🔒 Nothing is recorded · <u>Safety info ›</u></div></div></div><div class="label">Gentle</div></div><div class="shot"><div class="phone start fs honest "><div class="inner"><div class="wordmark">REMY<small>your live AI chef</small></div><div class="hero"><div class="bubble">Evening, chef. What are we making tonight?</div><svg viewBox="0 0 100 104"><use href="#f-sus"/></svg></div><div class="pick">Pick Remy's attitude</div><div class="bars"><div class="mode"><svg viewBox="-4 -12 108 116"><use href="#f-gentle"/></svg><div><b>Gentle</b><small>Patient. Never mean.</small></div><span class="tick"></span></div><div class="mode on"><svg viewBox="0 0 100 104"><use href="#f-sus"/></svg><div><b>Honest</b><small>Cheeky. Tells it straight.</small></div><span class="tick"></span></div><div class="mode"><svg viewBox="-28 -12 156 116"><use href="#f-savage"/></svg><div><b>Savage<span class="age">18+</span></b><small>Furious TV-chef. Swears.</small></div><span class="tick"></span></div></div><div class="go only">Start cooking</div><div class="fine">🔒 Nothing is recorded · <u>Safety info ›</u></div></div></div><div class="label">Honest</div></div></div></div><div class="opt"><h3><span class="swatch" style="background:#f1edfa"></span>3 · Gentle: soft lavender</h3><p>Pale lavender page: the most different from cream. Honest stays cream.</p><div class="pair"><div class="shot"><div class="phone start fs gentle g-lav"><div class="inner"><div class="wordmark">REMY<small>your live AI chef</small></div><div class="hero"><div class="bubble">Take your time, chef. I've got you.</div><svg viewBox="-4 -12 108 116"><use href="#f-gentle"/></svg></div><div class="pick">Pick Remy's attitude</div><div class="bars"><div class="mode on"><svg viewBox="-4 -12 108 116"><use href="#f-gentle"/></svg><div><b>Gentle</b><small>Patient. Never mean.</small></div><span class="tick"></span></div><div class="mode"><svg viewBox="0 0 100 104"><use href="#f-sus"/></svg><div><b>Honest</b><small>Cheeky. Tells it straight.</small></div><span class="tick"></span></div><div class="mode"><svg viewBox="-28 -12 156 116"><use href="#f-savage"/></svg><div><b>Savage<span class="age">18+</span></b><small>Furious TV-chef. Swears.</small></div><span class="tick"></span></div></div><div class="go only">Start cooking</div><div class="fine">🔒 Nothing is recorded · <u>Safety info ›</u></div></div></div><div class="label">Gentle</div></div><div class="shot"><div class="phone start fs honest "><div class="inner"><div class="wordmark">REMY<small>your live AI chef</small></div><div class="hero"><div class="bubble">Evening, chef. What are we making tonight?</div><svg viewBox="0 0 100 104"><use href="#f-sus"/></svg></div><div class="pick">Pick Remy's attitude</div><div class="bars"><div class="mode"><svg viewBox="-4 -12 108 116"><use href="#f-gentle"/></svg><div><b>Gentle</b><small>Patient. Never mean.</small></div><span class="tick"></span></div><div class="mode on"><svg viewBox="0 0 100 104"><use href="#f-sus"/></svg><div><b>Honest</b><small>Cheeky. Tells it straight.</small></div><span class="tick"></span></div><div class="mode"><svg viewBox="-28 -12 156 116"><use href="#f-savage"/></svg><div><b>Savage<span class="age">18+</span></b><small>Furious TV-chef. Swears.</small></div><span class="tick"></span></div></div><div class="go only">Start cooking</div><div class="fine">🔒 Nothing is recorded · <u>Safety info ›</u></div></div></div><div class="label">Honest</div></div></div></div><div class="opt"><h3><span class="swatch" style="background:#ffe9a8"></span>4 · Honest: butter yellow</h3><p>Gentle keeps cream with its mint accents, and Honest's page turns warm butter.</p><div class="pair"><div class="shot"><div class="phone start fs gentle "><div class="inner"><div class="wordmark">REMY<small>your live AI chef</small></div><div class="hero"><div class="bubble">Take your time, chef. I've got you.</div><svg viewBox="-4 -12 108 116"><use href="#f-gentle"/></svg></div><div class="pick">Pick Remy's attitude</div><div class="bars"><div class="mode on"><svg viewBox="-4 -12 108 116"><use href="#f-gentle"/></svg><div><b>Gentle</b><small>Patient. Never mean.</small></div><span class="tick"></span></div><div class="mode"><svg viewBox="0 0 100 104"><use href="#f-sus"/></svg><div><b>Honest</b><small>Cheeky. Tells it straight.</small></div><span class="tick"></span></div><div class="mode"><svg viewBox="-28 -12 156 116"><use href="#f-savage"/></svg><div><b>Savage<span class="age">18+</span></b><small>Furious TV-chef. Swears.</small></div><span class="tick"></span></div></div><div class="go only">Start cooking</div><div class="fine">🔒 Nothing is recorded · <u>Safety info ›</u></div></div></div><div class="label">Gentle</div></div><div class="shot"><div class="phone start fs honest h-butter"><div class="inner"><div class="wordmark">REMY<small>your live AI chef</small></div><div class="hero"><div class="bubble">Evening, chef. What are we making tonight?</div><svg viewBox="0 0 100 104"><use href="#f-sus"/></svg></div><div class="pick">Pick Remy's attitude</div><div class="bars"><div class="mode"><svg viewBox="-4 -12 108 116"><use href="#f-gentle"/></svg><div><b>Gentle</b><small>Patient. Never mean.</small></div><span class="tick"></span></div><div class="mode on"><svg viewBox="0 0 100 104"><use href="#f-sus"/></svg><div><b>Honest</b><small>Cheeky. Tells it straight.</small></div><span class="tick"></span></div><div class="mode"><svg viewBox="-28 -12 156 116"><use href="#f-savage"/></svg><div><b>Savage<span class="age">18+</span></b><small>Furious TV-chef. Swears.</small></div><span class="tick"></span></div></div><div class="go only">Start cooking</div><div class="fine">🔒 Nothing is recorded · <u>Safety info ›</u></div></div></div><div class="label">Honest</div></div></div></div></div></body></html>

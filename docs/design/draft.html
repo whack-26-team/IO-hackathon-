@@ -113,16 +113,12 @@
 
       <!-- accessories: a halo for Gentle, steam from the ears for Savage -->
       <g id="acc-halo"><ellipse cx="50" cy="2" rx="26" ry="7" fill="none" stroke="#1a1a1a" stroke-width="7"/><ellipse cx="50" cy="2" rx="26" ry="7" fill="none" stroke="#ffd166" stroke-width="3.5"/></g>
-      <g id="acc-steam" stroke="#1a1a1a" stroke-linecap="round" stroke-linejoin="round">
-        <!-- left ear: wavy jet + puffs blowing up and out -->
-        <path d="M18 74 C12 72 12 66 6 64 C0 62 0 56 -4 54" fill="none" stroke-width="3"/>
-        <path d="M-2 56 C-10 56 -12 48 -6 45 C-8 38 0 34 4 39 C6 33 14 34 13 41 C19 42 18 51 11 51 C10 56 4 58 -2 56 Z" fill="#fff" stroke-width="3"/>
-        <path d="M-12 34 C-16 32 -15 26 -11 26 C-10 22 -4 22 -4 27 C0 28 -1 34 -5 34 Z" fill="#fff" stroke-width="2.5"/>
-        <!-- right ear -->
-        <path d="M82 74 C88 72 88 66 94 64 C100 62 100 56 104 54" fill="none" stroke-width="3"/>
-        <path d="M102 56 C110 56 112 48 106 45 C108 38 100 34 96 39 C94 33 86 34 87 41 C81 42 82 51 89 51 C90 56 96 58 102 56 Z" fill="#fff" stroke-width="3"/>
-        <path d="M112 34 C116 32 115 26 111 26 C110 22 104 22 104 27 C100 28 101 34 105 34 Z" fill="#fff" stroke-width="2.5"/>
+      <g id="acc-steam">
+        <!-- cartoon steam: puffs grow as they blow out of each ear, plus little speed lines -->
+        <g fill="#1a1a1a" stroke="#1a1a1a" stroke-width="7"><circle cx="17" cy="73" r="4.5"/><circle cx="9" cy="64" r="6"/><circle cx="13" cy="59" r="5"/><circle cx="-2" cy="50" r="8"/><circle cx="-10" cy="43" r="7.5"/><circle cx="2" cy="40" r="7"/><circle cx="-6" cy="33" r="6"/></g><g fill="#fff"><circle cx="17" cy="73" r="4.5"/><circle cx="9" cy="64" r="6"/><circle cx="13" cy="59" r="5"/><circle cx="-2" cy="50" r="8"/><circle cx="-10" cy="43" r="7.5"/><circle cx="2" cy="40" r="7"/><circle cx="-6" cy="33" r="6"/></g><g fill="#1a1a1a" stroke="#1a1a1a" stroke-width="7"><circle cx="83" cy="73" r="4.5"/><circle cx="91" cy="64" r="6"/><circle cx="87" cy="59" r="5"/><circle cx="102" cy="50" r="8"/><circle cx="110" cy="43" r="7.5"/><circle cx="98" cy="40" r="7"/><circle cx="106" cy="33" r="6"/></g><g fill="#fff"><circle cx="83" cy="73" r="4.5"/><circle cx="91" cy="64" r="6"/><circle cx="87" cy="59" r="5"/><circle cx="102" cy="50" r="8"/><circle cx="110" cy="43" r="7.5"/><circle cx="98" cy="40" r="7"/><circle cx="106" cy="33" r="6"/></g>
+        <g stroke="#1a1a1a" stroke-width="3" stroke-linecap="round" fill="none"><path d="M-16 56 L-22 58"/><path d="M-18 46 L-25 46"/><path d="M116 56 L122 58"/><path d="M118 46 L125 46"/></g>
       </g>
+      <g id="acc-flush"><!-- angry red flush over the face --><path d="M22 60 C22 52 32 52 50 52 C68 52 78 52 78 60 L78 70 C78 86 65 96 50 96 C35 96 22 86 22 70 Z" fill="#e8432c" opacity=".28"/></g>
       <g id="f-gentle"><use href="#f-proud"/><use href="#acc-halo"/></g>
       <g id="f-savage"><use href="#acc-steam"/><use href="#f-fury"/></g>
       <!-- alarmed: no comedy, wide eyes, flat mouth (safety alerts only) -->
@@ -142,7 +138,7 @@
         <div class="pick">Pick Remy's attitude</div>
         <div class="mode"><svg viewBox="-4 -12 108 116"><use href="#f-gentle"/></svg><div><b>Gentle</b><small>Patient teacher. Never mean.</small></div></div>
         <div class="mode on"><svg viewBox="0 0 100 104"><use href="#f-sus"/></svg><div><b>Honest</b><small>Cheeky. Tells it straight.</small></div></div>
-        <div class="mode"><svg viewBox="-18 -12 136 116"><use href="#f-savage"/></svg><div><b>Savage<span class="age">18+</span></b><small>Furious TV-chef. Swears.</small></div></div>
+        <div class="mode"><svg viewBox="-28 -12 156 116"><use href="#f-savage"/></svg><div><b>Savage<span class="age">18+</span></b><small>Furious TV-chef. Swears.</small></div></div>
         <div class="go">Start cooking<small>🎤 then tell Remy what you're making</small></div>
         <div class="fine">🔒 Nothing is recorded · <u>Safety info ›</u></div>
       </div></div>
@@ -170,7 +166,7 @@
         <div class="rail"></div>
         <div class="ticket t2 check"><div class="k"><span>#02</span><span>Garlic</span></div><div class="big">0:04</div><div class="bar" style="--p:96%"></div></div>
         <div class="ticket t1"><div class="k"><span>#01</span><span>Rigatoni</span></div><div class="big">8:01</div><div class="bar" style="--p:27%"></div></div>
-        <svg class="face" style="bottom:202px;left:14px;width:92px;transform:rotate(-8deg);z-index:2" viewBox="-18 -12 136 116"><use href="#f-savage"/></svg>
+        <svg class="face" style="bottom:202px;left:14px;width:92px;transform:rotate(-8deg);z-index:2" viewBox="-28 -12 156 116"><use href="#f-savage"/></svg>
         <div style="top:130px;left:12px;display:flex;gap:6px"><span class="chip live">Remy speaking</span></div>
         <div class="chip stop" style="top:130px;right:12px">Stop</div>
         <div class="speech roast" style="bottom:86px"><span class="who">Remy · level 2</span>That garlic is officially charcoal. Bin it, chef.</div>
