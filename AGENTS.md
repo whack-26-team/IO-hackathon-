@@ -16,7 +16,7 @@ guides the recipe, and has personality modes (Gentle / Honest / Savage).
 | `app/` (except `app/remy/`, `app/demo/`, `app/extras/`) | **Matthew** (Claude Code), taken over from Felix |
 | `app/demo/` (demo mode), `app/extras/` (mode switch, setup guide), `docs/pitch/` (slides) | **Felix** (Claude Code) |
 | `app/remy/`, `server/second_opinion.py` | **Ahmed** (Codex) |
-| `remy-brain/instructions.md`, `remy-brain/actions.json`, `remy-brain/personality/`, `tests/` | **Pranav** (Codex) |
+| `remy-brain/instructions.md`, `remy-brain/actions.json`, `remy-brain/personality/`, `tests/` | **Pranav** (Codex), except Savage swearing, nicknames and the "It's fucking raw!" line (`savage.md`, Savage lines in `roasts.json`), which **Matthew** handles |
 
 If your task needs a change in someone else's folder, **don't make it**. Leave a
 comment on their GitHub issue or PR describing the change instead.

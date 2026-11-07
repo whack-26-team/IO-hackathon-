@@ -1,3 +1,5 @@
+> **🤬 Savage swearing is Matthew's now:** don't change the swearing, nicknames or "It's fucking raw!" line in `savage.md` / the Savage lines of `roasts.json` (see `docs/TEAM-TODO.md`).
+
 > **📌 Waiting for you:** check [`docs/TEAM-TODO.md`](../docs/TEAM-TODO.md) for changes the team has decided that need doing in your files.
 
 # Pranav: insults, roasts, catchphrases & personality · accuracy testing
