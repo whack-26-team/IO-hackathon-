@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REMY mood options</title>
+<!-- Design exploration for issue #52 (Matthew). Not part of the app: Felix builds the chosen one in app/. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Baloo+2:wght@600;800&family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root { --page: #f2f0ec; --ink: #1d1d1b; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font-family: Inter, system-ui, sans-serif; padding: 28px 16px 40px; }
+  h1 { margin: 0 0 4px; font-size: 26px; }
+  .intro { margin: 0 0 24px; color: #555; }
+  .row { display: flex; gap: 22px; flex-wrap: wrap; justify-content: center; }
+  .option { width: 300px; }
+  .option h2 { margin: 0; font-size: 18px; }
+  .option p { margin: 4px 0 12px; font-size: 13px; color: #555; min-height: 36px; }
+
+  /* phone frame (390x844 scaled to 300 wide) */
+  .phone { width: 300px; height: 650px; border-radius: 38px; border: 8px solid #111; overflow: hidden;
+    position: relative; box-shadow: 0 18px 40px rgba(0,0,0,.25); }
+  /* fake camera view: a pan from above */
+  .cam { position: absolute; inset: 0; background:
+      radial-gradient(circle at 52% 44%, transparent 0 34%, #2b2b2b 34.5% 41%, transparent 41.5%),
+      radial-gradient(circle at 46% 40%, #c98a3d 0 5%, transparent 5.5%),
+      radial-gradient(circle at 58% 47%, #b8742c 0 4.5%, transparent 5%),
+      radial-gradient(circle at 50% 52%, #8a4b1c 0 4%, transparent 4.5%),
+      radial-gradient(circle at 42% 50%, #d9a24f 0 3.5%, transparent 4%),
+      radial-gradient(circle at 60% 38%, #3a2312 0 3.5%, transparent 4%),
+      radial-gradient(circle at 52% 44%, #4a4a48 0 34%, transparent 34.5%),
+      linear-gradient(160deg, #6b6158, #3d3732); }
+  .phone > *:not(.cam) { position: absolute; z-index: 1; }
+  .top { top: 14px; left: 12px; right: 12px; display: flex; gap: 6px; align-items: center; font-size: 11px; }
+  .timer { top: 52px; right: 12px; }
+  .face { top: 52px; left: 12px; }
+  .bottom { left: 10px; right: 10px; bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
+
+  /* ---------- 1. Hell's kitchen ---------- */
+  .hell .phone { background: #000; }
+  .hell .cam { filter: contrast(1.15) saturate(1.2); }
+  .hell .pill { background: #000; color: #ff5a00; border: 1px solid #ff5a00; padding: 4px 9px; border-radius: 3px;
+    font-family: Anton, Impact, sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  .hell .pill.stop { margin-left: auto; background: #ff1e1e; color: #fff; border: 0; }
+  .hell .timer { background: #000; border-left: 5px solid #ff5a00; padding: 6px 10px; color: #fff; font-family: Anton, Impact, sans-serif; }
+  .hell .timer small { color: #ff5a00; font-size: 10px; letter-spacing: 2px; display: block; }
+  .hell .timer b { font-size: 34px; font-weight: 400; }
+  .hell .roast { background: linear-gradient(90deg, #ff1e1e, #ff7a00); color: #000; padding: 12px 14px; transform: rotate(-2deg);
+    font-family: Anton, Impact, sans-serif; font-size: 25px; line-height: 1.05; text-transform: uppercase; box-shadow: 0 0 30px rgba(255,80,0,.6); }
+  .hell .step { background: rgba(0,0,0,.85); color: #fff; padding: 10px 12px; font-size: 13px; border-top: 3px solid #ff5a00; }
+  .hell .step span { color: #ff5a00; font-family: Anton, Impact, sans-serif; letter-spacing: 1px; }
+
+  /* ---------- 2. Dark & bold (Felix's current) ---------- */
+  .bold .pill { background: rgba(0,0,0,.62); color: #fff; padding: 5px 10px; border-radius: 999px; backdrop-filter: blur(6px); }
+  .bold .pill.speak { background: rgba(255,106,26,.3); outline: 1px solid #ff6a1a; }
+  .bold .pill.stop { margin-left: auto; }
+  .bold .timer { background: rgba(0,0,0,.62); border-radius: 14px; padding: 7px 11px; color: #fff; }
+  .bold .timer small { color: #aaa; font-size: 10px; display: block; }
+  .bold .timer b { font-size: 28px; font-weight: 800; }
+  .bold .timer i { display: block; height: 3px; margin-top: 4px; background: linear-gradient(90deg, #ff6a1a 40%, rgba(255,255,255,.2) 40%); }
+  .bold .roast { background: rgba(30,18,10,.88); border: 2px solid #ff6a1a; border-radius: 14px; padding: 11px 13px;
+    color: #fff; font-weight: 800; font-size: 19px; line-height: 1.2; }
+  .bold .step { background: rgba(0,0,0,.7); border-radius: 14px; padding: 10px 12px; color: #fff; font-size: 12.5px; }
+  .bold .step span { color: #ff6a1a; font-weight: 800; }
+
+  /* ---------- 3. Playful cartoon chef ---------- */
+  .play .cam { filter: saturate(1.25) brightness(1.08); }
+  .play .pill { background: #fff; color: #222; padding: 5px 10px; border-radius: 999px; font-family: "Baloo 2", Inter, sans-serif;
+    font-weight: 800; box-shadow: 0 3px 0 rgba(0,0,0,.2); }
+  .play .pill.stop { margin-left: auto; background: #ff4d6d; color: #fff; }
+  .play .face { width: 74px; height: 74px; border-radius: 50%; background: #ffd23f; border: 4px solid #fff;
+    box-shadow: 0 4px 0 rgba(0,0,0,.2); display: grid; place-items: center; font-size: 40px; }
+  .play .face::before { content: ""; position: absolute; top: -26px; left: 10px; width: 46px; height: 30px; background: #fff;
+    border-radius: 16px 16px 6px 6px; box-shadow: inset 0 -6px 0 #eee; }
+  .play .timer { background: #2ec4b6; color: #fff; border-radius: 18px; padding: 6px 12px; font-family: "Baloo 2", Inter, sans-serif;
+    box-shadow: 0 4px 0 rgba(0,0,0,.2); }
+  .play .timer small { font-size: 11px; display: block; font-weight: 600; }
+  .play .timer b { font-size: 30px; font-weight: 800; line-height: 1; }
+  .play .roast { background: #fff; color: #222; border-radius: 22px; padding: 12px 14px; font-family: "Baloo 2", Inter, sans-serif;
+    font-weight: 800; font-size: 20px; line-height: 1.15; border: 4px solid #ff4d6d; position: relative; box-shadow: 0 5px 0 rgba(0,0,0,.2); }
+  .play .roast::before { content: ""; position: absolute; top: -16px; left: 28px; border: 9px solid transparent; border-bottom: 9px solid #ff4d6d; }
+  .play .step { background: rgba(255,255,255,.95); color: #333; border-radius: 18px; padding: 10px 12px; font-size: 12.5px; }
+  .play .step span { color: #2ec4b6; font-weight: 800; }
+
+  /* ---------- 4. Premium kitchen ---------- */
+  .prem .cam { filter: saturate(.8) brightness(.9); }
+  .prem .phone::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,18,16,.45), transparent 30%, transparent 55%, rgba(20,18,16,.85)); }
+  .prem .phone > * { z-index: 2; }
+  .prem .pill { color: #f4efe6; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; padding: 4px 0; }
+  .prem .pill.dot::before { content: "●"; color: #c9a45c; margin-right: 6px; }
+  .prem .pill.stop { margin-left: auto; border: 1px solid rgba(244,239,230,.5); padding: 4px 10px; border-radius: 2px; }
+  .prem .timer { color: #f4efe6; text-align: right; }
+  .prem .timer small { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #c9a45c; display: block; }
+  .prem .timer b { font-family: Fraunces, Georgia, serif; font-weight: 500; font-size: 40px; }
+  .prem .roast { color: #f4efe6; font-family: Fraunces, Georgia, serif; font-style: italic; font-size: 24px; line-height: 1.2;
+    padding: 0 4px 6px; border-bottom: 1px solid #c9a45c; }
+  .prem .roast small { display: block; font-family: Inter, sans-serif; font-style: normal; font-size: 10px; letter-spacing: 3px;
+    color: #c9a45c; text-transform: uppercase; margin-bottom: 6px; }
+  .prem .step { color: #e9e2d6; font-size: 12.5px; padding: 2px 4px; }
+  .prem .step span { color: #c9a45c; letter-spacing: 2px; font-size: 10px; text-transform: uppercase; display: block; margin-bottom: 2px; }
+</style>
+</head>
+<body>
+  <h1>REMY: pick a mood</h1>
+  <p class="intro">Same moment in all four: a timer running, Remy roasting you, the current step. The background is a fake camera view of a pan.</p>
+
+  <div class="row">
+    <section class="option hell">
+      <h2>1 · Hell's kitchen</h2>
+      <p>Loud, dramatic, black and fire. Leans into the roasting chef.</p>
+      <div class="phone"><div class="cam"></div>
+        <div class="top"><span class="pill">● Remy</span><span class="pill">🤬 Savage</span><span class="pill stop">Stop</span></div>
+        <div class="timer"><small>RIGATONI</small><b>08:42</b></div>
+        <div class="bottom">
+          <div class="roast">🔥 That garlic is CHARCOAL. Bin it!</div>
+          <div class="step"><span>STEP 3/6</span> · Warm the oil on medium-low and cook the garlic gently.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="option bold">
+      <h2>2 · Dark &amp; bold (current)</h2>
+      <p>Felix's current look, polished: dark glass cards, orange accent. Least work.</p>
+      <div class="phone"><div class="cam"></div>
+        <div class="top"><span class="pill speak">▮▮▮ Remy is speaking</span><span class="pill">😏</span><span class="pill stop">Stop</span></div>
+        <div class="timer"><small>Rigatoni</small><b>8:42</b><i></i></div>
+        <div class="bottom">
+          <div class="roast">🔥 Well, that garlic is officially charcoal. Bin it, chef.</div>
+          <div class="step"><span>Step 3 of 6</span> · Warm the oil on medium-low and cook the garlic gently.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="option play">
+      <h2>3 · Playful cartoon chef</h2>
+      <p>Bright and friendly, with a Remy face that reacts (😇 😏 🤬 😍). Memorable for judges.</p>
+      <div class="phone"><div class="cam"></div>
+        <div class="top"><span class="pill">Remy 👂</span><span class="pill stop">Stop</span></div>
+        <div class="face">😤</div>
+        <div class="timer"><small>Rigatoni</small><b>8:42</b></div>
+        <div class="bottom">
+          <div class="roast">Oi! That garlic's gone full charcoal 😩 Bin it, chef!</div>
+          <div class="step"><span>Step 3 of 6</span> · Warm the oil on medium-low and cook the garlic gently.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="option prem">
+      <h2>4 · Premium kitchen</h2>
+      <p>Calm and posh: serif, brass, lots of space. The roasts land harder because it looks so polite.</p>
+      <div class="phone"><div class="cam"></div>
+        <div class="top"><span class="pill dot">Remy</span><span class="pill">Honest</span><span class="pill stop">Stop</span></div>
+        <div class="timer"><small>Rigatoni</small><b>8:42</b></div>
+        <div class="bottom">
+          <div class="roast"><small>Remy</small>"That garlic is now charcoal. Bin it, chef."</div>
+          <div class="step"><span>Step 3 of 6</span>Warm the oil on medium-low and cook the garlic gently.</div>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
