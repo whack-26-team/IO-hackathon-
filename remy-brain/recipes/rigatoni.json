@@ -49,7 +49,8 @@
       "timer": {
         "label": "Rigatoni",
         "minutes": 11,
-        "check_at": 10
+        "check_at": 10,
+        "from": "pasta_dried_minutes_al_dente/rigatoni/default"
       },
       "done_when": "Pasta is in and stirred. Start the timer as soon as it goes in."
     },

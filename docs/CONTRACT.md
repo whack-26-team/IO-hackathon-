@@ -69,10 +69,14 @@ the events above (minutes → seconds).
       "instruction": "Add the rigatoni and stir.",
       "looks_right": ["pasta moving freely"],
       "looks_wrong": ["pasta clumped together"],
-      "timer": { "label": "Rigatoni", "minutes": 11, "check_at": 10 },  // optional, minutes
+      "timer": { "label": "Rigatoni", "minutes": 11, "check_at": 10,     // optional, minutes
+                 "from": "pasta_dried_minutes_al_dente/rigatoni/default" }, // the cook-times.json entry it comes from
       "done_when": "Pasta is in and stirred."
     }
   ]
 }
 ```
-`python tools/validate.py` checks this shape.
+`python tools/validate.py` checks this shape. Recipes marked `checked_by_human: true` must have
+`looks_right` / `looks_wrong` / `done_when` on every step, and every timer must match the
+`cook-times.json` entry named in `from`. Raw imports live in `remy-brain/recipes/_imported/` and
+aren't listed in the app.

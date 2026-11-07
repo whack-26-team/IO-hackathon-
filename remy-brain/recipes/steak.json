@@ -59,7 +59,8 @@
       "timer": {
         "label": "Steak, side 1",
         "minutes": 3,
-        "check_at": 2.5
+        "check_at": 2.5,
+        "from": "steak_minutes_per_side_very_hot_pan/2.5cm_thick/medium_rare"
       },
       "done_when": "Steak is in. Start the side-1 timer (3 min for medium-rare)."
     },
@@ -77,7 +78,8 @@
       "timer": {
         "label": "Steak, side 2",
         "minutes": 3,
-        "check_at": 2.5
+        "check_at": 2.5,
+        "from": "steak_minutes_per_side_very_hot_pan/2.5cm_thick/medium_rare"
       },
       "done_when": "Second side seared. Check with a thermometer: 57°C for medium-rare."
     },
@@ -91,7 +93,8 @@
       ],
       "timer": {
         "label": "Resting",
-        "minutes": 5
+        "minutes": 5,
+        "from": "steak_minutes_per_side_very_hot_pan/rest_minutes"
       },
       "done_when": "Rested and sliced. Ask the cook to show the inside to the camera."
     }
