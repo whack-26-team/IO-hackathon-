@@ -106,7 +106,7 @@
     {
       "type": "function",
       "name": "show_tip",
-      "description": "Show and say one short, immediately useful instruction. Use info for requested or timely guidance, warning for a likely non-dangerous mistake, and urgent only for time-sensitive correction that is not a safety emergency. Ask one concrete question instead when the view is uncertain. Do not call when everything is fine, repeat an unchanged tip, or bundle multiple tips. Use safety_alert for danger.",
+      "description": "Show and say one short, immediately useful instruction. Use info for requested or timely guidance, warning for a likely non-dangerous mistake, and urgent only for time-sensitive correction that is not a safety emergency. Visible smoke from a hot pan, even heavy smoke, gets one plain heat-down tip, never a roast or safety_alert for smoke alone. Ask one concrete question instead when the view is uncertain. Do not call when everything is fine, repeat an unchanged tip, or bundle multiple tips. Use safety_alert for immediate danger such as visible flames.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -132,7 +132,7 @@
     {
       "type": "function",
       "name": "roast",
-      "description": "Use only after a non-safety mistake is clearly visible or the cook confirms it. Give the corrective action first, then one short line in the current mode. Target the food or technique, never the person. Level 1 is the first incident; increase only for a separate confirmed repeat, never more frames of the same incident. Do not call when uncertain, during unresolved danger, for normal waiting, or for an unchanged mistake already roasted.",
+      "description": "Use only after a non-safety mistake is clearly visible or the cook confirms it. Give the corrective action first, then one short line in the current mode. Target the food or technique, never the person. Smoke alone is not a roastable mistake or proof that food is burnt. Level 1 is the first incident; increase only for a separate confirmed repeat, never more frames of the same incident. Do not call when uncertain, during unresolved danger, for normal waiting, or for an unchanged mistake already roasted.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -162,13 +162,13 @@
     {
       "type": "function",
       "name": "safety_alert",
-      "description": "Highest-priority red warning for a clearly visible or cook-confirmed immediate danger such as fire, smoking oil, fingers in a knife's path, raw-meat cross-contamination, or a child or pet beside an active hob. Call this before every other action, use a direct imperative, and drop all comedy. Do not pair it with roast while danger remains. Do not use for ordinary cooking mistakes or an ambiguous view; ask first if it is safe to wait for an answer.",
+      "description": "Highest-priority red warning for clearly visible or cook-confirmed immediate danger such as flames or fire, fingers in a knife's path, raw-meat cross-contamination, or a child or pet beside an active hob. Smoke from a hot pan, even heavy smoke, is a show_tip to turn down heat, not a safety_alert unless flames or fire are visible. Call this before every other action, use a direct imperative, and drop all comedy. Do not pair it with roast while danger remains. Do not use for ordinary cooking mistakes or an ambiguous view; ask first if it is safe to wait for an answer.",
       "parameters": {
         "type": "object",
         "properties": {
           "text": {
             "type": "string",
-            "description": "Short and clear, e.g. 'Oil is smoking: take the pan off the heat'."
+            "description": "Short and clear, e.g. 'Flames in the pan: turn off the heat and cover it'."
           }
         },
         "required": [
