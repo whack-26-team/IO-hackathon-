@@ -113,7 +113,7 @@ def roasts_for_mode(data: dict, mode: str) -> dict:
     return out
 
 
-def build_instructions(recipe: dict | None, mode: str) -> str:
+def build_instructions(recipe: dict | None, mode: str, lite: bool = False) -> str:
     """Glue Pranav's personality files + Matthew's recipe/knowledge into one prompt."""
     core = _read_text(BRAIN_DIR / "instructions.md")
     personality = _read_text(BRAIN_DIR / "personality" / f"{mode}.md")
@@ -126,7 +126,7 @@ def build_instructions(recipe: dict | None, mode: str) -> str:
         core,
         f"# PERSONALITY MODE: {mode.upper()}\n{personality}",
         NAME_RULE,
-        "# ROAST & CATCHPHRASE LIBRARY (riff on these, don't just repeat them)\n" + roast_text,
+        *([] if lite else ["# ROAST & CATCHPHRASE LIBRARY (riff on these, don't just repeat them)\n" + roast_text]),
         ("# TODAY'S RECIPE\n" + json.dumps(recipe, ensure_ascii=False)) if recipe else NO_RECIPE_YET,
         "# COOKING TIMES (use these for start_timer, never guess)\n" + cook_times,
         "# FOOD SAFETY (fixed facts, never contradict these)\n" + safety,
@@ -195,6 +195,7 @@ def get_recipe(recipe_id: str):
 class SessionRequest(BaseModel):
     recipe_id: str | None = None   # None = Remy asks the cook what to make
     mode: str = "honest"
+    lite: bool = False             # ?lite=1 on the page: no roast library (connection test)
 
 
 @app.post("/api/brain")
@@ -208,7 +209,7 @@ def get_brain(req: SessionRequest):
         raise HTTPException(400, f"mode must be one of {MODES}")
     recipe = load_recipe(req.recipe_id) if req.recipe_id else None
     return {
-        "instructions": build_instructions(recipe, req.mode),
+        "instructions": build_instructions(recipe, req.mode, req.lite),
         "tools": load_tools(),
         "recipe": recipe,
         "mode": req.mode,

@@ -108,7 +108,9 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', stream, v
     status('connecting', 'Connecting Remy’s voice…');
     try {
       if (!brain) {
-        brain = await request('/api/brain', { mode, ...(recipe?.id ? { recipe_id: recipe.id } : {}) });
+        // ?lite=1 on the page address: Remy without the roast library, to test whether size/content stops the call
+        const lite = typeof location !== 'undefined' && new URLSearchParams(location.search).has('lite');
+        brain = await request('/api/brain', { mode, ...(recipe?.id ? { recipe_id: recipe.id } : {}), ...(lite ? { lite: true } : {}) });
         if (!brain.instructions || !Array.isArray(brain.tools)) throw new Error('Server did not provide Remy’s instructions.');
         actions.configure(brain);
       }
