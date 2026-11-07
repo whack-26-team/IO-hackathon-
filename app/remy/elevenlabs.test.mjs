@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 // Load the plain browser ES module without adding a repository-wide package.json.
-const source = await readFile(new URL('./elevenlabs.js', import.meta.url), 'utf8');
+const source = await readFile(new URL('./elevenlabs-c1.js', import.meta.url), 'utf8');
 const { createElevenLabsRemy } = await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
 
 function fixture(startSession) {

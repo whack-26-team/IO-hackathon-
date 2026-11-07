@@ -1,4 +1,4 @@
-import { createElevenLabsRemy } from "./elevenlabs.js";
+import { createElevenLabsRemy } from "./elevenlabs-c1.js";
 const $ = id => document.getElementById(id);
 let remy;
 let generation = 0;
