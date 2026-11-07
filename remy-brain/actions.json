@@ -4,7 +4,7 @@
     {
       "type": "function",
       "name": "find_recipe",
-      "description": "Find the recipe for the dish the cook wants, as soon as they say it (e.g. 'steak', 'some pasta', 'chicken curry'). Pass their words. The result says where it came from: our checked recipe, an online recipe without visual cues, or nothing found, plus what to do next. Call it again if they change their mind.",
+      "description": "Check whether we have a hand-checked recipe for the dish the cook wants, as soon as they say it (e.g. 'steak', 'some pasta'). Pass their words. If it's not ours, the result tells you to write the recipe yourself with create_recipe (sometimes with an online reference to adapt).",
       "parameters": {
         "type": "object",
         "properties": {
@@ -15,6 +15,91 @@
         },
         "required": [
           "dish"
+        ]
+      }
+    },
+    {
+      "type": "function",
+      "name": "create_recipe",
+      "description": "Write a recipe yourself and show it on screen: when find_recipe says it's not one of ours, or the cook wants a change (spicier, vegetarian, more people, only what they have). Keep it short and home-cook friendly. The server checks it, fixes timers from our cooking-times table, marks estimates and adds safe temperatures: use the returned version.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "serves": {
+            "type": "integer"
+          },
+          "ingredients": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "With amounts."
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "instruction": {
+                  "type": "string"
+                },
+                "looks_right": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "What it should look like (visible)."
+                },
+                "looks_wrong": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Visible signs of a mistake."
+                },
+                "done_when": {
+                  "type": "string"
+                },
+                "timer": {
+                  "type": "object",
+                  "description": "Only if this step is timed.",
+                  "properties": {
+                    "label": {
+                      "type": "string"
+                    },
+                    "minutes": {
+                      "type": "number"
+                    },
+                    "check_at": {
+                      "type": "number",
+                      "description": "Minutes in, when to check/taste."
+                    }
+                  },
+                  "required": [
+                    "label",
+                    "minutes"
+                  ]
+                }
+              },
+              "required": [
+                "instruction",
+                "looks_right",
+                "looks_wrong",
+                "done_when"
+              ]
+            }
+          }
+        },
+        "required": [
+          "title",
+          "ingredients",
+          "steps"
         ]
       }
     },

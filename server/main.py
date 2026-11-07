@@ -6,6 +6,7 @@ What it does:
   * serves the app (the `app/` folder) so the phone opens one link
   * GET  /api/recipes        -> list of recipes
   * GET  /api/recipes/find?q=steak -> find a recipe by what the cook said (Remy's find_recipe)
+  * POST /api/recipes/ai     -> safety-check a recipe Remy wrote itself (create_recipe)
   * GET  /api/recipes/{id}   -> one full recipe
   * POST /api/brain          -> Remy's instructions + actions for ANY voice route
   * POST /api/session        -> a short-lived pass for the live OpenAI call,
@@ -30,6 +31,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+from server.recipe_check import check_ai_recipe
 from server.recipe_sources import IMPORT_DIR, find_recipe
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -73,10 +75,15 @@ def load_recipe(recipe_id: str) -> dict:
 
 NO_RECIPE_YET = """# TODAY'S RECIPE
 Not chosen yet. The cook just pressed Start cooking. After your greeting and camera
-check, ask what they'd like to cook. When they tell you, call find_recipe with the
-dish exactly as they said it. If it returns a recipe, briefly confirm it ("Steak
-Diane it is"), name the ingredients they'll need, and guide from step 1. If nothing
-is found, follow the message it returns."""
+check, ask what they'd like to cook (they can also tell you what ingredients they have).
+1. Call find_recipe with their words. If it returns one of OUR recipes (found: true),
+   briefly confirm it, name the ingredients, and guide from step 1.
+2. Otherwise (or if they want changes, e.g. spicier, vegetarian, for 6 people, only
+   what's in their fridge): write the recipe yourself and call create_recipe. Give every
+   step looks_right / looks_wrong / done_when, and timers only where something is timed.
+   If find_recipe gave a "reference" recipe, you may adapt it.
+3. create_recipe returns the checked recipe: use ITS timers (they may have been
+   corrected), mention any estimates, and give the attached safe temperatures."""
 
 
 def build_instructions(recipe: dict | None, mode: str) -> str:
@@ -131,6 +138,17 @@ def find(q: str):
     if not q.strip():
         raise HTTPException(400, "Say what you'd like to cook")
     return find_recipe(q[:200])
+
+
+class AIRecipe(BaseModel):
+    recipe: dict
+
+
+@app.post("/api/recipes/ai")
+def ai_recipe(req: AIRecipe):
+    """Safety-check a recipe Remy wrote (create_recipe): fixes timers from cook-times.json,
+    marks the rest as estimates, attaches safe temperatures. See server/recipe_check.py."""
+    return check_ai_recipe(req.recipe)
 
 
 @app.get("/api/recipes/{recipe_id}")

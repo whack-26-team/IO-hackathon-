@@ -7,11 +7,9 @@ Used by:
 Order of preference:
   1. Our own hand-written / hand-checked recipes in remy-brain/recipes/ (matched on
      title + "aliases"), because they have looks_right / looks_wrong / timers.
-  2. TheMealDB (free online recipe database), converted to Remy's format and cached
-     in remy-brain/recipes/_imported/. These have ingredients + steps but no visual
-     cues, so they're marked checked_by_human: false.
-  3. Nothing found -> Remy guides from general cooking knowledge, still using the
-     cook-times and food-safety tables, and tells the cook it's not a checked recipe.
+  2. Otherwise Remy writes the recipe itself (create_recipe -> server/recipe_check.py).
+     If TheMealDB (free online recipe database) has the dish, it's returned as a
+     "reference" Remy may adapt (cached in remy-brain/recipes/_imported/).
 """
 
 from __future__ import annotations
@@ -152,7 +150,7 @@ def match_mealdb(query: str) -> dict | None:
 # ---------- the one function the server calls ----------
 
 def find_recipe(query: str) -> dict:
-    """-> {found, source: 'remy'|'themealdb'|None, checked_by_human, recipe?, message}"""
+    """-> {found, source: 'remy'|'themealdb'|None, checked_by_human, recipe? | reference?, message}"""
     r = match_local(query)
     if r:
         return {"found": True, "source": "remy", "checked_by_human": bool(r.get("checked_by_human")),
@@ -169,11 +167,10 @@ def find_recipe(query: str) -> dict:
                 json.dumps(recipe, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         except OSError:
             pass
-        return {"found": True, "source": "themealdb", "checked_by_human": False, "recipe": recipe,
-                "message": (f"Found '{recipe['title']}' in an online recipe database. It has no visual "
-                            "cues or checked timers: use the COOKING TIMES table for timers, judge "
-                            "visually from general knowledge, and confirm it's what the cook wants.")}
+        return {"found": False, "source": "themealdb", "checked_by_human": False, "reference": recipe,
+                "message": (f"Not one of our checked recipes. Write your own recipe for what the cook "
+                            f"asked and call create_recipe. You may adapt this online reference "
+                            f"('{recipe['title']}') if it fits.")}
     return {"found": False, "source": None, "checked_by_human": False,
-            "message": ("No recipe found. Ask the cook to confirm the dish or describe it. You may guide "
-                        "from general cooking knowledge, but take timers only from COOKING TIMES, "
-                        "temperatures only from FOOD SAFETY, and tell the cook it isn't a checked recipe.")}
+            "message": ("Not one of our checked recipes. If you know the dish, write the recipe "
+                        "yourself and call create_recipe. If you're not sure what they mean, ask.")}
