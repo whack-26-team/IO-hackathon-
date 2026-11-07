@@ -88,6 +88,12 @@ check, ask what they'd like to cook (they can also tell you what ingredients the
    corrected), mention any estimates, and give the attached safe temperatures."""
 
 
+NAME_RULE = """# YOUR NAME
+The cook calls you Remy. Whenever they say "Remy" (on its own, or to start a sentence), answer
+straight away, e.g. "Yes, chef?" or "I'm here.", then help with whatever they ask. Never ignore
+your name. Only a safety alert comes first."""
+
+
 def build_instructions(recipe: dict | None, mode: str) -> str:
     """Glue Pranav's personality files + Matthew's recipe/knowledge into one prompt."""
     core = _read_text(BRAIN_DIR / "instructions.md")
@@ -100,6 +106,7 @@ def build_instructions(recipe: dict | None, mode: str) -> str:
     return "\n\n".join([
         core,
         f"# PERSONALITY MODE: {mode.upper()}\n{personality}",
+        NAME_RULE,
         "# ROAST & CATCHPHRASE LIBRARY (riff on these, don't just repeat them)\n" + roast_text,
         ("# TODAY'S RECIPE\n" + json.dumps(recipe, ensure_ascii=False)) if recipe else NO_RECIPE_YET,
         "# COOKING TIMES (use these for start_timer, never guess)\n" + cook_times,

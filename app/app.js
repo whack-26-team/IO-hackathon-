@@ -132,11 +132,35 @@ function stopCooking() {
   pendingRoast = null;
   quietRemy();
   $("cook-screen").classList.add("hidden");
+  document.documentElement.dataset.mode = state.mode; // the attitude's page colour behind the goodbye
+  showGoodbye();
+}
+
+// Remy signs off in his attitude's voice, then the start screen comes back by itself.
+const GOODBYES = {
+  gentle: { face: "f-gentle", text: "Lovely cooking, chef. Enjoy every bite!" },
+  honest: { face: "f-proud", text: "Plate it. Take the credit. I'm an app." },
+  savage: { face: "f-savage", text: "Bloody hell, we survived. Plate it and get out of my kitchen." },
+};
+const GOODBYE_MS = 4000;
+function showGoodbye() {
+  const g = GOODBYES[state.mode] || GOODBYES.honest;
+  $("goodbye-text").textContent = g.text;
+  const face = $("goodbye-face");
+  setUse(face, g.face);
+  face.setAttribute("viewBox", g.face === "f-savage" ? "-28 -12 156 116" : "-18 -12 136 116");
+  $("goodbye").classList.remove("hidden");
+  clearTimeout(showGoodbye.t);
+  showGoodbye.t = setTimeout(backToStart, GOODBYE_MS);
+}
+function backToStart() {
+  clearTimeout(showGoodbye.t);
+  $("goodbye").classList.add("hidden");
   $("start-screen").classList.remove("hidden");
   // back to the top-left at 100%, in case the iPhone shifted the view while the camera was up
   window.scrollTo(0, 0); $("start-screen").scrollTop = 0;
-  document.documentElement.dataset.mode = state.mode;
 }
+$("goodbye").addEventListener("click", backToStart);
 
 // ---------- events from Remy ----------
 
@@ -390,7 +414,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v77`,
+      `version  v78`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
