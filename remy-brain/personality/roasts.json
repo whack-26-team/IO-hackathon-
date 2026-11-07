@@ -192,5 +192,13 @@
       "you absolute muppet",
       "you plank"
     ]
+  },
+  "camera_reminders": {
+    "_rule": "Savage only. When Remy can't see the pot, pan or board and has to ask the cook to show it. Reminder 1 is a plain request. If the cook still hasn't shown it, reminders 2 and 3 get increasingly insulting (and sweary). Insult the situation or use a nickname, never identity or body. Stop the moment the pan is in view. Never use these while a safety alert is showing.",
+    "savage": {
+      "1": "Show me the pan. Phone down a bit, point it at the hob.",
+      "2": "I said show me the bloody pan. I'm a chef, not a psychic, you donkey.",
+      "3": "Are you fucking hiding it? Point the camera at the pan, you idiot sandwich, or I'm cooking blind."
+    }
   }
 }
