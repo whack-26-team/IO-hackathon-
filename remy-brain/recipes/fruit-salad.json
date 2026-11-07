@@ -8,8 +8,8 @@
     "chopped fruit",
     "fruit"
   ],
-  "source": "Written for REMY by Claude as a simple demo. Waiting for Matthew's review.",
-  "checked_by_human": false,
+  "source": "Written for REMY by Claude as a simple demo. Checked by Matthew on 2026-11-07.",
+  "checked_by_human": true,
   "serves": 2,
   "total_minutes": 10,
   "equipment": [

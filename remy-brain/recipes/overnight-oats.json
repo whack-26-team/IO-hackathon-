@@ -9,8 +9,8 @@
     "bircher",
     "bircher muesli"
   ],
-  "source": "Written for REMY by Claude as a simple demo. Waiting for Matthew's review.",
-  "checked_by_human": false,
+  "source": "Written for REMY by Claude as a simple demo. Checked by Matthew on 2026-11-07.",
+  "checked_by_human": true,
   "serves": 1,
   "total_minutes": 3,
   "equipment": [
