@@ -8,6 +8,8 @@ Order of preference:
   1. Our own hand-written / hand-checked recipes in remy-brain/recipes/ (matched on
      title + "aliases"), because they have looks_right / looks_wrong / timers.
   2. Otherwise Remy writes the recipe itself (create_recipe -> server/recipe_check.py).
+     If one of our recipes is close ("ham sandwich" ~ cheese sandwich, "spaghetti
+     bolognese" ~ boiled pasta), it's passed as a "base" to adapt, keeping our timers.
      If TheMealDB (free online recipe database) has the dish, it's returned as a
      "reference" Remy may adapt (cached in remy-brain/recipes/_imported/).
 """
@@ -75,6 +77,30 @@ def match_local(query: str) -> dict | None:
             if score > best_score:
                 best, best_score = r, score
     return best if best_score[0] >= 1.0 else None
+
+
+def recipe_words(r: dict) -> set[str]:
+    """Every word in a recipe's title, id and aliases."""
+    out: set[str] = set()
+    for name in [r.get("title", ""), r.get("id", ""), *r.get("aliases", [])]:
+        out |= set(words(name.replace("-", " ")))
+    return out
+
+
+def closest_local(query: str) -> dict | None:
+    """Our recipe that shares the most words with what the cook said, as a BASE to adapt
+    ("chicken noodle soup" -> instant noodles). None if nothing in common."""
+    q = set(words(query))
+    best, best_n = None, 0
+    for r in local_recipes():
+        n = len(q & recipe_words(r))
+        if n > best_n:
+            best, best_n = r, n
+    return best
+
+
+ADAPT_HOW = ("keep its steps, timers and safety notes where they still apply, change only what's "
+             "different, and say it's adapted from our recipe")
 
 
 # ---------- 2. TheMealDB ----------
@@ -154,8 +180,16 @@ def find_recipe(query: str) -> dict:
     """-> {found, source: 'remy'|'themealdb'|None, checked_by_human, recipe? | reference?, message}"""
     r = match_local(query)
     if r:
+        msg = f"Found our recipe: {r['title']}."
+        extra = [w for w in words(query) if w not in recipe_words(r)]
+        if extra:  # "ham sandwich" matched our cheese sandwich: the extra words may change the dish
+            msg += (f" The cook also said '{' '.join(extra)}'. If that changes the dish, ask, then adapt "
+                    f"this recipe with create_recipe: {ADAPT_HOW}. Otherwise use it as it is.")
         return {"found": True, "source": "remy", "checked_by_human": bool(r.get("checked_by_human")),
-                "recipe": r, "message": f"Found our recipe: {r['title']}."}
+                "recipe": r, "message": msg}
+    base = closest_local(query)
+    base_hint = (f" Our closest checked recipe is '{base['title']}' (in 'base'). If the dish is a "
+                 f"variation of it, adapt it with create_recipe: {ADAPT_HOW}. If not, ignore it.") if base else ""
     try:
         meal = match_mealdb(query)
     except httpx.HTTPError:
@@ -169,9 +203,11 @@ def find_recipe(query: str) -> dict:
         except OSError:
             pass
         return {"found": False, "source": "themealdb", "checked_by_human": False, "reference": recipe,
+                **({"base": base} if base else {}),
                 "message": (f"Not one of our checked recipes. Write your own recipe for what the cook "
                             f"asked and call create_recipe. You may adapt this online reference "
-                            f"('{recipe['title']}') if it fits.")}
-    return {"found": False, "source": None, "checked_by_human": False,
-            "message": ("Not one of our checked recipes. If you know the dish, write the recipe "
-                        "yourself and call create_recipe. If you're not sure what they mean, ask.")}
+                            f"('{recipe['title']}') if it fits.{base_hint}")}
+    return {"found": False, "source": None, "checked_by_human": False, **({"base": base} if base else {}),
+            "message": ("Not one of our checked recipes. If you know the dish, write a sensible home-cook "
+                        "recipe yourself and call create_recipe. If you're not sure what they mean, ask."
+                        + base_hint)}
