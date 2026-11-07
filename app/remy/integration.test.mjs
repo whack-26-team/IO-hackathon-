@@ -88,11 +88,11 @@ test('late camera response is discarded after stop, and stale analysis does not 
   const stale=visionFixture(async()=>{stale.setTime(7000);return {safety:'old danger'};});
   stale.vision.start(); await tick(); assert.equal(stale.speech.length,0); assert.match(stale.context[0],/STALE/); stale.vision.stop();
 });
-function voiceFixture(start) {
+function voiceFixture(start, stream) {
   let options, closed=0, clock=10000; const events=[],sent=[],context=[],tasks=[];
   const page=new EventTarget(); page.hidden=false;
   const session={endSession:async()=>{closed++;},sendContextualUpdate:t=>context.push(t),sendUserMessage:t=>sent.push(t)};
-  const remy=createElevenLabsRemy({page,now:()=>clock, schedule:(fn,ms)=>{const t={fn,ms};tasks.push(t);return t;},cancel:t=>{if(t)t.cancelled=true;},
+  const remy=createElevenLabsRemy({page,stream,now:()=>clock, schedule:(fn,ms)=>{const t={fn,ms};tasks.push(t);return t;},cancel:t=>{if(t)t.cancelled=true;},
     fetcher:async()=>({ok:true,json:async()=>brain}),loadSDK:async()=>({Conversation:{startSession:async o=>{options=o;return start?start(session,o):session;}}})});
   for(const type of ['status','timer_start','tip']) remy.on(type,data=>events.push({type,data}));
   return {remy,page,events,sent,context,tasks,get options(){return options;},get closed(){return closed;},setTime:t=>clock=t};
@@ -177,4 +177,14 @@ test('timer announcements say what the timer is for',async()=>{
     recipe:{id:'rigatoni',title:'Rigatoni',steps:[{instruction:'Boil'},{instruction:'In',timer:{label:'Rigatoni',minutes:11,check_at:10,from:'pasta_dried_minutes_al_dente/rigatoni/default'}},{instruction:'Garlic',timer:{label:'Garlic',minutes:1.5,from:'veg_minutes/garlic'}}]}});
   assert.equal(actions.hear("Pasta's in").announce,'11-minute timer for the rigatoni pasta.');
   assert.match((await actions.call('start_timer',{id:'garlic',label:'Garlic',minutes:1.5})).message,/1\.5-minute timer for the garlic\./);
+});
+
+test('iPhone mic: an exact-device "Invalid constraint" error retries with the default mic',async()=>{
+  let tries=0;
+  const f=voiceFixture((session,o)=>{ tries++; if(o.inputDeviceId){ const e=new Error('Invalid constraint'); e.name='OverconstrainedError'; throw e; } return session; },
+    {getAudioTracks:()=>[{getSettings:()=>({deviceId:'abc'}),stop(){}}],getTracks:()=>[],getVideoTracks:()=>[]});
+  await f.remy.start();
+  assert.equal(tries,2); assert.equal(f.options.inputDeviceId,undefined);
+  assert.ok(!f.events.some(e=>e.type==='status'&&e.data.status==='error'));
+  await f.remy.stop();
 });
