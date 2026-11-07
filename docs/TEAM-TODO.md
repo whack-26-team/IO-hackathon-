@@ -24,7 +24,7 @@ Gemini picture check in `server/vision.py`.
 
 ### 2. Savage swearing is now Matthew's (decided 2026-11-07)
 Matthew is handling **Savage swearing, the nicknames** ("you donkey", "you idiot sandwich",
-"you absolute muppet", "you plank") **and the raw line "It's fucking raw!"** himself.
+"you absolute muppet", "you plank") **the raw line "It's fucking raw!"** and the **escalating "show me the pan" reminders** (`camera_reminders` in roasts.json) himself.
 That means `personality/savage.md` and the **Savage** lines in `personality/roasts.json`.
 
 - [ ] Don't change the swearing, nicknames or raw line in those files. If you think one needs changing, comment on the PR or ask Matthew
