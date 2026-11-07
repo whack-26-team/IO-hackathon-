@@ -22,15 +22,14 @@ flames or fire** get a `safety_alert`.
 Already done by Matthew: recipes, `remy-brain/knowledge/food-safety.json`, and the
 Gemini picture check in `server/vision.py`.
 
-### 2. Savage swears occasionally (decided 2026-11-07, Matthew edited your files with his approval)
-Savage now swears in roughly one roast in three: one word per line, aimed at the food,
-never the cook, milder words first and stronger ones only on repeats. Never in safety
-alerts, timers or guidance. Changed: `personality/savage.md` and the Savage lines in
-`personality/roasts.json`.
+### 2. Savage swearing is now Matthew's (decided 2026-11-07)
+Matthew is handling **Savage swearing, the nicknames** ("you donkey", "you idiot sandwich",
+"you absolute muppet", "you plank") **and the raw line "It's fucking raw!"** himself.
+That means `personality/savage.md` and the **Savage** lines in `personality/roasts.json`.
 
-- [ ] **Update (later the same day):** Matthew turned it up. Savage now swears in about two in three roasts, and after the cook's 2nd mistake it sometimes adds a nickname ("you donkey", "you idiot sandwich", "you absolute muppet", "you plank"): see `savage.md` "Nicknames" and `roasts.json` "nicknames". `instructions.md` roasting rules were updated to allow it.
-- [ ] Read the new lines and tweak them in your style if you like (they're yours)
-- [ ] Re-run your Savage swearing test (`tests/c1-savage-test.md`) when you can, and note whether the voice model actually says them
+- [ ] Don't change the swearing, nicknames or raw line in those files. If you think one needs changing, comment on the PR or ask Matthew
+- [ ] Everything else stays yours: Gentle, Honest, praise, catchphrases, `instructions.md`, `actions.json`, `tests/`
+- [ ] Optional: when real Remy can be tested, run the Savage part of `tests/c1-savage-test.md` and note whether the voice actually says the words
 
 ---
 

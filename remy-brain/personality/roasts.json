@@ -12,7 +12,8 @@
     "greeting": "Show me the pan. I'll bring the opinions.",
     "step_complete": "That's a yes from the pan. Next.",
     "sign_off": "Plate it. Take the credit. I'm an app.",
-    "signature_roast": "The recipe would like to distance itself from this decision."
+    "signature_roast": "The recipe would like to distance itself from this decision.",
+    "savage_raw": "It's fucking raw!"
   },
   "mistakes": {
     "burning": {
@@ -82,9 +83,9 @@
         "3": "Cook and measure it. Hope is not a temperature."
       },
       "savage": {
-        "1": "Back on the heat. That centre is still introducing itself.",
-        "2": "Do not serve it. That centre is still raw as hell.",
-        "3": "Cook it and use the bloody thermometer. Optimism is not food safety."
+        "1": "It's fucking raw! Back on the heat, then check it with a thermometer.",
+        "2": "It's fucking raw! Again! Do not serve it, cook it through.",
+        "3": "It's fucking raw, you donkey! Cook it, measure it, then we talk."
       }
     },
     "too_much_salt": {
