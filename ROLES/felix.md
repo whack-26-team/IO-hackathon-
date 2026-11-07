@@ -1,3 +1,7 @@
+> ⚠️ **Handed over:** Matthew has taken over the app screens, design, demo and pitch from C3 onwards
+> (issues #10, #11, #12 and the design in #52). Felix's C0–C2 work (screens, timers, icon, iPhone fixes) is merged.
+> This file is kept for reference.
+
 # Felix: the app screen, timers, demo & pitch
 
 ## 📩 Message to Felix

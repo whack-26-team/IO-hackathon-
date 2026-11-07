@@ -25,8 +25,8 @@ MY ROLE: team lead + the "back office": server, https link, deployment, recipes,
 cooking-times and food-safety facts, merging PRs.
 
 I OWN: server/ (except second_opinion.py), remy-brain/recipes/, remy-brain/knowledge/,
-tools/, docs/. I must NOT edit app/, app/remy/, remy-brain/personality/ or
-remy-brain/instructions.md (Felix, Ahmed and Pranav own those).
+tools/, docs/, ROLES/, and app/ (except app/remy/): I've taken over the app screens from Felix.
+I must NOT edit app/remy/ (Ahmed), remy-brain/personality/ or remy-brain/instructions.md (Pranav).
 
 MY CHECKPOINTS (GitHub issues #1–#6):
 - C0 (#1): project board set up, team onboarded, PRs reviewed.
@@ -44,6 +44,12 @@ MY CHECKPOINTS (GitHub issues #1–#6):
 - C4 (#5): deploy to Render (start: uvicorn server.main:app --host 0.0.0.0 --port $PORT,
   key as a Render secret); fix recipe issues; stretch: pick any TheMealDB dish in-app.
 - C5 (#6): feature freeze, final merge, cost check, "how it works" pitch slide.
+
+TAKEN OVER FROM FELIX (app screens, see ROLES/felix.md for the original detail):
+- #52 design: build the agreed design (docs/design/start.html + draft.html) into app/.
+- C3 (#10): swap pretend Remy for real Remy once Ahmed's voice connection lands; fix what looks wrong.
+- C4 (#11): polish + demo script (rigatoni auto timer → burn something in Savage → safety alert).
+- C5 (#12): backup demo video, pitch slides, rehearse.
 
 MY DEDICATED BRANCHES (one per issue; exact names, don't invent others):
 - C0 (#1): matthew/c0-1-setup

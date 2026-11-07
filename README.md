@@ -18,8 +18,8 @@ Full step-by-step guide, including the iPhone: **[docs/SETUP.md](docs/SETUP.md)*
 ## The team
 | | Role |
 |---|---|
-| **Matthew** | Team lead · server · recipes & cooking knowledge |
-| **Felix** | The app screen · timers · demo & pitch |
+| **Matthew** | Team lead · server · recipes & cooking knowledge · **app screens & design (from C3)** |
+| **Felix** | Built the app screens, timers and icon (C0–C2) |
 | **Ahmed** | Everything live voice · AI voice connection |
 | **Pranav** | Personality, roasts & catchphrases · accuracy testing |
 
