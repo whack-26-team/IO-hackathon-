@@ -17,7 +17,7 @@ export function createVision({ video, canvas, request, actions, context, speak, 
       const step = actions.currentStep();
       const result = await request('/api/vision/look', { image: canvas.toDataURL('image/jpeg', 0.65), step: step ? JSON.stringify(step) : '' }, 25000);
       if (!running || run !== generation || !alive()) return;
-      if (now() - started > 15000) {
+      if (now() - started > 5000) {
         context('[CAMERA STALE] Latest image analysis arrived too late. Do not rely on previous visuals.');
         if (!recent('stale', 30000)) emit('tip', { text: 'Camera analysis is slow. Describe the pan to Remy for now.', severity: 'warning' });
         return;

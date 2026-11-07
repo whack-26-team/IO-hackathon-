@@ -77,7 +77,7 @@ test('camera safety is immediate, and repeated frames do not repeat ordinary war
 test('late camera response is discarded after stop, and stale analysis does not drive action',async()=>{
   let finish; const f=visionFixture(()=>new Promise(r=>finish=r));
   f.vision.start(); f.vision.stop(); finish({safety:'old danger'}); await tick(); assert.equal(f.speech.length,0);
-  const stale=visionFixture(async()=>{stale.setTime(20000);return {safety:'old danger'};});
+  const stale=visionFixture(async()=>{stale.setTime(7000);return {safety:'old danger'};});
   stale.vision.start(); await tick(); assert.equal(stale.speech.length,0); assert.match(stale.context[0],/STALE/); stale.vision.stop();
 });
 function voiceFixture(start) {

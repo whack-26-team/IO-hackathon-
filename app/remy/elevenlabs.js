@@ -59,7 +59,7 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', stream, v
     if (urgent) { safetyUntil = now() + 10000; queue = queue.filter(item => item.persistent); }
     // Camera observations expire; timer reminders survive a short reconnection.
     if (!persistent && !urgent) queue = queue.filter(item => item.persistent || item.urgent);
-    queue.push({ text, urgent, persistent, expires: persistent ? 0 : now() + 10000 });
+    queue.push({ text, urgent, persistent, expires: persistent ? 0 : now() + 5000 });
     if (queue.length > 30) queue.shift();
     flush();
     return true;
