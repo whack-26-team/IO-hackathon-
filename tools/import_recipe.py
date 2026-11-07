@@ -1,14 +1,16 @@
 """Import a recipe from TheMealDB into REMY's recipe format (Owner: Matthew).
 
 Usage (from the repo root):
-    python tools/import_recipe.py "rigatoni"            # search by name, pick the first match
-    python tools/import_recipe.py "beef" --list         # just list matches
+    python tools/import_recipe.py "steak" --list        # list matches with their TheMealDB ids
+    python tools/import_recipe.py --id 52874            # import one exact dish by id
+    python tools/import_recipe.py "steak"               # import the first match
 
 What it does:
   1. Fetches the base recipe (name, ingredients + measures, method) from TheMealDB.
   2. Splits the method into steps.
-  3. Saves remy-brain/recipes/<id>.json with EMPTY looks_right / looks_wrong / done_when
-     and checked_by_human = false.
+  3. Saves remy-brain/recipes/_imported/<id>.json with EMPTY looks_right / looks_wrong /
+     done_when and checked_by_human = false. The app only lists remy-brain/recipes/*.json,
+     so raw imports never show up until they've been "Remy-ified" and moved up a folder.
 
 Next (C2, TODO Matthew): the "Remy-ify" step. Send the base recipe to an AI once to
 fill in looks_right / looks_wrong / done_when, and take timers from
@@ -36,27 +38,39 @@ from server.recipe_sources import (IMPORT_DIR, mealdb_lookup as lookup,  # noqa:
 
 def main() -> int:
     p = argparse.ArgumentParser()
-    p.add_argument("name")
-    p.add_argument("--list", action="store_true")
+    p.add_argument("name", nargs="?", help="dish to search for, e.g. steak")
+    p.add_argument("--list", action="store_true", help="only list matches (with ids)")
+    p.add_argument("--id", help="import this exact TheMealDB id")
     p.add_argument("--force", action="store_true", help="overwrite an existing file")
     args = p.parse_args()
 
-    meals = search(args.name)
-    if not meals:
-        print(f"No TheMealDB results for '{args.name}'.")
-        return 1
-    if args.list:
-        for m in meals:
-            print(f"- {m['strMeal']} ({m.get('strArea')}, {m.get('strCategory')})")
-        return 0
+    if args.id:
+        meal = lookup(args.id)
+        if not meal:
+            print(f"No TheMealDB dish with id {args.id}.")
+            return 1
+    else:
+        if not args.name:
+            p.error("give a dish name or --id")
+        meals = search(args.name)
+        if not meals:
+            print(f"No TheMealDB results for '{args.name}'. Try a broader word (e.g. 'beef', 'pasta').")
+            return 1
+        if args.list:
+            for m in meals:
+                print(f"  --id {m['idMeal']:>6}  {m['strMeal']}  ({m.get('strArea')}, {m.get('strCategory')})")
+            return 0
+        meal = meals[0]
 
-    recipe = to_remy(meals[0])
-    out = RECIPES_DIR / f"{recipe['id']}.json"
+    recipe = to_remy(meal)
+    IMPORT_DIR.mkdir(parents=True, exist_ok=True)
+    out = IMPORT_DIR / f"{recipe['id']}.json"
     if out.exists() and not args.force:
-        print(f"{out} already exists (use --force to overwrite).")
+        print(f"{out.relative_to(ROOT)} already exists (use --force to overwrite).")
         return 1
     out.write_text(json.dumps(recipe, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(f"Saved {out} with {len(recipe['steps'])} steps. Next: Remy-ify + human check.")
+    print(f"Saved {out.relative_to(ROOT)}: {recipe['title']}, {len(recipe['ingredients'])} ingredients, "
+          f"{len(recipe['steps'])} steps.\nNext: commit + push it, then it gets Remy-ified and hand-checked.")
     return 0
 
 

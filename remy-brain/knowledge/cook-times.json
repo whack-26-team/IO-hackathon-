@@ -1,36 +1,86 @@
 {
-  "_owner": "Matthew. Timers come from here (or the recipe step), never guessed. Always tell the cook: 'check the packet time'. Starter values, expand at C2.",
+  "_owner": "Matthew. Timers come from here (or the recipe step), never guessed.",
+  "_rules": [
+    "Always tell the cook which timer you started and that they can change it: 'Rigatoni in, 11-minute timer. Shout if your packet says different.'",
+    "The packet time wins over this table for pasta and rice.",
+    "check_at = when to taste/check, usually 1 minute before the end for pasta.",
+    "Times assume a normal home hob. Thickness matters more than weight for meat."
+  ],
   "pasta_dried_minutes_al_dente": {
-    "rigatoni": { "min": 11, "max": 13, "default": 11 },
-    "penne": { "min": 10, "max": 12, "default": 11 },
-    "fusilli": { "min": 10, "max": 12, "default": 11 },
-    "spaghetti": { "min": 9, "max": 11, "default": 10 },
-    "linguine": { "min": 9, "max": 11, "default": 10 },
-    "tagliatelle_dried": { "min": 7, "max": 9, "default": 8 },
-    "fresh_egg_pasta": { "min": 2, "max": 4, "default": 3 }
+    "_note": "Water at a rolling boil, about 10g salt per litre. Start the timer when the water returns to the boil.",
+    "rigatoni": { "min": 11, "max": 13, "default": 11, "check_at": 10 },
+    "penne": { "min": 10, "max": 12, "default": 11, "check_at": 10 },
+    "fusilli": { "min": 10, "max": 12, "default": 11, "check_at": 10 },
+    "farfalle": { "min": 10, "max": 12, "default": 11, "check_at": 10 },
+    "macaroni": { "min": 8, "max": 10, "default": 9, "check_at": 8 },
+    "orecchiette": { "min": 11, "max": 13, "default": 12, "check_at": 11 },
+    "spaghetti": { "min": 9, "max": 11, "default": 10, "check_at": 9 },
+    "linguine": { "min": 9, "max": 11, "default": 10, "check_at": 9 },
+    "tagliatelle_dried": { "min": 7, "max": 9, "default": 8, "check_at": 7 },
+    "lasagne_sheets_boiled": { "min": 8, "max": 10, "default": 9, "check_at": 8 },
+    "fresh_egg_pasta": { "min": 2, "max": 4, "default": 3, "check_at": 2 },
+    "fresh_filled_pasta (ravioli, tortellini)": { "min": 3, "max": 5, "default": 4, "check_at": 3 }
   },
-  "steak_minutes_per_side_hot_pan": {
-    "_note": "For a ~2.5cm (1 inch) thick steak in a very hot pan. Rest 5 minutes after. Use a thermometer for accuracy.",
-    "rare": 2,
-    "medium_rare": 3,
-    "medium": 4,
-    "well_done": 6
+  "steak_minutes_per_side_very_hot_pan": {
+    "_note": "Pat dry, very hot heavy pan, flip once (or every minute for even cooking, same total). Always confirm with a thermometer: see food-safety.json steak_doneness_c.",
+    "2cm_thick": { "rare": 1.5, "medium_rare": 2, "medium": 3, "well_done": 4.5 },
+    "2.5cm_thick": { "rare": 2, "medium_rare": 3, "medium": 4, "well_done": 6 },
+    "4cm_thick": {
+      "rare": 3, "medium_rare": 4, "medium": 5, "well_done": 7,
+      "note": "Thick steaks: sear, then finish in a 200°C oven or lower heat if well done is wanted."
+    },
+    "rest_minutes": 5
   },
-  "eggs_minutes_in_boiling_water": {
-    "soft_boiled_runny": 6.5,
-    "jammy": 7.5,
-    "hard_boiled": 10
+  "other_meat_and_fish": {
+    "chicken_breast_pan_medium_heat": { "minutes_per_side": 6, "note": "~2cm thick. Must reach 74°C inside." },
+    "chicken_thigh_boneless_pan": { "minutes_per_side": 6, "note": "Must reach 74°C inside." },
+    "salmon_fillet_pan_skin_side_down": { "skin_side_minutes": 4, "flesh_side_minutes": 2, "note": "Flesh turns opaque, flakes easily; 63°C." },
+    "bacon_rashers_pan": { "minutes_per_side": 3 },
+    "sausages_pan_medium_low": { "total_minutes": 15, "note": "Turn often; no pink inside (71°C)." },
+    "burgers_pan_medium_high": { "minutes_per_side": 4, "note": "~2cm thick. Cooked through, 71°C, no pink." },
+    "prawns_raw_pan": { "total_minutes": 3, "note": "Grey → pink and opaque, curled into a C." }
   },
-  "rice_minutes": {
+  "eggs": {
+    "boiled_soft_runny_yolk": 6.5,
+    "boiled_jammy": 7.5,
+    "boiled_hard": 10,
+    "_boiled_note": "Lower fridge-cold eggs into already boiling water, then straight into cold water when the timer ends.",
+    "poached": 3,
+    "fried_sunny_side_up": 3,
+    "scrambled_low_heat_total": { "min": 3, "max": 5, "note": "Take off the heat while still glossy; they keep cooking." },
+    "omelette_total": 3
+  },
+  "rice_and_grains_minutes": {
     "white_basmati_simmer": 10,
     "white_long_grain_simmer": 12,
+    "jasmine_simmer": 12,
     "brown_rice_simmer": 25,
+    "risotto_total_after_adding_stock": { "min": 18, "max": 20 },
+    "couscous_soak_off_heat": 5,
+    "quinoa_simmer": 15,
     "rest_covered_after": 5
   },
-  "veg_minutes_boiling": {
-    "broccoli_florets": 3,
-    "green_beans": 4,
-    "peas_frozen": 3,
-    "potatoes_chunks": 15
+  "potatoes_minutes": {
+    "boiled_chunks_from_cold_water": 15,
+    "boiled_new_potatoes_whole": 15,
+    "mash_potatoes_boil": 18,
+    "roast_chunks_200c_oven": 45,
+    "chips_oven_220c": 25
+  },
+  "veg_minutes": {
+    "broccoli_florets_boil": 3,
+    "green_beans_boil": 4,
+    "peas_frozen_boil": 3,
+    "carrots_sliced_boil": 6,
+    "asparagus_boil": 3,
+    "spinach_wilt_pan": 1,
+    "onions_soften_medium_heat": 8,
+    "onions_caramelise_low_heat": 30,
+    "garlic_sliced_gentle_heat": 1.5,
+    "mushrooms_sliced_hot_pan": 5
+  },
+  "sauces": {
+    "tomato_sauce_simmer": 10,
+    "garlic_butter_baste_steak": 1
   }
 }
