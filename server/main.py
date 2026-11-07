@@ -253,6 +253,18 @@ def vision_look(req: LookRequest, request: Request):
         raise HTTPException(e.status, str(e)) from None
 
 
+@app.get("/api/vision/models")
+def vision_models():
+    """Which Gemini models this key can use, in the order we'd try them (names only)."""
+    if not vision.api_key():
+        raise HTTPException(503, "Vision key missing.")
+    try:
+        with vision.httpx.Client(timeout=10) as client:
+            return {"try_order": vision.candidates(client), "current": vision.key_status()["vision_model"]}
+    except (vision.httpx.HTTPError, vision.VisionError) as e:
+        raise HTTPException(502, f"Couldn't list Gemini models: {e}") from None
+
+
 # ---------- the app itself ----------
 
 @app.get("/")

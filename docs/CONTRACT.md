@@ -55,7 +55,7 @@ Two actions need an answer from the server, which the live connection passes bac
 | `POST /api/recipes/ai` | `{ recipe: { title, ingredients, steps, ... } }` (from `create_recipe`) | `{ ok, recipe, changes, warnings, message }`: cleaned recipe with corrected timers, `estimate` flags and `safety` temps |
 | `GET /api/recipes/{id}` | | full recipe (shape below) |
 | `POST /api/brain` | `{ mode, recipe_id? }` (no `recipe_id` = Remy asks what to cook) | `{ instructions, tools, recipe, mode, max_minutes }`: Remy's brain for **any** voice route, no AI key needed |
-| `POST /api/vision/look` | `{ image: <JPEG base64 / data: URL, ≤1.5 MB>, step?: <current recipe step>, question? }` | `{ summary, can_see_cooking, camera_tip, observations[], issues[{type, detail, confidence}], safety, step_done, answer, model, ms, at }`: **Remy's eyes** (Gemini). Send ~1 picture every 2–3 s (429 if faster). Feed it to the voice as context, act on `issues` with confidence ≥ 0.6, and treat `safety` as urgent |
+| `POST /api/vision/look` | `{ image: <JPEG base64 / data: URL, ≤1.5 MB>, step?: <current recipe step>, question? }` | `{ summary, can_see_cooking, camera_tip, observations[], issues[{type, detail, confidence}], safety, step_done, answer, model, ms, at }`: **Remy's eyes** (Gemini). Send ~1 picture every 3 s (429 if under 2 s apart). `GET /api/vision/models` shows which models the key can use. Feed it to the voice as context, act on `issues` with confidence ≥ 0.6, and treat `safety` as urgent |
 | `POST /api/session` | `{ mode: "gentle" \| "honest" \| "savage", recipe_id? }` (no `recipe_id` = Remy asks) | `{ client_secret, expires_at, model, max_minutes, recipe, mode }` · `503` if no OpenAI key |
 
 ## 5. Recipe file shape (`remy-brain/recipes/<id>.json`)
