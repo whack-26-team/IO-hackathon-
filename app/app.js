@@ -7,6 +7,8 @@ import { unlockSound, beep } from "./sound.js";
 import { createMockRemy } from "./remy/mock.js";
 import { createLiveRemy } from "./remy/live.js";
 import { createDemoRemy } from "./demo/demo-remy.js"; // ?demo=1 (Felix)
+import { initModeSwitch } from "./extras/mode-switch.js"; // tap the badge mid-cook (Felix)
+import { initSetupGuide } from "./extras/setup-guide.js"; // first-time setup card (Felix)
 
 const $ = (id) => document.getElementById(id);
 const state = { recipe: null, mode: "honest", remy: null, stream: null, cooking: false, live: false };
@@ -60,6 +62,17 @@ $("age-no").addEventListener("click", () => {
 $("safety-link").addEventListener("click", () => $("safety-dialog").classList.remove("hidden"));
 $("safety-ok").addEventListener("click", () => $("safety-dialog").classList.add("hidden"));
 applyMode(checkedMode()); // the browser may remember the last choice after a reload
+initSetupGuide();
+
+// Switch attitude while cooking (Felix builds the picker in extras/mode-switch.js)
+function setMode(mode) {
+  if (!MODE_NAMES[mode] || mode === state.mode) return;
+  state.mode = mode;
+  $("mode-badge").textContent = MODE_NAMES[mode];
+  state.remy?.send("mode_changed", { mode });
+  if ($("speech").classList.contains("quiet")) quietRemy(); // his resting face follows the attitude
+}
+initModeSwitch({ badge: $("mode-badge"), getMode: () => state.mode, setMode });
 
 $("start-btn").addEventListener("click", async () => {
   // This tap is important: iPhones only allow sound and mic after a tap.
@@ -359,7 +372,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v75`,
+      `version  v76`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);

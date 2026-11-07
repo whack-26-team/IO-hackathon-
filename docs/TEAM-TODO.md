@@ -38,7 +38,7 @@ Same rule as above.
 
 ---
 
-## Felix (`app/demo/`, `docs/pitch/`)
+## Felix (`app/demo/`, `app/extras/`, `docs/pitch/`)
 
 New tasks while Matthew is on a break: **issue #83**. Read `docs/DEMO.md` first.
 
@@ -46,6 +46,9 @@ New tasks while Matthew is on a break: **issue #83**. Read `docs/DEMO.md` first.
 - [ ] Pitch slides in `docs/pitch/` (6 slides max, plus a PDF)
 - [ ] Rehearse the demo on your iPhone, post the timings on #83
 - [ ] Record the backup video once demo mode works (shared drive, link on #83)
+- [ ] Change attitude mid-cook by tapping the badge (`app/extras/mode-switch.js`)
+- [ ] First-time setup card (`app/extras/setup-guide.js`)
+- [ ] Backup video on a laptop with a video file as the camera (steps in #83)
 
 ---
 
