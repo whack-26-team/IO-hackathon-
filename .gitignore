@@ -8,3 +8,4 @@ venv/
 tests/clips/
 *.mp4
 *.mov
+remy-brain/recipes/_imported/

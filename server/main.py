@@ -5,6 +5,7 @@ Owner: Matthew. Other people: please ask before editing.
 What it does:
   * serves the app (the `app/` folder) so the phone opens one link
   * GET  /api/recipes        -> list of recipes
+  * GET  /api/recipes/find?q=steak -> find a recipe by what the cook said (Remy's find_recipe)
   * GET  /api/recipes/{id}   -> one full recipe
   * POST /api/brain          -> Remy's instructions + actions for ANY voice route
   * POST /api/session        -> a short-lived pass for the live OpenAI call,
@@ -28,6 +29,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+
+from server.recipe_sources import IMPORT_DIR, find_recipe
 
 ROOT = Path(__file__).resolve().parent.parent
 APP_DIR = ROOT / "app"
@@ -59,14 +62,24 @@ def _read_text(path: Path) -> str:
 
 
 def load_recipe(recipe_id: str) -> dict:
-    path = RECIPES_DIR / f"{recipe_id}.json"
-    # Only allow plain file names, so nobody can ask for ../../secret
-    if path.parent != RECIPES_DIR or not path.exists():
-        raise HTTPException(404, f"No recipe called '{recipe_id}'")
-    return _read_json(path)
+    # Our recipes first, then ones found online earlier (cached in _imported/)
+    for folder in (RECIPES_DIR, IMPORT_DIR):
+        path = folder / f"{recipe_id}.json"
+        # Only allow plain file names, so nobody can ask for ../../secret
+        if path.parent == folder and path.exists():
+            return _read_json(path)
+    raise HTTPException(404, f"No recipe called '{recipe_id}'")
 
 
-def build_instructions(recipe: dict, mode: str) -> str:
+NO_RECIPE_YET = """# TODAY'S RECIPE
+Not chosen yet. The cook just pressed Start cooking. After your greeting and camera
+check, ask what they'd like to cook. When they tell you, call find_recipe with the
+dish exactly as they said it. If it returns a recipe, briefly confirm it ("Steak
+Diane it is"), name the ingredients they'll need, and guide from step 1. If nothing
+is found, follow the message it returns."""
+
+
+def build_instructions(recipe: dict | None, mode: str) -> str:
     """Glue Pranav's personality files + Matthew's recipe/knowledge into one prompt."""
     core = _read_text(BRAIN_DIR / "instructions.md")
     personality = _read_text(BRAIN_DIR / "personality" / f"{mode}.md")
@@ -79,7 +92,7 @@ def build_instructions(recipe: dict, mode: str) -> str:
         core,
         f"# PERSONALITY MODE: {mode.upper()}\n{personality}",
         "# ROAST & CATCHPHRASE LIBRARY (riff on these, don't just repeat them)\n" + roast_text,
-        "# TODAY'S RECIPE\n" + json.dumps(recipe, ensure_ascii=False),
+        ("# TODAY'S RECIPE\n" + json.dumps(recipe, ensure_ascii=False)) if recipe else NO_RECIPE_YET,
         "# COOKING TIMES (use these for start_timer, never guess)\n" + cook_times,
         "# FOOD SAFETY (fixed facts, never contradict these)\n" + safety,
     ])
@@ -111,13 +124,22 @@ def list_recipes():
     return out
 
 
+@app.get("/api/recipes/find")
+def find(q: str):
+    """Find a recipe from what the cook said, e.g. ?q=I want to make steak.
+    Remy's find_recipe action calls this. See server/recipe_sources.py for the order."""
+    if not q.strip():
+        raise HTTPException(400, "Say what you'd like to cook")
+    return find_recipe(q[:200])
+
+
 @app.get("/api/recipes/{recipe_id}")
 def get_recipe(recipe_id: str):
     return load_recipe(recipe_id)
 
 
 class SessionRequest(BaseModel):
-    recipe_id: str
+    recipe_id: str | None = None   # None = Remy asks the cook what to make
     mode: str = "honest"
 
 
@@ -130,7 +152,7 @@ def get_brain(req: SessionRequest):
     """
     if req.mode not in MODES:
         raise HTTPException(400, f"mode must be one of {MODES}")
-    recipe = load_recipe(req.recipe_id)
+    recipe = load_recipe(req.recipe_id) if req.recipe_id else None
     return {
         "instructions": build_instructions(recipe, req.mode),
         "tools": load_tools(),
@@ -144,7 +166,7 @@ def get_brain(req: SessionRequest):
 async def create_session(req: SessionRequest):
     if req.mode not in MODES:
         raise HTTPException(400, f"mode must be one of {MODES}")
-    recipe = load_recipe(req.recipe_id)
+    recipe = load_recipe(req.recipe_id) if req.recipe_id else None
     instructions = build_instructions(recipe, req.mode)
 
     if not OPENAI_API_KEY:

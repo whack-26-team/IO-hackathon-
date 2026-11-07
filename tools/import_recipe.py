@@ -26,56 +26,12 @@ import re
 import sys
 from pathlib import Path
 
-import httpx
 
 ROOT = Path(__file__).resolve().parent.parent
-RECIPES_DIR = ROOT / "remy-brain" / "recipes"
-KEY = os.getenv("THEMEALDB_KEY", "1")
-API = f"https://www.themealdb.com/api/json/v1/{KEY}"
-
-
-def slugify(text: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
-
-
-def search(name: str) -> list[dict]:
-    r = httpx.get(f"{API}/search.php", params={"s": name}, timeout=20)
-    r.raise_for_status()
-    return r.json().get("meals") or []
-
-
-def split_steps(method: str) -> list[str]:
-    # TheMealDB methods are sometimes numbered lines, sometimes one big paragraph.
-    lines = [l.strip() for l in re.split(r"\r?\n+", method) if l.strip()]
-    lines = [re.sub(r"^(step\s*)?\d+[.):]?\s*", "", l, flags=re.I) for l in lines]
-    lines = [l for l in lines if len(l) > 3]
-    if len(lines) <= 1:  # one paragraph -> split into sentences
-        lines = [s.strip() for s in re.split(r"(?<=[.!?])\s+", method) if len(s.strip()) > 3]
-    return lines
-
-
-def to_remy(meal: dict) -> dict:
-    ingredients = []
-    for i in range(1, 21):
-        ing = (meal.get(f"strIngredient{i}") or "").strip()
-        measure = (meal.get(f"strMeasure{i}") or "").strip()
-        if ing:
-            ingredients.append(f"{measure} {ing}".strip())
-    return {
-        "id": slugify(meal["strMeal"]),
-        "title": meal["strMeal"],
-        "summary": f"{meal.get('strArea') or ''} {meal.get('strCategory') or ''}".strip(),
-        "source": f"TheMealDB #{meal['idMeal']}",
-        "source_url": meal.get("strSource") or "",
-        "video": meal.get("strYoutube") or "",
-        "image": meal.get("strMealThumb") or "",
-        "checked_by_human": False,
-        "ingredients": ingredients,
-        "steps": [
-            {"instruction": s, "looks_right": [], "looks_wrong": [], "done_when": ""}
-            for s in split_steps(meal.get("strInstructions") or "")
-        ],
-    }
+sys.path.insert(0, str(ROOT))
+# One shared copy of the TheMealDB code (also used live by the server's recipe finder)
+from server.recipe_sources import (IMPORT_DIR, mealdb_lookup as lookup,  # noqa: E402
+                                   mealdb_search as search, mealdb_to_remy as to_remy)
 
 
 def main() -> int:
