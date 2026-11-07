@@ -22,6 +22,15 @@ flames or fire** get a `safety_alert`.
 Already done by Matthew: recipes, `remy-brain/knowledge/food-safety.json`, and the
 Gemini picture check in `server/vision.py`.
 
+### 2. Savage swears occasionally (decided 2026-11-07, Matthew edited your files with his approval)
+Savage now swears in roughly one roast in three: one word per line, aimed at the food,
+never the cook, milder words first and stronger ones only on repeats. Never in safety
+alerts, timers or guidance. Changed: `personality/savage.md` and the Savage lines in
+`personality/roasts.json`.
+
+- [ ] Read the new lines and tweak them in your style if you like (they're yours)
+- [ ] Re-run your Savage swearing test (`tests/c1-savage-test.md`) when you can, and note whether the voice model actually says them
+
 ---
 
 ## Ahmed (`app/remy/`, `server/second_opinion.py`)
@@ -32,6 +41,10 @@ Same rule as above.
 - [ ] `app/remy/agent-prompt.md`, priority 1: remove "smoking oil" and say "fire or flames".
 - [ ] The ElevenLabs agent's prompt in the ElevenLabs dashboard, if it's a copy of `agent-prompt.md`: same change.
 - [ ] `app/remy/mock.js` (around line 81): Pretend Remy's alert "Pan is smoking! Take it off the heat." → a different danger, e.g. "Fingers! Tuck them into a claw grip."
+
+### 2. Savage swears occasionally (decided 2026-11-07)
+- [ ] If the ElevenLabs agent has its own copy of the Savage personality (not loaded from `/api/brain`), update it to match `remy-brain/personality/savage.md`: occasional swearing in roasts, aimed at the food, never in safety alerts
+- [ ] Check the Savage voice actually says the words (ElevenLabs may soften them) and note the result on #55
 
 ### Done
 - [x] Timer beeps skipped in real sessions, plus an accurate privacy note (Matthew, PR #73).
