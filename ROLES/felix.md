@@ -13,6 +13,8 @@
 >
 > Rule of thumb: only edit `app/` (not `app/remy/`, that's Ahmed's), work on your own branch, push every hour, open a PR at each checkpoint.
 
+> 🌿 **Your branches:** you work only on your own branches, one per issue, all starting with `felix/` (e.g. `felix/c2-9-app-screens`). The exact names are in your issues and in `docs/BRANCHES.md`. Never push to `main`.
+
 ## 🤖 Prompt to paste into Claude Code
 ```
 I'm Felix, on a 4-person hackathon team building REMY: a live AI chef that watches
@@ -63,10 +65,30 @@ CONSTRAINTS:
 - Safety alerts must always be visually stronger than roasts.
 - Nothing is recorded or saved; keep the privacy note on the start screen.
 
+MY DEDICATED BRANCHES (one per issue; exact names, don't invent others):
+- C0 (#7): felix/c0-7-run-skeleton
+- C1 (#8): felix/c1-8-iphone-check
+- C2 (#9): felix/c2-9-app-screens
+- C3 (#10): felix/c3-10-real-remy
+- C4 (#11): felix/c4-11-polish-demo
+- C5 (#12): felix/c5-12-video-pitch
+Branch rules, follow them every time:
+- Before starting an issue: `git checkout main && git pull`, then
+  `git checkout -b <that issue's branch>`. Always branch from the LATEST main.
+- Before EVERY commit, check `git branch --show-current`. It must be one of MY
+  branches above. If it says main or someone else's branch, STOP and tell me.
+- Never commit or push to main, and never to another person's branch.
+- Push the branch at least every hour: `git push -u origin <branch>`.
+- One PR per branch, with "Closes #<issue>". Once it's merged, that branch is
+  finished: start the next issue's branch from fresh main (don't reuse it).
+- A new task that's not in the list (e.g. a bug from issue #31) gets
+  felix/c<checkpoint>-31-<short-description>.
+
 HOW TO WORK WITH ME:
 1. Don't code yet. First, give me a short plan for my CURRENT checkpoint (start with
    C0/C1, then C2), broken into small steps, and ask me any questions.
-2. After I approve: create a branch felix/<short-task>, make small commits, and push
+2. After I approve: create the branch named for the issue in docs/BRANCHES.md
+   (felix/c<checkpoint>-<issue>-<description>, from the latest main), make small commits, and push
    at least every hour.
 3. After each change, run the server (uvicorn server.main:app --reload --port 8000)
    and check it in the browser with pretend Remy.

@@ -12,6 +12,8 @@
 >
 > The two hard rules: **safety beats comedy** (real danger means a clear warning first, roast after), and **roast the cooking, never the person**.
 
+> 🌿 **Your branches:** you work only on your own branches, one per issue, all starting with `pranav/` (e.g. `pranav/c2-21-personality`). The exact names are in your issues and in `docs/BRANCHES.md`. Never push to `main`.
+
 ## 🤖 Prompt to paste into Codex
 ```
 I'm Pranav, on a 4-person hackathon team building REMY: a live AI chef that watches
@@ -74,10 +76,30 @@ BOUNDARIES (non-negotiable):
 - A wrong roast is worse than no roast, so confidence first.
 - Keep files valid: run `python tools/validate.py` before every commit.
 
+MY DEDICATED BRANCHES (one per issue; exact names, don't invent others):
+- C0 (#19): pranav/c0-19-core-rules
+- C1 (#20): pranav/c1-20-savage-test
+- C2 (#21): pranav/c2-21-personality
+- C3 (#22): pranav/c3-22-cookalong-log
+- C4 (#23): pranav/c4-23-accuracy
+- C5 (#24): pranav/c5-24-final-personality
+Branch rules, follow them every time:
+- Before starting an issue: `git checkout main && git pull`, then
+  `git checkout -b <that issue's branch>`. Always branch from the LATEST main.
+- Before EVERY commit, check `git branch --show-current`. It must be one of MY
+  branches above. If it says main or someone else's branch, STOP and tell me.
+- Never commit or push to main, and never to another person's branch.
+- Push the branch at least every hour: `git push -u origin <branch>`.
+- One PR per branch, with "Closes #<issue>". Once it's merged, that branch is
+  finished: start the next issue's branch from fresh main (don't reuse it).
+- A new task that's not in the list (e.g. a bug from issue #31) gets
+  pranav/c<checkpoint>-31-<short-description>.
+
 HOW TO WORK WITH ME:
 1. Don't write files yet. Give me a plan for C0 + C2, pitch me 10 sample roasts per
    mode and 5 catchphrase ideas so I can pick the vibe, and ask me any questions.
-2. After I approve: branch pranav/<short-task>, small commits, push at least hourly.
+2. After I approve: branch using the exact branch name for the issue from docs/BRANCHES.md
+   (pranav/c<checkpoint>-<issue>-<description>, always started from the latest main), small commits, push at least hourly.
 3. At each checkpoint: open a PR to main with "Closes #<issue>" (include the accuracy
    score once we have one) and give me a Done / Next / Blocked note for the issue.
 Be bold and creative with the comedy. Remy should be memorable.

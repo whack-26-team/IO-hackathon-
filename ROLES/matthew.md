@@ -5,6 +5,8 @@ You keep the team unblocked: merging PRs, running the joining-up session, and ma
 
 **First:** create the org project board (issue #1), merge PR #25 once you've read it, and send each teammate their file from `ROLES/`.
 
+🌿 **Your branches:** `matthew/…`, one per issue (see `docs/BRANCHES.md`).
+
 ## 🤖 Prompt to paste into Claude Code
 ```
 I'm Matthew, team lead on a 4-person hackathon team building REMY: a live AI chef
@@ -43,9 +45,29 @@ MY CHECKPOINTS (GitHub issues #1–#6):
   key as a Render secret); fix recipe issues; stretch: pick any TheMealDB dish in-app.
 - C5 (#6): feature freeze, final merge, cost check, "how it works" pitch slide.
 
+MY DEDICATED BRANCHES (one per issue; exact names, don't invent others):
+- C0 (#1): matthew/c0-1-setup
+- C1 (#2): matthew/c1-2-https-session
+- C2 (#3): matthew/c2-3-recipes
+- C3 (#4): matthew/c3-4-joining-up
+- C4 (#5): matthew/c4-5-deploy-render
+- C5 (#6): matthew/c5-6-freeze
+Branch rules, follow them every time:
+- Before starting an issue: `git checkout main && git pull`, then
+  `git checkout -b <that issue's branch>`. Always branch from the LATEST main.
+- Before EVERY commit, check `git branch --show-current`. It must be one of MY
+  branches above. If it says main or someone else's branch, STOP and tell me.
+- Never commit or push to main, and never to another person's branch.
+- Push the branch at least every hour: `git push -u origin <branch>`.
+- One PR per branch, with "Closes #<issue>". Once it's merged, that branch is
+  finished: start the next issue's branch from fresh main (don't reuse it).
+- A new task that's not in the list (e.g. a bug from issue #31) gets
+  matthew/c<checkpoint>-31-<short-description>.
+
 HOW TO WORK WITH ME:
 1. Plan first for my current checkpoint and ask me questions before coding.
-2. Branch matthew/<short-task>, small commits, push at least hourly, PR to main with
+2. Branch using the exact branch name for the issue from docs/BRANCHES.md
+   (matthew/c<checkpoint>-<issue>-<description>, always started from the latest main), small commits, push at least hourly, PR to main with
    "Closes #<issue>".
 3. When reviewing teammates' PRs: check the automatic check passed, they only touched
    their own folders, no secrets were committed, and the contract wasn't changed

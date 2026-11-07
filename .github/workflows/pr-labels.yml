@@ -1,0 +1,38 @@
+name: PR labels
+# Labels pull requests from the branch name (see docs/BRANCHES.md):
+#   felix/c2-9-app-screens  ->  label "felix", milestone C2
+# and gently comments if the branch doesn't follow the naming rule.
+on:
+  pull_request:
+    types: [opened, reopened]
+
+permissions:
+  pull-requests: write
+  issues: write
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const branch = context.payload.pull_request.head.ref;
+            const pr = context.payload.pull_request.number;
+            const m = branch.match(/^(matthew|felix|ahmed|pranav|claude)\/c([0-5])-(\d+-)?[a-z0-9-]+$/);
+            if (!m) {
+              await github.rest.issues.createComment({ ...context.repo, issue_number: pr,
+                body: `👋 Heads up: branch \`${branch}\` doesn't follow our naming rule ` +
+                      "`<name>/c<checkpoint>-<issue>-<short-description>` (e.g. `felix/c2-9-app-screens`). " +
+                      "See [docs/BRANCHES.md](../blob/main/docs/BRANCHES.md). No need to redo this PR, just use it next time." });
+              return;
+            }
+            const [, who, cp] = m;
+            if (who !== "claude") {
+              await github.rest.issues.addLabels({ ...context.repo, issue_number: pr, labels: [who] });
+            }
+            const milestones = await github.rest.issues.listMilestones({ ...context.repo, state: "all", per_page: 100 });
+            const ms = milestones.data.find(x => x.title.startsWith(`C${cp} `));
+            if (ms) {
+              await github.rest.issues.update({ ...context.repo, issue_number: pr, milestone: ms.number });
+            }

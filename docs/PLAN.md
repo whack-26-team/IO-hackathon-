@@ -295,7 +295,7 @@ A **GitHub Project** board for the `whack-26-team` organisation, which everyone 
 
 ## GitHub rules (plain version)
 - **`main`** = the working version. Nobody edits it directly.
-- Own **branch** per task (e.g. `pranav/savage-mode`) → **pull request** → a quick teammate review (Matthew by default) → merge.
+- One **branch** per issue, named `<name>/c<checkpoint>-<issue>-<description>` (e.g. `pranav/c2-21-personality`, full list in `docs/BRANCHES.md`) → **pull request** → a quick teammate review (Matthew by default) → merge.
 - Claude switches to this too after the initial skeleton, which is the one direct push.
 - **Needed:** Felix's, Ahmed's and Pranav's **GitHub usernames** so Claude can assign their issues (or Claude creates them unassigned and people self-assign).
 
