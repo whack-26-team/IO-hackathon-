@@ -1,0 +1,15 @@
+{
+  "_owner": "Pranav. One entry per test clip. Clips live in a shared drive (too big for GitHub), not in tests/clips/.",
+  "_how": "For each clip, list the moments Remy SHOULD react to. score.py checks Remy's reactions against these.",
+  "clips": [
+    {
+      "file": "burnt-garlic.mp4",
+      "recipe": "rigatoni",
+      "events": [
+        { "at_seconds": 42, "expect": "warning", "mistake": "burning", "note": "garlic starts browning" },
+        { "at_seconds": 70, "expect": "roast", "mistake": "burning", "note": "garlic black" }
+      ],
+      "quiet_periods": [[0, 35]]
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>REMY</title>
+  <!-- Makes "Add to Home Screen" open full screen like an app -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="REMY">
+  <link rel="apple-touch-icon" href="icon.png">
+  <meta name="theme-color" content="#111111">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Owner: Felix (except app/remy/, which is Ahmed's) -->
+
+  <!-- START SCREEN -->
+  <section id="start-screen" class="screen">
+    <h1 class="logo">REMY</h1>
+    <p class="tagline">Your live AI chef. It watches, it judges, it helps.</p>
+
+    <label class="field">What are we cooking?
+      <select id="recipe-picker"></select>
+    </label>
+
+    <fieldset class="modes">
+      <legend>Pick Remy's attitude</legend>
+      <label><input type="radio" name="mode" value="gentle"> 😇 Gentle</label>
+      <label><input type="radio" name="mode" value="honest" checked> 😏 Honest</label>
+      <label><input type="radio" name="mode" value="savage"> 🤬 Savage <small>(18+, swearing)</small></label>
+    </fieldset>
+
+    <label class="field toggle">
+      <input type="checkbox" id="use-mock" checked> Pretend Remy (no AI, for testing)
+    </label>
+
+    <button id="start-btn" class="big-btn">Start cooking</button>
+
+    <p class="small-print">
+      Nothing is recorded or saved. Remy is an assistant, so use your own judgment,
+      especially with knives, hot oil and meat temperatures (use a thermometer).
+    </p>
+  </section>
+
+  <!-- COOKING SCREEN -->
+  <section id="cook-screen" class="screen hidden">
+    <video id="camera" autoplay playsinline muted></video>
+    <canvas id="frame-canvas" hidden></canvas>
+
+    <div id="alert-flash" class="hidden"></div>
+
+    <header class="top-bar">
+      <span id="status" class="status">connecting…</span>
+      <span id="mode-badge" class="badge"></span>
+      <button id="stop-btn" class="stop-btn">Stop</button>
+    </header>
+
+    <div id="timers" class="timers"></div>
+
+    <div class="bottom">
+      <div id="bubble" class="bubble hidden"></div>
+      <details id="steps-panel" class="steps" open>
+        <summary id="step-summary">Steps</summary>
+        <ol id="steps-list"></ol>
+      </details>
+    </div>
+  </section>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

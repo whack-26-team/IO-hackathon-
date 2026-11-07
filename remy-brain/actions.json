@@ -1,0 +1,81 @@
+{
+  "_owner": "Pranav. These are the on-screen actions Remy can trigger. Ahmed's live.js turns each into a screen event (docs/CONTRACT.md).",
+  "tools": [
+    {
+      "type": "function",
+      "name": "show_tip",
+      "description": "Show a short tip on screen (also say it out loud). Use for normal guidance and mild warnings.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "text": { "type": "string", "description": "Max ~15 words." },
+          "severity": { "type": "string", "enum": ["info", "warning", "urgent"] }
+        },
+        "required": ["text", "severity"]
+      }
+    },
+    {
+      "type": "function",
+      "name": "roast",
+      "description": "Roast the cook's mistake in the current personality mode. Only when you are CONFIDENT a mistake happened. Never during a safety problem.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "text": { "type": "string" },
+          "level": { "type": "integer", "enum": [1, 2, 3], "description": "1 = first jab, 3 = repeat-offender meltdown." },
+          "mistake": { "type": "string", "description": "Key from roasts.json, e.g. burning, overcooked." }
+        },
+        "required": ["text", "level"]
+      }
+    },
+    {
+      "type": "function",
+      "name": "safety_alert",
+      "description": "Red full-screen warning for real danger: fire, smoking oil, knife near fingers, raw meat cross-contamination, child or pet near the hob. Drop the comedy.",
+      "parameters": {
+        "type": "object",
+        "properties": { "text": { "type": "string", "description": "Short and clear, e.g. 'Oil is smoking: take the pan off the heat'." } },
+        "required": ["text"]
+      }
+    },
+    {
+      "type": "function",
+      "name": "update_step",
+      "description": "Move the recipe on when a step is done (use the step's done_when).",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "current_step": { "type": "integer", "description": "0-based index of the step the cook is now on." },
+          "step_complete": { "type": "boolean" },
+          "next_instruction": { "type": "string" }
+        },
+        "required": ["current_step", "step_complete"]
+      }
+    },
+    {
+      "type": "function",
+      "name": "start_timer",
+      "description": "Start a countdown when you SEE or HEAR that something timed has started (e.g. pasta goes into the water). Take minutes from the recipe step timer or the cook-times table. Never guess. Say what you started so the cook can correct it.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "description": "Short id, e.g. 'pasta'." },
+          "label": { "type": "string", "description": "e.g. 'Rigatoni'." },
+          "minutes": { "type": "number" },
+          "check_at_minutes": { "type": "number", "description": "When to check/taste, e.g. 1 minute before the end." }
+        },
+        "required": ["id", "label", "minutes"]
+      }
+    },
+    {
+      "type": "function",
+      "name": "cancel_timer",
+      "description": "Cancel a timer the cook says is wrong, or that no longer applies.",
+      "parameters": {
+        "type": "object",
+        "properties": { "id": { "type": "string" } },
+        "required": ["id"]
+      }
+    }
+  ]
+}

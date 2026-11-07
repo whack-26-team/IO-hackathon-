@@ -1,0 +1,71 @@
+/* Owner: Felix */
+:root {
+  --bg: #111;
+  --fg: #fff;
+  --muted: #aaa;
+  --accent: #ff6a1a;
+  --info: #2d7dff;
+  --warning: #ffb020;
+  --urgent: #ff3030;
+  --panel: rgba(0, 0, 0, 0.6);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+
+.hidden { display: none !important; }
+.screen { min-height: 100dvh; }
+
+/* ---------- start screen ---------- */
+#start-screen { display: flex; flex-direction: column; gap: 18px; padding: 48px 20px 32px;
+  max-width: 480px; margin: 0 auto; }
+.logo { font-size: 64px; margin: 0; letter-spacing: 4px; color: var(--accent); }
+.tagline { margin: 0; color: var(--muted); }
+.field { display: flex; flex-direction: column; gap: 6px; font-weight: 600; }
+.field.toggle { flex-direction: row; align-items: center; font-weight: 400; color: var(--muted); }
+select { font-size: 18px; padding: 12px; border-radius: 12px; border: 0; }
+.modes { border: 1px solid #333; border-radius: 12px; display: flex; flex-direction: column; gap: 10px; }
+.modes label { font-size: 18px; }
+.big-btn { font-size: 22px; font-weight: 700; padding: 18px; border: 0; border-radius: 16px;
+  background: var(--accent); color: #000; }
+.small-print { font-size: 13px; color: var(--muted); }
+
+/* ---------- cooking screen ---------- */
+#cook-screen { position: relative; height: 100dvh; overflow: hidden; }
+#camera { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #000; }
+
+.top-bar { position: absolute; top: env(safe-area-inset-top, 0); left: 0; right: 0;
+  display: flex; gap: 8px; align-items: center; padding: 12px 16px; }
+.status, .badge { background: var(--panel); padding: 6px 10px; border-radius: 999px; font-size: 14px; }
+.stop-btn { margin-left: auto; background: var(--panel); color: var(--fg); border: 1px solid #555;
+  border-radius: 999px; padding: 6px 14px; font-size: 14px; }
+
+.timers { position: absolute; top: 64px; right: 16px; display: flex; flex-direction: column; gap: 8px; }
+.timer { background: var(--panel); border-radius: 14px; padding: 8px 12px; min-width: 130px; text-align: right; }
+.timer .label { font-size: 13px; color: var(--muted); }
+.timer .time { font-size: 28px; font-variant-numeric: tabular-nums; font-weight: 700; }
+.timer.check .time { color: var(--warning); }
+.timer.done { background: var(--urgent); animation: pulse 1s infinite; }
+.timer .x { background: none; border: 0; color: var(--muted); font-size: 12px; }
+
+.bottom { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 16px calc(16px + env(safe-area-inset-bottom, 0));
+  display: flex; flex-direction: column; gap: 10px; }
+.bubble { background: var(--panel); border-left: 6px solid var(--info); border-radius: 14px;
+  padding: 12px 14px; font-size: 20px; line-height: 1.3; }
+.bubble.warning { border-color: var(--warning); }
+.bubble.urgent { border-color: var(--urgent); }
+.bubble.roast { border-color: var(--accent); font-size: 24px; font-weight: 700; animation: shake 0.4s; }
+
+.steps { background: var(--panel); border-radius: 14px; padding: 8px 14px; max-height: 30dvh; overflow: auto; }
+.steps summary { font-weight: 700; }
+.steps li { margin: 6px 0; color: var(--muted); }
+.steps li.current { color: var(--fg); font-weight: 600; }
+.steps li.done { text-decoration: line-through; }
+
+#alert-flash { position: absolute; inset: 0; background: rgba(255, 0, 0, 0.45); display: flex;
+  align-items: center; justify-content: center; text-align: center; font-size: 34px; font-weight: 800;
+  padding: 24px; animation: pulse 0.6s 4; z-index: 5; }
+
+@keyframes pulse { 50% { opacity: 0.5; } }
+@keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }

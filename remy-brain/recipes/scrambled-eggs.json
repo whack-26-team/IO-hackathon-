@@ -1,0 +1,41 @@
+{
+  "id": "scrambled-eggs",
+  "title": "Creamy scrambled eggs",
+  "summary": "Quick, cheap and easy to overcook: perfect for a demo.",
+  "source": "Starter outline written by Claude. Matthew: replace/compare with a TheMealDB import, then hand-check.",
+  "checked_by_human": false,
+  "serves": 1,
+  "ingredients": [
+    "3 eggs",
+    "1 tbsp butter",
+    "Salt and pepper",
+    "Chives (optional)",
+    "Toast to serve"
+  ],
+  "steps": [
+    {
+      "instruction": "Crack the eggs into a bowl and whisk until smooth.",
+      "looks_right": ["even yellow colour, no streaks of white"],
+      "looks_wrong": ["bits of shell in the bowl", "streaky whites"],
+      "done_when": "Smooth, even yellow."
+    },
+    {
+      "instruction": "Melt the butter in a non-stick pan on LOW heat.",
+      "looks_right": ["butter melting gently, light foam"],
+      "looks_wrong": ["butter browning or smoking (heat too high)"],
+      "done_when": "Butter melted and foaming gently."
+    },
+    {
+      "instruction": "Pour in the eggs and stir slowly and constantly with a spatula.",
+      "looks_right": ["soft, small curds forming slowly", "eggs still glossy"],
+      "looks_wrong": ["eggs setting instantly at the edges (too hot)", "big rubbery lumps", "eggs browning"],
+      "done_when": "Curds forming but still a bit wet."
+    },
+    {
+      "instruction": "Take the pan off the heat while still slightly runny. Season and serve on toast.",
+      "looks_right": ["soft, glossy, creamy curds"],
+      "looks_wrong": ["dry, crumbly, rubbery eggs (overcooked)", "water leaking out of the eggs"],
+      "done_when": "Off the heat while glossy. They keep cooking in the pan."
+    }
+  ]
+}

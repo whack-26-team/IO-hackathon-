@@ -1,0 +1,36 @@
+{
+  "_owner": "Matthew. Timers come from here (or the recipe step), never guessed. Always tell the cook: 'check the packet time'. Starter values, expand at C2.",
+  "pasta_dried_minutes_al_dente": {
+    "rigatoni": { "min": 11, "max": 13, "default": 11 },
+    "penne": { "min": 10, "max": 12, "default": 11 },
+    "fusilli": { "min": 10, "max": 12, "default": 11 },
+    "spaghetti": { "min": 9, "max": 11, "default": 10 },
+    "linguine": { "min": 9, "max": 11, "default": 10 },
+    "tagliatelle_dried": { "min": 7, "max": 9, "default": 8 },
+    "fresh_egg_pasta": { "min": 2, "max": 4, "default": 3 }
+  },
+  "steak_minutes_per_side_hot_pan": {
+    "_note": "For a ~2.5cm (1 inch) thick steak in a very hot pan. Rest 5 minutes after. Use a thermometer for accuracy.",
+    "rare": 2,
+    "medium_rare": 3,
+    "medium": 4,
+    "well_done": 6
+  },
+  "eggs_minutes_in_boiling_water": {
+    "soft_boiled_runny": 6.5,
+    "jammy": 7.5,
+    "hard_boiled": 10
+  },
+  "rice_minutes": {
+    "white_basmati_simmer": 10,
+    "white_long_grain_simmer": 12,
+    "brown_rice_simmer": 25,
+    "rest_covered_after": 5
+  },
+  "veg_minutes_boiling": {
+    "broccoli_florets": 3,
+    "green_beans": 4,
+    "peas_frozen": 3,
+    "potatoes_chunks": 15
+  }
+}

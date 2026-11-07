@@ -1,0 +1,51 @@
+{
+  "id": "steak",
+  "title": "Pan-seared steak",
+  "summary": "A properly seared steak, the best test of 'too hot / not hot enough'.",
+  "source": "Starter outline written by Claude. Matthew: replace/compare with a TheMealDB import, then hand-check.",
+  "checked_by_human": false,
+  "serves": 1,
+  "ingredients": [
+    "1 sirloin or ribeye steak, ~2.5cm thick, at room temperature",
+    "1 tbsp high smoke point oil (vegetable, rapeseed)",
+    "Salt and black pepper",
+    "1 tbsp butter",
+    "1 garlic clove, crushed",
+    "Sprig of thyme or rosemary"
+  ],
+  "steps": [
+    {
+      "instruction": "Pat the steak dry with kitchen paper and season well on both sides.",
+      "looks_right": ["dry surface", "visible salt and pepper"],
+      "looks_wrong": ["wet steak straight from the packet (it won't sear)"],
+      "done_when": "Steak is dry and seasoned."
+    },
+    {
+      "instruction": "Heat a heavy pan on high until very hot, then add the oil.",
+      "looks_right": ["oil shimmering", "first wisps of smoke"],
+      "looks_wrong": ["heavy smoke (too hot, take it off)", "cold pan, no shimmer"],
+      "done_when": "Oil shimmers and just starts to smoke."
+    },
+    {
+      "instruction": "Lay the steak in, away from you. Don't move it.",
+      "looks_right": ["loud sizzle as it goes in"],
+      "looks_wrong": ["no sizzle (pan not hot enough)", "steak being poked and moved around"],
+      "timer": { "label": "Steak, side 1", "minutes": 3, "check_at": 2.5 },
+      "done_when": "Steak is in. Start the side-1 timer (3 min for medium-rare)."
+    },
+    {
+      "instruction": "Flip the steak. Add the butter, garlic and herbs, and spoon the butter over.",
+      "looks_right": ["deep brown crust on the cooked side", "foaming butter"],
+      "looks_wrong": ["grey, pale side (not seared)", "black, burnt crust", "butter burning black"],
+      "timer": { "label": "Steak, side 2", "minutes": 3, "check_at": 2.5 },
+      "done_when": "Second side seared. Check with a thermometer: 57°C for medium-rare."
+    },
+    {
+      "instruction": "Rest the steak on a board for 5 minutes, then slice against the grain.",
+      "looks_right": ["steak resting, not being cut straight away"],
+      "looks_wrong": ["slicing immediately (juices run out)"],
+      "timer": { "label": "Resting", "minutes": 5 },
+      "done_when": "Rested and sliced. Ask the cook to show the inside to the camera."
+    }
+  ]
+}

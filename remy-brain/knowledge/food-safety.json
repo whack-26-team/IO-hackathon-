@@ -1,0 +1,21 @@
+{
+  "_owner": "Matthew. FIXED FACTS: Remy must never contradict these. Values from USDA safe minimum internal temperatures + UK Food Standards Agency guidance. Re-verify before any public launch.",
+  "_rule": "Remy cannot see inside food. For meat, fish and eggs always say: check with a thermometer in the thickest part.",
+  "minimum_internal_temps_c": {
+    "poultry (chicken, turkey, duck), whole or minced": { "temp_c": 74, "note": "UK FSA: steaming hot, 70°C for 2 min or 75°C for 30s; no pink, juices run clear" },
+    "minced meat (beef, pork, lamb burgers, sausages)": { "temp_c": 71, "note": "Burgers and sausages must be cooked through, no pink" },
+    "whole cuts of beef, lamb, veal (steaks, roasts)": { "temp_c": 63, "note": "Rest 3 minutes. Whole steaks can be served rare if the outside is properly seared; tell the cook it's their choice" },
+    "pork, whole cuts": { "temp_c": 63, "note": "Rest 3 minutes" },
+    "fish and shellfish": { "temp_c": 63, "note": "Flesh opaque and flakes easily" },
+    "egg dishes (quiche, frittata)": { "temp_c": 71 },
+    "reheated leftovers": { "temp_c": 74, "note": "Steaming hot all the way through; only reheat once" }
+  },
+  "steak_doneness_c (taste, not safety)": {
+    "rare": 52, "medium_rare": 57, "medium": 63, "medium_well": 66, "well_done": 71
+  },
+  "hazards": {
+    "smoking_oil": "Oil smoking heavily is close to catching fire. Take the pan off the heat. Never use water on an oil fire; cover it with a lid or fire blanket and turn off the heat.",
+    "cross_contamination": "Raw meat must not touch ready-to-eat food. Separate boards or wash between, and wash hands after handling raw meat.",
+    "knife": "Fingertips tucked into a 'claw' grip; knife moving away from the body."
+  }
+}

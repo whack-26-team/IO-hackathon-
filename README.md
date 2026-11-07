@@ -1,19 +1,39 @@
-# IO Hackathon
+# REMY: your live AI chef 👨‍🍳
 
-## Chef AI
+Built for the **IO Hackathon**.
 
-An AI cooking assistant that watches you cook in real time. Point your iPhone camera at your workspace and Chef AI will:
+Prop up your iPhone, start cooking, and REMY **watches live and talks to you out
+loud**. It spots mistakes, starts timers by itself (rigatoni in → 11-minute al dente
+timer), walks you through the recipe, and roasts you when you burn the garlic.
+Pick its attitude: 😇 Gentle, 😏 Honest or 🤬 Savage (18+).
 
-- **See** what you're doing: ingredients, technique and what's in the pan
-- **Critique** your cooking as it happens, such as heat that's too high, uneven chopping or something about to burn
-- **Guide** you step by step through a recipe, adjusting to your progress
+## Quick start
+```bash
+pip install -r server/requirements.txt
+uvicorn server.main:app --reload --port 8000
+```
+Open http://localhost:8000, tick **Pretend Remy**, and press **Start cooking**.
+Full step-by-step guide, including the iPhone: **[docs/SETUP.md](docs/SETUP.md)**.
 
-## How it works (planned)
+## The team
+| | Role |
+|---|---|
+| **Matthew** | Team lead · server · recipes & cooking knowledge |
+| **Felix** | The app screen · timers · demo & pitch |
+| **Ahmed** | Everything live voice · OpenAI connection |
+| **Pranav** | Personality, roasts & catchphrases · accuracy testing |
 
-1. **iPhone camera**: streams live video of your cooking.
-2. **Vision AI**: analyses the frames to understand what's happening.
-3. **Feedback**: gives live tips and corrections, plus the next step to take.
+## Docs
+- 📋 **[docs/PLAN.md](docs/PLAN.md)**: the full plan, individual roles, checkpoints
+- 🔌 **[docs/CONTRACT.md](docs/CONTRACT.md)**: how the pieces talk to each other
+- ⚠️ **[docs/RISKS.md](docs/RISKS.md)**: risks & boundaries
+- 🤖 **[AGENTS.md](AGENTS.md)**: rules for Codex / Claude Code (and humans)
 
-## Status
-
-🚧 Early development, built during the IO Hackathon.
+## How it works
+```
+iPhone (app/)  ──camera pictures + voice──▶  OpenAI realtime model (Remy)
+     ▲   │                                         │
+     │   └── asks for a short-lived pass ──▶ server/ (adds Remy's personality,
+     │                                        recipe, cook-times, food-safety)
+     └──── Remy's voice + actions (tips, roasts, timers, alerts) ◀──┘
+```

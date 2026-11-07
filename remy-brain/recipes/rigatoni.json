@@ -1,0 +1,57 @@
+{
+  "id": "rigatoni",
+  "title": "Rigatoni with tomato & garlic",
+  "summary": "Simple weeknight pasta, great for testing the auto pasta timer.",
+  "source": "Starter outline written by Claude. Matthew: replace/compare with a TheMealDB import, then hand-check.",
+  "checked_by_human": false,
+  "serves": 2,
+  "ingredients": [
+    "200g dried rigatoni",
+    "1 tbsp salt (for the pasta water)",
+    "2 tbsp olive oil",
+    "2 garlic cloves, thinly sliced",
+    "400g tin chopped tomatoes",
+    "Pinch of chilli flakes (optional)",
+    "Handful of basil",
+    "Parmesan to serve"
+  ],
+  "steps": [
+    {
+      "instruction": "Bring a big pot of water to a rolling boil and salt it well.",
+      "looks_right": ["lots of bubbles breaking the surface all over", "steam rising"],
+      "looks_wrong": ["only small bubbles at the bottom (not boiling yet)", "tiny pot of water"],
+      "done_when": "Big rolling boil."
+    },
+    {
+      "instruction": "Add the rigatoni and stir straight away so it doesn't stick.",
+      "looks_right": ["pasta moving freely in the water"],
+      "looks_wrong": ["pasta clumped together", "foam boiling over the edge"],
+      "timer": { "label": "Rigatoni", "minutes": 11, "check_at": 10 },
+      "done_when": "Pasta is in and stirred. Start the timer as soon as it goes in."
+    },
+    {
+      "instruction": "Meanwhile, warm the olive oil in a pan on medium-low and gently cook the garlic.",
+      "looks_right": ["garlic gently sizzling", "garlic turning pale golden"],
+      "looks_wrong": ["garlic going brown or black (bitter)", "oil smoking"],
+      "done_when": "Garlic is pale golden, about 1–2 minutes."
+    },
+    {
+      "instruction": "Add the tomatoes and chilli, simmer while the pasta cooks.",
+      "looks_right": ["gentle bubbling sauce", "sauce thickening slightly"],
+      "looks_wrong": ["sauce spitting violently (heat too high)", "sauce sticking or catching on the bottom"],
+      "done_when": "Sauce has thickened a little."
+    },
+    {
+      "instruction": "Taste a piece of pasta. It should be al dente. Save a mug of pasta water, then drain.",
+      "looks_right": ["pasta holding its shape", "firm bite with no white core"],
+      "looks_wrong": ["pasta swollen, splitting or falling apart (overcooked)", "chalky white centre (undercooked)"],
+      "done_when": "Bite test: tender with a slight firm centre. Ask the cook to hold a piece up to the camera or bite it."
+    },
+    {
+      "instruction": "Toss the pasta in the sauce with a splash of pasta water, then add basil and parmesan.",
+      "looks_right": ["glossy sauce coating every tube"],
+      "looks_wrong": ["watery sauce pooling", "dry pasta"],
+      "done_when": "Plated."
+    }
+  ]
+}
