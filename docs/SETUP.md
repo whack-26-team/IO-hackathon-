@@ -36,10 +36,10 @@ To install it as an app: **Share → Add to Home Screen**.
 ## 5. Daily git routine
 ```bash
 git checkout main && git pull            # get everyone's latest work
-git checkout -b yourname/your-task       # your own branch (first time only)
+git checkout -b felix/c2-9-app-screens  # one branch per issue, see docs/BRANCHES.md for your exact names
 # …work…
 git add -A && git commit -m "What I changed"
-git push -u origin yourname/your-task    # at least every hour
+git push -u origin felix/c2-9-app-screens  # at least every hour
 ```
 Then open a **pull request** on GitHub. Codex and Claude Code can do all of this for
 you: just ask "commit and push my work, then open a PR".

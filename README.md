@@ -26,6 +26,7 @@ Full step-by-step guide, including the iPhone: **[docs/SETUP.md](docs/SETUP.md)*
 ## Docs
 - 📋 **[docs/PLAN.md](docs/PLAN.md)**: the full plan, individual roles, checkpoints
 - 👤 **[ROLES/](ROLES/)**: each person's role and starter prompt for Codex / Claude Code
+- 🌿 **[docs/BRANCHES.md](docs/BRANCHES.md)**: branch naming (`felix/c2-9-app-screens`) and your exact branch names
 - 🔌 **[docs/CONTRACT.md](docs/CONTRACT.md)**: how the pieces talk to each other
 - ⚠️ **[docs/RISKS.md](docs/RISKS.md)**: risks & boundaries
 - 🤖 **[AGENTS.md](AGENTS.md)**: rules for Codex / Claude Code (and humans)

@@ -77,7 +77,8 @@ BOUNDARIES (non-negotiable):
 HOW TO WORK WITH ME:
 1. Don't write files yet. Give me a plan for C0 + C2, pitch me 10 sample roasts per
    mode and 5 catchphrase ideas so I can pick the vibe, and ask me any questions.
-2. After I approve: branch pranav/<short-task>, small commits, push at least hourly.
+2. After I approve: branch using the exact branch name for the issue from docs/BRANCHES.md
+   (pranav/c<checkpoint>-<issue>-<description>, always started from the latest main), small commits, push at least hourly.
 3. At each checkpoint: open a PR to main with "Closes #<issue>" (include the accuracy
    score once we have one) and give me a Done / Next / Blocked note for the issue.
 Be bold and creative with the comedy. Remy should be memorable.

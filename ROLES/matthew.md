@@ -45,7 +45,8 @@ MY CHECKPOINTS (GitHub issues #1–#6):
 
 HOW TO WORK WITH ME:
 1. Plan first for my current checkpoint and ask me questions before coding.
-2. Branch matthew/<short-task>, small commits, push at least hourly, PR to main with
+2. Branch using the exact branch name for the issue from docs/BRANCHES.md
+   (matthew/c<checkpoint>-<issue>-<description>, always started from the latest main), small commits, push at least hourly, PR to main with
    "Closes #<issue>".
 3. When reviewing teammates' PRs: check the automatic check passed, they only touched
    their own folders, no secrets were committed, and the contract wasn't changed

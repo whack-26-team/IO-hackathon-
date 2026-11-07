@@ -76,7 +76,8 @@ CONSTRAINTS:
 HOW TO WORK WITH ME:
 1. Don't write code yet. Give me a plan for C0 (comparing routes A/B/C with cost,
    effort and quality) and ask me any questions.
-2. After I approve: branch ahmed/<short-task>, small commits, push at least hourly.
+2. After I approve: branch using the exact branch name for the issue from docs/BRANCHES.md
+   (ahmed/c<checkpoint>-<issue>-<description>, always started from the latest main), small commits, push at least hourly.
 3. Test with the real server: uvicorn server.main:app --reload --port 8000, and on
    an iPhone via Matthew's https link.
 4. At each checkpoint: open a PR to main with "Closes #<issue>" and give me a

@@ -66,7 +66,8 @@ CONSTRAINTS:
 HOW TO WORK WITH ME:
 1. Don't code yet. First, give me a short plan for my CURRENT checkpoint (start with
    C0/C1, then C2), broken into small steps, and ask me any questions.
-2. After I approve: create a branch felix/<short-task>, make small commits, and push
+2. After I approve: create the branch named for the issue in docs/BRANCHES.md
+   (felix/c<checkpoint>-<issue>-<description>, from the latest main), make small commits, and push
    at least every hour.
 3. After each change, run the server (uvicorn server.main:app --reload --port 8000)
    and check it in the browser with pretend Remy.
