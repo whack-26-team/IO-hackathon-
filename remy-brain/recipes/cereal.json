@@ -1,0 +1,67 @@
+{
+  "id": "cereal",
+  "title": "Bowl of cereal",
+  "summary": "The simplest 'recipe' there is: perfect for showing REMY off without turning on a hob.",
+  "aliases": [
+    "cereal",
+    "bowl of cereal",
+    "cornflakes",
+    "corn flakes",
+    "breakfast cereal",
+    "granola",
+    "muesli",
+    "cheerios",
+    "weetabix",
+    "rice krispies"
+  ],
+  "source": "Written for REMY by Claude as a no-cook demo. Waiting for Matthew's review.",
+  "checked_by_human": false,
+  "serves": 1,
+  "total_minutes": 2,
+  "equipment": [
+    "Bowl",
+    "Spoon"
+  ],
+  "notes": "No heat, no knives: the safe demo. Remy's job here is mostly comedy (cereal-first vs milk-first) and showing the steps and the screen.",
+  "ingredients": [
+    "About 40g cereal (a small bowlful)",
+    "About 150ml cold milk (or a plant milk)",
+    "Optional: a handful of berries or a sliced banana"
+  ],
+  "steps": [
+    {
+      "instruction": "Pour the cereal into the bowl, about half full.",
+      "looks_right": [
+        "cereal in the bowl, roughly half full"
+      ],
+      "looks_wrong": [
+        "cereal overflowing onto the table",
+        "milk poured in first (Remy will have opinions)"
+      ],
+      "done_when": "The bowl is about half full of cereal."
+    },
+    {
+      "instruction": "Pour in cold milk until it just reaches the top of the cereal.",
+      "looks_right": [
+        "milk just level with the cereal",
+        "flakes still crisp and floating"
+      ],
+      "looks_wrong": [
+        "bowl filled to the brim (it'll spill)",
+        "milk spilling over the side"
+      ],
+      "done_when": "The milk comes just up to the cereal."
+    },
+    {
+      "instruction": "Add berries or banana on top if you like, then eat it straight away before it goes soggy.",
+      "looks_right": [
+        "fruit on top",
+        "spoon going in"
+      ],
+      "looks_wrong": [
+        "the bowl left to sit until the cereal goes soggy"
+      ],
+      "done_when": "Spoon in hand. Breakfast is served."
+    }
+  ]
+}
