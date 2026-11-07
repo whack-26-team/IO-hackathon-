@@ -1,0 +1,67 @@
+{
+  "id": "fruit-salad",
+  "title": "Fruit salad",
+  "summary": "Colourful, fresh and a good chance for Remy to coach knife skills.",
+  "aliases": [
+    "fruit salad",
+    "fruit bowl",
+    "chopped fruit",
+    "fruit"
+  ],
+  "source": "Written for REMY by Claude as a simple demo. Waiting for Matthew's review.",
+  "checked_by_human": false,
+  "serves": 2,
+  "total_minutes": 10,
+  "equipment": [
+    "Chopping board",
+    "Sharp knife",
+    "Bowl",
+    "Damp cloth (under the board)"
+  ],
+  "notes": "Knife safety: board on a damp cloth so it doesn't slide, fingers in a claw grip, cut flat sides down so fruit doesn't roll.",
+  "ingredients": [
+    "1 apple",
+    "1 banana",
+    "A handful of grapes",
+    "1 orange",
+    "A handful of strawberries or other berries",
+    "Squeeze of lemon juice (stops the apple going brown)"
+  ],
+  "steps": [
+    {
+      "instruction": "Put a damp cloth under the board so it doesn't slide. Wash the fruit.",
+      "looks_right": [
+        "board steady on the cloth"
+      ],
+      "looks_wrong": [
+        "board sliding around on the worktop"
+      ],
+      "done_when": "Board steady and fruit washed."
+    },
+    {
+      "instruction": "Peel the orange and banana. Cut the apple into quarters, remove the core, then cut every fruit into bite-sized pieces. Cut a flat side first so nothing rolls, and keep your fingers in a claw.",
+      "looks_right": [
+        "flat side down on the board",
+        "fingertips tucked behind the knuckles",
+        "even bite-sized pieces"
+      ],
+      "looks_wrong": [
+        "round fruit rolling under the knife",
+        "fingers flat in front of the blade",
+        "cutting towards your hand"
+      ],
+      "done_when": "All the fruit is in bite-sized pieces."
+    },
+    {
+      "instruction": "Put everything in the bowl, squeeze over a little lemon juice and toss gently.",
+      "looks_right": [
+        "mixed colours",
+        "fruit glistening with juice"
+      ],
+      "looks_wrong": [
+        "mushy, crushed fruit (toss more gently)"
+      ],
+      "done_when": "Tossed and ready to serve."
+    }
+  ]
+}

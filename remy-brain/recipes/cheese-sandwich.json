@@ -1,0 +1,64 @@
+{
+  "id": "cheese-sandwich",
+  "title": "Cheese sandwich",
+  "summary": "Bread, butter, cheese. A classic no-cook demo.",
+  "aliases": [
+    "cheese sandwich",
+    "sandwich",
+    "cheese sarnie",
+    "cheese and pickle",
+    "ham and cheese sandwich"
+  ],
+  "source": "Written for REMY by Claude as a simple demo. Waiting for Matthew's review.",
+  "checked_by_human": false,
+  "serves": 1,
+  "total_minutes": 4,
+  "equipment": [
+    "Chopping board",
+    "Knife (for slicing the cheese)",
+    "Butter knife",
+    "Plate"
+  ],
+  "notes": "Slicing cheese: keep your fingers tucked in a claw grip and cut down onto the board.",
+  "ingredients": [
+    "2 slices of bread",
+    "Butter, softened",
+    "About 40g cheddar (or any cheese)",
+    "Optional: pickle, tomato slices or lettuce"
+  ],
+  "steps": [
+    {
+      "instruction": "Spread butter thinly over one side of each slice of bread, right to the edges.",
+      "looks_right": [
+        "thin, even butter to the crusts"
+      ],
+      "looks_wrong": [
+        "torn bread (butter too hard: soften it first)"
+      ],
+      "done_when": "Both slices are buttered."
+    },
+    {
+      "instruction": "Slice the cheese on the board. Keep your fingers curled like a claw, away from the blade.",
+      "looks_right": [
+        "even slices",
+        "fingertips tucked behind the knuckles"
+      ],
+      "looks_wrong": [
+        "fingertips flat in front of the blade",
+        "cutting towards your hand"
+      ],
+      "done_when": "The cheese is sliced."
+    },
+    {
+      "instruction": "Lay the cheese (and any extras) on one slice, buttered side up. Put the other slice on top, buttered side down, and cut it in half.",
+      "looks_right": [
+        "cheese covering the bread to the edges",
+        "neat halves"
+      ],
+      "looks_wrong": [
+        "fillings sliding out of the sides"
+      ],
+      "done_when": "Sandwich made and cut. Done."
+    }
+  ]
+}

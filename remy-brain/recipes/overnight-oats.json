@@ -1,0 +1,63 @@
+{
+  "id": "overnight-oats",
+  "title": "Overnight oats",
+  "summary": "Mix it in two minutes tonight, eat it tomorrow. No cooking at all.",
+  "aliases": [
+    "overnight oats",
+    "oats",
+    "overnight porridge",
+    "bircher",
+    "bircher muesli"
+  ],
+  "source": "Written for REMY by Claude as a simple demo. Waiting for Matthew's review.",
+  "checked_by_human": false,
+  "serves": 1,
+  "total_minutes": 3,
+  "equipment": [
+    "Jar or bowl with a lid",
+    "Spoon"
+  ],
+  "notes": "It needs at least 4 hours (ideally overnight) in the fridge before eating. Keep it in the fridge and eat it within 2 days.",
+  "ingredients": [
+    "50g rolled oats",
+    "120ml milk (or a plant milk)",
+    "2 tbsp yoghurt",
+    "1 tsp honey or maple syrup",
+    "Toppings: berries, banana, nuts or seeds"
+  ],
+  "steps": [
+    {
+      "instruction": "Put the oats, milk, yoghurt and honey in the jar and stir well.",
+      "looks_right": [
+        "oats fully covered in liquid",
+        "no dry patches"
+      ],
+      "looks_wrong": [
+        "dry oats sitting on top (stir more)",
+        "too little milk (it'll be stodgy: add a splash)"
+      ],
+      "done_when": "Everything is mixed and the oats are covered."
+    },
+    {
+      "instruction": "Put the lid on and leave it in the fridge for at least 4 hours, ideally overnight.",
+      "looks_right": [
+        "lid on, jar going into the fridge"
+      ],
+      "looks_wrong": [
+        "left out on the counter overnight (milk and yoghurt need the fridge)"
+      ],
+      "done_when": "It's in the fridge."
+    },
+    {
+      "instruction": "In the morning, stir it, add a splash of milk if it's too thick, and top with fruit.",
+      "looks_right": [
+        "creamy, soft oats",
+        "fruit on top"
+      ],
+      "looks_wrong": [
+        "very thick and stiff (stir in more milk)"
+      ],
+      "done_when": "Topped and ready to eat cold."
+    }
+  ]
+}
