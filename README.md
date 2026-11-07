@@ -20,11 +20,12 @@ Full step-by-step guide, including the iPhone: **[docs/SETUP.md](docs/SETUP.md)*
 |---|---|
 | **Matthew** | Team lead · server · recipes & cooking knowledge |
 | **Felix** | The app screen · timers · demo & pitch |
-| **Ahmed** | Everything live voice · OpenAI connection |
+| **Ahmed** | Everything live voice · AI voice connection |
 | **Pranav** | Personality, roasts & catchphrases · accuracy testing |
 
 ## Docs
 - 📋 **[docs/PLAN.md](docs/PLAN.md)**: the full plan, individual roles, checkpoints
+- 👤 **[ROLES/](ROLES/)**: each person's role and starter prompt for Codex / Claude Code
 - 🔌 **[docs/CONTRACT.md](docs/CONTRACT.md)**: how the pieces talk to each other
 - ⚠️ **[docs/RISKS.md](docs/RISKS.md)**: risks & boundaries
 - 🤖 **[AGENTS.md](AGENTS.md)**: rules for Codex / Claude Code (and humans)

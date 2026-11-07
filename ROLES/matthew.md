@@ -3,7 +3,7 @@
 ## 📩 Note to self
 You keep the team unblocked: merging PRs, running the joining-up session, and making sure Remy has a solid kitchen behind it (server, recipes, cooking times, food-safety facts). Your issues are #1–#6.
 
-**First:** create the org project board (issue #1), merge PR #25 once you've read it, and send each teammate their file from `docs/prompts/`.
+**First:** create the org project board (issue #1), merge PR #25 once you've read it, and send each teammate their file from `ROLES/`.
 
 ## 🤖 Prompt to paste into Claude Code
 ```

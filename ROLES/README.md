@@ -1,4 +1,4 @@
-# Starter prompts: one per person
+# ROLES: one file per person
 
 Each file has a short **message** to send the person, plus a detailed **prompt** to paste into their AI assistant (Claude Code or Codex). The prompt tells the assistant to read the project first, plan before coding, stay in its own folders, and follow the team's git rules.
 
