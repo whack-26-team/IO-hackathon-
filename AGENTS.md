@@ -37,6 +37,8 @@ The iPhone needs **https** for the camera. Use `cloudflared tunnel --url http://
 - **Never commit to `main` directly.** One branch per issue, named `<name>/c<checkpoint>-<issue>-<short-description>`,
   e.g. `felix/c2-9-app-screens`. Exact names for every issue: `docs/BRANCHES.md`.
 - Always start a new branch from the latest `main`. Once a branch is merged, it's finished: start a fresh one.
+- **Before every commit, run `git branch --show-current`.** It must be one of *your* branches
+  (starting with your name). If it's `main` or a teammate's branch, stop and ask, and never commit there.
 - Commit small and often. **Push your branch at least every hour.**
 - At every checkpoint (C0–C5, see `docs/PLAN.md`): open/update your PR, link your
   issue (`Closes #N`), and post a Done / Next / Blocked comment on your issue.

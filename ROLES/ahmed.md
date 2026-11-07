@@ -12,6 +12,8 @@
 >
 > ⚠️ A ChatGPT/Codex subscription doesn't include API calls, so whatever route you pick needs an API key (free tier or with a spending limit). Send it to Matthew **privately**, never in GitHub or group chat.
 
+> 🌿 **Your branches:** you work only on your own branches, one per issue, all starting with `ahmed/` (e.g. `ahmed/c2-15-voice-connection`). The exact names are in your issues and in `docs/BRANCHES.md`. Never push to `main`.
+
 ## 🤖 Prompt to paste into Codex
 ```
 I'm Ahmed, on a 4-person hackathon team building REMY: a live AI chef that watches
@@ -72,6 +74,25 @@ CONSTRAINTS:
   docs rather than relying on memory, and keep model names in server/.env.
 - Cost matters: small images, only send when useful, spending limits on keys.
 - Safety alerts must never be delayed or swallowed by other messages.
+
+MY DEDICATED BRANCHES (one per issue; exact names, don't invent others):
+- C0 (#13): ahmed/c0-13-voice-route
+- C1 (#14): ahmed/c1-14-voice-test
+- C2 (#15): ahmed/c2-15-voice-connection
+- C3 (#16): ahmed/c3-16-latency
+- C4 (#17): ahmed/c4-17-second-opinion
+- C5 (#18): ahmed/c5-18-reliability
+Branch rules, follow them every time:
+- Before starting an issue: `git checkout main && git pull`, then
+  `git checkout -b <that issue's branch>`. Always branch from the LATEST main.
+- Before EVERY commit, check `git branch --show-current`. It must be one of MY
+  branches above. If it says main or someone else's branch, STOP and tell me.
+- Never commit or push to main, and never to another person's branch.
+- Push the branch at least every hour: `git push -u origin <branch>`.
+- One PR per branch, with "Closes #<issue>". Once it's merged, that branch is
+  finished: start the next issue's branch from fresh main (don't reuse it).
+- A new task that's not in the list (e.g. a bug from issue #31) gets
+  ahmed/c<checkpoint>-31-<short-description>.
 
 HOW TO WORK WITH ME:
 1. Don't write code yet. Give me a plan for C0 (comparing routes A/B/C with cost,
