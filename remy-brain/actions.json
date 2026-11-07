@@ -3,15 +3,45 @@
   "tools": [
     {
       "type": "function",
+      "name": "find_recipe",
+      "description": "Find the recipe for the dish the cook wants, as soon as they say it (e.g. 'steak', 'some pasta', 'chicken curry'). Pass their words. The result says where it came from: our checked recipe, an online recipe without visual cues, or nothing found, plus what to do next. Call it again if they change their mind.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "dish": {
+            "type": "string",
+            "description": "The dish in the cook's words."
+          }
+        },
+        "required": [
+          "dish"
+        ]
+      }
+    },
+    {
+      "type": "function",
       "name": "show_tip",
       "description": "Show a short tip on screen (also say it out loud). Use for normal guidance and mild warnings.",
       "parameters": {
         "type": "object",
         "properties": {
-          "text": { "type": "string", "description": "Max ~15 words." },
-          "severity": { "type": "string", "enum": ["info", "warning", "urgent"] }
+          "text": {
+            "type": "string",
+            "description": "Max ~15 words."
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "info",
+              "warning",
+              "urgent"
+            ]
+          }
         },
-        "required": ["text", "severity"]
+        "required": [
+          "text",
+          "severity"
+        ]
       }
     },
     {
@@ -21,11 +51,27 @@
       "parameters": {
         "type": "object",
         "properties": {
-          "text": { "type": "string" },
-          "level": { "type": "integer", "enum": [1, 2, 3], "description": "1 = first jab, 3 = repeat-offender meltdown." },
-          "mistake": { "type": "string", "description": "Key from roasts.json, e.g. burning, overcooked." }
+          "text": {
+            "type": "string"
+          },
+          "level": {
+            "type": "integer",
+            "enum": [
+              1,
+              2,
+              3
+            ],
+            "description": "1 = first jab, 3 = repeat-offender meltdown."
+          },
+          "mistake": {
+            "type": "string",
+            "description": "Key from roasts.json, e.g. burning, overcooked."
+          }
         },
-        "required": ["text", "level"]
+        "required": [
+          "text",
+          "level"
+        ]
       }
     },
     {
@@ -34,8 +80,15 @@
       "description": "Red full-screen warning for real danger: fire, smoking oil, knife near fingers, raw meat cross-contamination, child or pet near the hob. Drop the comedy.",
       "parameters": {
         "type": "object",
-        "properties": { "text": { "type": "string", "description": "Short and clear, e.g. 'Oil is smoking: take the pan off the heat'." } },
-        "required": ["text"]
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Short and clear, e.g. 'Oil is smoking: take the pan off the heat'."
+          }
+        },
+        "required": [
+          "text"
+        ]
       }
     },
     {
@@ -45,11 +98,21 @@
       "parameters": {
         "type": "object",
         "properties": {
-          "current_step": { "type": "integer", "description": "0-based index of the step the cook is now on." },
-          "step_complete": { "type": "boolean" },
-          "next_instruction": { "type": "string" }
+          "current_step": {
+            "type": "integer",
+            "description": "0-based index of the step the cook is now on."
+          },
+          "step_complete": {
+            "type": "boolean"
+          },
+          "next_instruction": {
+            "type": "string"
+          }
         },
-        "required": ["current_step", "step_complete"]
+        "required": [
+          "current_step",
+          "step_complete"
+        ]
       }
     },
     {
@@ -59,12 +122,27 @@
       "parameters": {
         "type": "object",
         "properties": {
-          "id": { "type": "string", "description": "Short id, e.g. 'pasta'." },
-          "label": { "type": "string", "description": "e.g. 'Rigatoni'." },
-          "minutes": { "type": "number" },
-          "check_at_minutes": { "type": "number", "description": "When to check/taste, e.g. 1 minute before the end." }
+          "id": {
+            "type": "string",
+            "description": "Short id, e.g. 'pasta'."
+          },
+          "label": {
+            "type": "string",
+            "description": "e.g. 'Rigatoni'."
+          },
+          "minutes": {
+            "type": "number"
+          },
+          "check_at_minutes": {
+            "type": "number",
+            "description": "When to check/taste, e.g. 1 minute before the end."
+          }
         },
-        "required": ["id", "label", "minutes"]
+        "required": [
+          "id",
+          "label",
+          "minutes"
+        ]
       }
     },
     {
@@ -73,8 +151,14 @@
       "description": "Cancel a timer the cook says is wrong, or that no longer applies.",
       "parameters": {
         "type": "object",
-        "properties": { "id": { "type": "string" } },
-        "required": ["id"]
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
       }
     }
   ]
