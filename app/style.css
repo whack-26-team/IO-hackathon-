@@ -132,9 +132,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
   max-width: none; max-height: none; }
 
 /* steel rail across the top; timer tickets hang from it */
-.rail { position: absolute; z-index: 3; top: 0; left: 0; right: 0; height: calc(14px + var(--safe-top));
-  background: linear-gradient(var(--steel-1), var(--steel-2)); border-bottom: 2.5px solid var(--ink); }
-.timers { position: absolute; z-index: 2; top: calc(14px + var(--safe-top)); right: calc(10px + var(--safe-right)); left: calc(10px + var(--safe-left));
+.rail { position: absolute; z-index: 3; top: 0; left: 0; right: 0; height: calc(7px + var(--safe-top));
+  background: linear-gradient(var(--steel-1), var(--steel-2)); border-bottom: 2px solid var(--ink); }
+.timers { position: absolute; z-index: 2; top: calc(7px + var(--safe-top)); right: calc(10px + var(--safe-right)); left: calc(10px + var(--safe-left));
   display: flex; flex-direction: row-reverse; flex-wrap: wrap; gap: 8px; align-items: flex-start; pointer-events: none; }
 .timer { pointer-events: auto; width: 126px; background: var(--paper); border: 2.5px solid var(--ink); border-top: 0; box-shadow: var(--shadow);
   padding: 7px 9px 12px; text-align: center; animation: drop .35s ease-out; transform: rotate(var(--tilt, 1deg));
@@ -182,6 +182,11 @@ button { font: inherit; color: inherit; cursor: pointer; }
 /* Remy's speech: his face sits on top of the bubble */
 .speech { position: relative; padding-top: 64px; animation: pop .25s ease-out; }
 .cook-face { position: absolute; top: 0; left: 6px; width: 96px; z-index: 1; transition: transform .2s; }
+/* quiet: no bubble, Remy just sits on the recipe panel and watches */
+.speech.quiet { padding-top: 78px; animation: none; pointer-events: none; }
+.speech.quiet .bubble { display: none; }
+.speech.quiet .cook-face { animation: idle 3.5s ease-in-out infinite; }
+@keyframes idle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
 .bubble { position: relative; background: var(--cream); border: var(--line); border-radius: 18px; box-shadow: 5px 5px 0 var(--ink);
   padding: 10px 14px 12px; font-weight: 800; font-size: 20px; line-height: 1.15; }
 .bubble::before { content: ""; position: absolute; top: -15px; left: 96px; width: 20px; height: 20px; background: inherit;

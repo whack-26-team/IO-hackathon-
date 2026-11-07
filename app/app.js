@@ -88,6 +88,7 @@ $("start-btn").addEventListener("click", async () => {
     return;
   }
 
+  quietRemy(); // Remy on screen from the start, with this attitude's face
   const useMock = $("use-mock").checked;
   state.live = !useMock; // real Remy speaks timer reminders himself (see the timers' sound below)
   const factory = useMock ? createMockRemy : createLiveRemy;
@@ -114,7 +115,7 @@ function stopCooking() {
   clearTimeout(showBubble.t);
   hideAlert();
   pendingRoast = null;
-  $("speech").className = "speech hidden";
+  quietRemy();
   $("cook-screen").classList.add("hidden");
   $("start-screen").classList.remove("hidden");
   // back to the top-left at 100%, in case the iPhone shifted the view while the camera was up
@@ -166,18 +167,28 @@ function faceFor(severity) {
   return state.mode === "gentle" ? "f-gentle" : "f-watch";
 }
 
+// Remy stays on screen when he isn't talking: bubble hidden, his everyday face showing.
+function quietRemy() {
+  clearTimeout(showBubble.t);
+  $("speech").className = "speech quiet";
+  setFace(faceFor("info"));
+}
+
+function setFace(id) {
+  const face = $("cook-face");
+  setUse(face, id);
+  face.setAttribute("viewBox", id === "f-savage" ? "-28 -12 156 116" : "-18 -12 136 116"); // room for the steam
+}
+
 function showBubble({ text, severity = "info", level }) {
   const sp = $("speech");
   sp.className = "speech";      // reset, then force the browser to notice,
   void sp.offsetWidth;          // so the pop/shake animation replays every time
   sp.className = `speech ${severity}` + (level ? ` level-${level}` : "");
   $("bubble-text").textContent = text;
-  const face = $("cook-face");
-  const id = faceFor(severity);
-  setUse(face, id);
-  face.setAttribute("viewBox", id === "f-savage" ? "-28 -12 156 116" : "-18 -12 136 116"); // room for the steam
+  setFace(faceFor(severity));
   clearTimeout(showBubble.t);
-  showBubble.t = setTimeout(() => sp.classList.add("hidden"), BUBBLE_MS[severity] || 9000);
+  showBubble.t = setTimeout(quietRemy, BUBBLE_MS[severity] || 9000);
 }
 
 // Safety beats comedy: a roast that arrives during a safety alert waits until it's gone.
@@ -197,7 +208,7 @@ function showAlert(text) {
   const f = $("alert-flash");
   f.classList.remove("hidden");
   // hide whatever Remy was saying (e.g. a joke) so nothing competes with the alert
-  $("speech").classList.add("hidden");
+  quietRemy();
   beep("alert");
   if (navigator.vibrate) navigator.vibrate([300, 100, 300]); // Android only; iPhones ignore this
   clearTimeout(showAlert.t);
@@ -346,7 +357,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v73`,
+      `version  v74`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
