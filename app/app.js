@@ -128,8 +128,8 @@ function stopCooking() {
   // Remy says goodbye out loud in his attitude. Real Remy speaks it himself, so his voice
   // stays connected until the goodbye screen ends; Pretend Remy uses the phone's own voice.
   const bye = GOODBYES[state.mode] || GOODBYES.honest;
-  if (wasLive && remy) {
-    remy.send("goodbye", { text: bye.text });
+  // send() returns false if real Remy isn't connected (e.g. he never connected): then the phone says it
+  if (wasLive && remy && remy.send("goodbye", { text: bye.text }) === true) {
     pendingStop = remy;
     state.stream?.getVideoTracks().forEach((t) => t.stop()); // camera off now, mic until he's done
   } else {
@@ -162,7 +162,11 @@ function sayLocally(text) {
     if (!("speechSynthesis" in window)) return;
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = "en-GB"; u.rate = state.mode === "savage" ? 1.1 : state.mode === "gentle" ? 0.95 : 1;
+    u.lang = "en-GB";
+    // a British male voice if the phone has one (iPhone: Daniel / Arthur), closest to Remy
+    const voices = speechSynthesis.getVoices?.() || [];
+    u.voice = voices.find((v) => /daniel|arthur|oliver|uk english male|george|harry/i.test(v.name) && /en.GB/i.test(v.lang))
+      || voices.find((v) => /en.GB/i.test(v.lang)) || null; u.rate = state.mode === "savage" ? 1.1 : state.mode === "gentle" ? 0.95 : 1;
     speechSynthesis.speak(u);
   } catch { /* no voice available: the goodbye is still on screen */ }
 }
@@ -439,7 +443,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v79`,
+      `version  v80`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);

@@ -151,9 +151,12 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', stream, v
       vision.start();
       status('live', 'Listening · camera analysis starting');
       flush();
-    } catch {
+    } catch (error) {
       if (run !== generation || !active) return;
-      await exhausted('Could not connect Remy. Check microphone access, internet and ElevenLabs settings, then Stop and Start.');
+      // Show the real reason too, so a failed connection can be diagnosed from a screenshot
+      const why = String(error?.message || error?.reason || error || 'unknown').slice(0, 120);
+      console.error('[Remy] connect failed:', error);
+      await exhausted(`Could not connect Remy (${why}). Check microphone access, internet and ElevenLabs settings, then Stop and Start.`);
     } finally { if (run === generation) connecting = false; }
   }
   async function visibility() {
