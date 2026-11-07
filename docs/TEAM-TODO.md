@@ -28,6 +28,7 @@ never the cook, milder words first and stronger ones only on repeats. Never in s
 alerts, timers or guidance. Changed: `personality/savage.md` and the Savage lines in
 `personality/roasts.json`.
 
+- [ ] **Update (later the same day):** Matthew turned it up. Savage now swears in about two in three roasts, and after the cook's 2nd mistake it sometimes adds a nickname ("you donkey", "you idiot sandwich", "you absolute muppet", "you plank"): see `savage.md` "Nicknames" and `roasts.json` "nicknames". `instructions.md` roasting rules were updated to allow it.
 - [ ] Read the new lines and tweak them in your style if you like (they're yours)
 - [ ] Re-run your Savage swearing test (`tests/c1-savage-test.md`) when you can, and note whether the voice model actually says them
 
@@ -69,5 +70,5 @@ New tasks while Matthew is on a break: **issue #83**. Read `docs/DEMO.md` first.
 Remy finds these by name (see `aliases` in each file):
 - `rigatoni`, `steak`, `scrambled-eggs` (all ✓ checked by Matthew)
 - `cereal` ✓: no-cook demo, safe to use anywhere (no hob, no knife)
-- `boiled-pasta` (unchecked): Remy asks which shape, then uses that shape's timer from `timer_by_shape` (cook-times.json). Say "pasta", "penne", "fusilli"…
+- `boiled-pasta` ✓: Remy asks which shape, then uses that shape's timer from `timer_by_shape` (cook-times.json). Say "pasta", "penne", "fusilli"…
 - Simple demos ✓: `toast`, `cheese-sandwich`, `overnight-oats`, `fruit-salad` (knife), `instant-noodles` (3-min timer)

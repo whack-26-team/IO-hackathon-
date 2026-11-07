@@ -20,8 +20,8 @@
     "ravioli",
     "tortellini"
   ],
-  "source": "Written for REMY by Claude, timers from cook-times.json (pasta_dried_minutes_al_dente). Waiting for Matthew's review.",
-  "checked_by_human": false,
+  "source": "Written for REMY by Claude, timers from cook-times.json (pasta_dried_minutes_al_dente). Checked by Matthew on 2026-11-07.",
+  "checked_by_human": true,
   "serves": 2,
   "total_minutes": 20,
   "equipment": [
