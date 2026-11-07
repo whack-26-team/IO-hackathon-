@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <!-- minimum-scale=1 + shrink-to-fit=no: the iPhone may never zoom the app out (it did, leaving blank strips) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no, viewport-fit=cover">
   <title>REMY</title>
   <!-- Makes "Add to Home Screen" open full screen like an app -->
   <link rel="manifest" href="manifest.json">
@@ -15,7 +16,7 @@
   <meta name="theme-color" content="#fff4e0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=66">
+  <link rel="stylesheet" href="style.css?v=68">
 </head>
 <body>
   <!-- Owner: Matthew (taken over from Felix). app/remy/ is Ahmed's.
@@ -170,6 +171,6 @@
     </div>
   </section>
 
-  <script type="module" src="app.js?v=66"></script>
+  <script type="module" src="app.js?v=68"></script>
 </body>
 </html>

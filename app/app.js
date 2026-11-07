@@ -116,6 +116,8 @@ function stopCooking() {
   $("speech").className = "speech hidden";
   $("cook-screen").classList.add("hidden");
   $("start-screen").classList.remove("hidden");
+  // back to the top-left at 100%, in case the iPhone shifted the view while the camera was up
+  window.scrollTo(0, 0); $("start-screen").scrollTop = 0;
   document.documentElement.dataset.mode = state.mode;
 }
 
