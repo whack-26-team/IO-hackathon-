@@ -22,7 +22,9 @@ Owner: Matthew (issue #5). It takes about 10 minutes, once.
 
 ## After that
 - **Every merge into `main` redeploys automatically**, so the link always shows the latest version.
-- **Change the key or model:** service → **Environment** → edit → **Save** (it restarts by itself).
+- **Add or change keys:** service → **Environment** → edit → **Save** (it restarts by itself).
+  For Ahmed's ElevenLabs voice: `ELEVENLABS_API_KEY` and `ELEVENLABS_AGENT_ID` (get both from Ahmed privately).
+  Check it worked: `<your link>/api/health` shows `"elevenlabs_key_set": true` (never the key itself).
 - **Logs** (if something breaks): service → **Logs**.
 
 ## ⚠️ Things to know

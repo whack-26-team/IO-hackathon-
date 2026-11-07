@@ -116,6 +116,12 @@ def main() -> int:
         "sha": pr["head"]["sha"],  # only merge exactly what was checked
     })
     print(f"✅ Auto-merged #{PR}")
+    # Merges by the Actions bot don't trigger GitHub's "delete head branch" setting, so tidy up here.
+    try:
+        gh(f"repos/{REPO}/git/refs/heads/{branch}", "-X", "DELETE")
+        print(f"🧹 Deleted branch {branch}")
+    except RuntimeError as e:
+        print(f"(Couldn't delete branch {branch}: {e})")
     return 0
 
 
