@@ -55,7 +55,7 @@ The iPhone needs **https** for the camera. Use `cloudflared tunnel --url http://
 ## Remy's behaviour boundaries (apply to all prompt/personality work)
 - Safety beats comedy: real danger → clear `safety_alert` first, jokes after.
 - Only warn/roast when confident; ask when unsure.
-- Roast the cooking, never the person's identity or body.
+- Roast the cooking, never the person's identity or body. (Savage may use playful nicknames like "you donkey" after two mistakes.)
 - Swearing only in Savage mode (18+ opt-in).
 - Food safety temperatures come only from `remy-brain/knowledge/food-safety.json`.
 - Timers come from the recipe step or `cook-times.json`, never guessed. The
