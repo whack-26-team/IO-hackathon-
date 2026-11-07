@@ -25,10 +25,21 @@ html { touch-action: manipulation; overscroll-behavior: none; -webkit-text-size-
 html, body { margin: 0; height: 100%; color: var(--ink); overscroll-behavior: none; font-family: var(--font); }
 /* The page BEHIND the app also has the colour + utensil pattern, so any edge the iPhone shows past
    the app (under the home bar, behind Safari's toolbar, during bounce) looks the same. */
-html { background: var(--cream) var(--utensils); background-attachment: fixed; }
-html[data-mode="gentle"] { background: var(--sky) var(--utensils); }
-html[data-mode="savage"] { background: var(--night) var(--utensils-light); }
+/* ONE background for the whole start screen, painted on the page itself (html) and on a backdrop
+   layer that overhangs every edge (#backdrop). No "background-attachment: fixed": iOS doesn't
+   support it and only painted the pattern inside the viewport, leaving a plain band at the bottom. */
+html { background: var(--cream) var(--utensils) repeat; }
+html[data-mode="gentle"] { background: var(--sky) var(--utensils) repeat; }
+html[data-mode="savage"] { background: var(--night) var(--utensils-light) repeat; }
 html[data-mode="cooking"] { background: #000; }
+#backdrop { position: fixed; z-index: 0; pointer-events: none; left: -200px; right: -200px;
+  top: calc(-200px - var(--safe-top)); bottom: calc(-200px - var(--safe-bottom));
+  background: var(--cream) var(--utensils) repeat; }
+html[data-mode="gentle"] #backdrop { background: var(--sky) var(--utensils) repeat; }
+html[data-mode="savage"] #backdrop { background: var(--night) var(--utensils-light) repeat; }
+html[data-mode="cooking"] #backdrop { display: none; }
+/* line the backdrop's pattern up with the page's (the backdrop starts 200px + notch above/left of the screen) */
+#backdrop { background-position: 200px calc(200px + var(--safe-top)) !important; }
 body { background: transparent; }
 /* App shell: the page itself is exactly the screen and never scrolls or grows. Each screen is
    pinned to the edges and scrolls inside itself if it ever needs to. This stops the iPhone zooming
@@ -45,7 +56,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   display: flex; flex-direction: column; gap: 10px;
   /* bottom: the footer sits close to the edge, just clear of the iPhone home bar */
   padding: calc(22px + var(--safe-top)) calc(18px + var(--safe-right)) max(6px, calc(var(--safe-bottom) - 22px)) calc(18px + var(--safe-left));
-  background: var(--cream) var(--utensils); background-attachment: fixed; transition: background-color .25s, color .25s; }
+  background: transparent; z-index: 1; transition: color .25s; }
 #start-screen > * { width: 100%; max-width: 440px; margin-left: auto; margin-right: auto; }
 .wordmark { text-align: center; font-weight: 800; font-size: clamp(34px, 5.4vh, 50px); letter-spacing: -1px; line-height: 1; }
 .wordmark small { display: block; font-size: 14px; letter-spacing: 0; font-weight: 600; color: var(--muted); margin-top: 3px; }
@@ -88,11 +99,11 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .pretend input { width: 16px; height: 16px; accent-color: var(--tomato); }
 
 /* --- the page per attitude --- */
-.mode-gentle { background-color: var(--sky) !important; }
+/* page colours per attitude live on html[data-mode] above */
 .mode-gentle .greeting, .mode-gentle .mode-bar:has(input:checked) { background: var(--sky-2); }
 .mode-gentle .mode-bar:has(input:checked) .tick { box-shadow: inset 0 0 0 4px var(--sky-2); }
 .mode-honest .mode-bar:has(input:checked) { background: var(--butter); }
-.mode-savage { background-color: var(--night) !important; background-image: var(--utensils-light) !important; color: var(--cream); }
+.mode-savage { color: var(--cream); }
 .mode-savage .wordmark small, .mode-savage .start-foot { color: #c9b8a6; }
 .mode-savage .link { color: var(--cream); }
 .mode-savage .greeting { background: var(--tomato); color: var(--cream); transform: rotate(-2deg); }
@@ -255,3 +266,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .timer .time { font-size: 28px; }
   .recipe { max-height: 28dvh; }
 }
+
+/* ?debug=1 only: measurements to diagnose screen-size problems on a real phone */
+#debug { position: fixed; z-index: 50; left: 8px; right: 8px; top: calc(8px + var(--safe-top)); background: rgba(0,0,0,.85); color: #0f0;
+  font: 11px/1.4 var(--mono); padding: 8px 10px; border-radius: 8px; white-space: pre-wrap; pointer-events: none; }
+#safe-probe { position: fixed; visibility: hidden; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
