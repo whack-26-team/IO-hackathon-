@@ -3,6 +3,7 @@
 // so pretend Remy (remy/mock.js) and real Remy (remy/live.js) are interchangeable.
 
 import { createTimers } from "./timers.js";
+import { unlockSound } from "./sound.js";
 import { createMockRemy } from "./remy/mock.js";
 import { createLiveRemy } from "./remy/live.js";
 
@@ -37,6 +38,8 @@ document.querySelectorAll('input[name="mode"]').forEach((el) =>
 
 $("start-btn").addEventListener("click", async () => {
   // This tap is important: iPhones only allow sound and mic after a tap.
+  // Unlock sound FIRST, before any waiting, or the iPhone forgets the tap.
+  unlockSound();
   state.mode = document.querySelector('input[name="mode"]:checked').value;
   state.recipe = await (await fetch(`/api/recipes/${$("recipe-picker").value}`)).json();
 
