@@ -1,7 +1,9 @@
 {
+  "id": "/",
   "name": "REMY: your live AI chef",
   "short_name": "REMY",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#fff4e0",

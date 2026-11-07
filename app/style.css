@@ -41,7 +41,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 /* ================= START SCREEN ================= */
 /* Pinned to the real screen edges, like the cooking screen: 100dvh is sometimes too short in iPhone
    home-screen apps, which left a strip of the wrong colour at the bottom. Scrolls on tiny screens. */
-#start-screen { position: fixed; top: 0; left: 0; right: 0; height: 100vh; height: 100lvh;  /* whole screen, home bar included */ overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+#start-screen { position: fixed; inset: 0;  /* exactly the visible area: in a web app that's the whole screen; in Safari it stops above the toolbar so the footer stays visible */ overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
   display: flex; flex-direction: column; gap: 10px;
   /* bottom: the footer sits close to the edge, just clear of the iPhone home bar */
   padding: calc(22px + var(--safe-top)) calc(18px + var(--safe-right)) max(6px, calc(var(--safe-bottom) - 22px)) calc(18px + var(--safe-left));
