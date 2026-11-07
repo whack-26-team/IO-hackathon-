@@ -23,11 +23,12 @@ import time
 import httpx
 
 API = "https://generativelanguage.googleapis.com/v1beta"
-DEFAULT_MODEL = "gemini-2.5-flash"
+DEFAULT_MODEL = "gemini-3.8-flash"   # Google retired 2.5-flash for new accounts (Nov 2026)
 MAX_IMAGE_BYTES = 1_500_000      # ~1.5 MB JPEG is plenty; phones should send ~512–1024px
 MIN_SECONDS_BETWEEN = 1.0        # per caller, so one phone can't drain the free quota
 
 _model_cache: dict[str, str] = {}
+_refused: set[str] = set()       # models that answered 404 "not available" on this account
 _last_call: dict[str, float] = {}
 
 PROMPT = """You are the eyes of REMY, a live cooking assistant. Look at this photo from the
@@ -92,12 +93,14 @@ def list_models(client: httpx.Client) -> list[str]:
             if "generateContent" in m.get("supportedGenerationMethods", [])]
 
 
-def _pick_model(client: httpx.Client) -> str:
+def _pick_model(client: httpx.Client, suggested: str = "") -> str:
     if "model" in _model_cache:
         return _model_cache["model"]
     wanted = os.getenv("GEMINI_MODEL") or DEFAULT_MODEL
-    names = list_models(client)
-    if wanted in names:
+    names = [n for n in list_models(client) if n not in _refused]
+    if suggested and suggested in names:
+        choice = suggested                      # Google told us which model to use instead
+    elif wanted in names:
         choice = wanted
     else:  # e.g. the default was renamed/retired: take the newest-looking flash model
         flash = sorted([n for n in names if "flash" in n and "image" not in n and "tts" not in n
@@ -133,9 +136,13 @@ def look(image: str, step: dict | None = None, question: str = "", caller: str =
         model = _pick_model(client)
         r = client.post(f"{API}/models/{model}:generateContent",
                         headers={"x-goog-api-key": api_key()}, json=body)
-        if r.status_code == 404:  # model vanished since we cached it: pick again once
+        for _ in range(3):  # model retired / not available to this account: try another
+            if r.status_code != 404:
+                break
+            _refused.add(model)
             _model_cache.pop("model", None)
-            model = _pick_model(client)
+            hint = re.search(r"use models/([a-z0-9.\-]+)", r.text)
+            model = _pick_model(client, suggested=hint.group(1) if hint else "")
             r = client.post(f"{API}/models/{model}:generateContent",
                             headers={"x-goog-api-key": api_key()}, json=body)
     if r.status_code == 429:
