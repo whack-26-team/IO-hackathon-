@@ -26,7 +26,7 @@
     {
       "instruction": "Melt the butter in the non-stick pan on LOW heat. Patience is the whole trick.",
       "looks_right": ["butter melting slowly with a light foam"],
-      "looks_wrong": ["butter browning, sizzling hard or smoking (heat too high: take it off for a moment)"],
+      "looks_wrong": ["butter browning or sizzling hard (heat too high: take it off for a moment)"],
       "done_when": "The butter has melted and is gently foaming."
     },
     {

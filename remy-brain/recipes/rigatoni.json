@@ -41,7 +41,7 @@
     {
       "instruction": "While the pasta cooks, warm the olive oil in a pan on medium-low and add the sliced garlic. Keep it gentle: garlic burns fast.",
       "looks_right": ["garlic sizzling gently in the oil", "garlic turning pale golden at the edges"],
-      "looks_wrong": ["garlic going brown or black (it'll taste bitter: start again)", "oil smoking (heat too high)"],
+      "looks_wrong": ["garlic going brown or black (it'll taste bitter: start again)", "garlic frying hard and fast (heat too high: turn it down)"],
       "timer": {
         "label": "Garlic",
         "minutes": 1.5,
