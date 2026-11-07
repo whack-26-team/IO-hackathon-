@@ -42,4 +42,4 @@ Same rule as above.
 Remy finds these by name (see `aliases` in each file):
 - `rigatoni`, `steak`, `scrambled-eggs` (all ✓ checked by Matthew)
 - `cereal` ✓: no-cook demo, safe to use anywhere (no hob, no knife)
-- Simple demos (unchecked): `toast`, `cheese-sandwich`, `overnight-oats`, `fruit-salad` (knife), `instant-noodles` (3-min timer)
+- Simple demos ✓: `toast`, `cheese-sandwich`, `overnight-oats`, `fruit-salad` (knife), `instant-noodles` (3-min timer)
