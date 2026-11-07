@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REMY design draft</title>
+<!-- Design draft for issue #52 (Matthew): direction B (drawn Remy) + A's ticket timers.
+     Not part of the app: Felix builds it in app/. -->
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #fff4e0; --paper: #f7f2e8; --ink: #1a1a1a; --tomato: #e8432c; --butter: #ffd166; --mint: #2a9d8f; --skin: #ffd9a8;
+    --steel-1: #d7dadd; --steel-2: #8d9297;
+    --shadow: 4px 4px 0 var(--ink); --line: 3px solid var(--ink);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #e9e4da; color: var(--ink); font-family: "Bricolage Grotesque", system-ui, sans-serif; padding: 28px 16px 40px; }
+  h1 { font-size: 30px; font-weight: 800; margin: 0; }
+  .intro { margin: 2px 0 22px; font-size: 14px; color: #555; }
+  .row { display: flex; gap: 22px; flex-wrap: wrap; }
+  .shot { width: 300px; }
+  .label { font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #666; margin: 10px 2px 0; }
+  .phone { width: 300px; height: 650px; border-radius: 38px; border: 8px solid #111; overflow: hidden; position: relative;
+    box-shadow: 0 14px 30px rgba(0,0,0,.22); background: #000; }
+  .phone > * { position: absolute; z-index: 1; }
+  .cam { inset: 0; z-index: 0; background:
+      radial-gradient(circle at 52% 50%, transparent 0 34%, #262626 34.5% 41%, transparent 41.5%),
+      radial-gradient(circle at 46% 46%, #c98a3d 0 5%, transparent 5.5%),
+      radial-gradient(circle at 58% 53%, #b8742c 0 4.5%, transparent 5%),
+      radial-gradient(circle at 50% 58%, #8a4b1c 0 4%, transparent 4.5%),
+      radial-gradient(circle at 42% 56%, #d9a24f 0 3.5%, transparent 4%),
+      radial-gradient(circle at 60% 44%, #2a170b 0 3.5%, transparent 4%),
+      radial-gradient(circle at 52% 50%, #474745 0 34%, transparent 34.5%),
+      linear-gradient(160deg, #6b6158, #3d3732); }
+
+  /* ---------- shared pieces ---------- */
+  .chip { background: var(--cream); border: 2.5px solid var(--ink); border-radius: 10px; padding: 4px 9px; box-shadow: 3px 3px 0 var(--ink);
+    font-weight: 800; font-size: 12px; white-space: nowrap; }
+  .chip.stop { background: var(--tomato); color: var(--cream); }
+  .chip.live::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); margin-right: 5px; vertical-align: 1px; }
+
+  /* A's ticket rail, restyled to match B (ink outline + hard shadow) */
+  .rail { top: 0; left: 0; right: 0; height: 16px; background: linear-gradient(var(--steel-1), var(--steel-2)); border-bottom: 2.5px solid var(--ink); }
+  .ticket { background: var(--paper); border: 2.5px solid var(--ink); border-top: 0; box-shadow: var(--shadow); padding: 7px 10px 10px; text-align: center;
+    -webkit-mask: linear-gradient(#000 0 0) top/100% calc(100% - 6px) no-repeat, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom/10px 6px repeat-x;
+            mask: linear-gradient(#000 0 0) top/100% calc(100% - 6px) no-repeat, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom/10px 6px repeat-x; }
+  .ticket .k { font-family: "IBM Plex Mono", monospace; font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase; color: #6b6b6b; display: flex; justify-content: space-between; gap: 6px; }
+  .ticket .big { font-weight: 800; font-size: 34px; line-height: 1; margin-top: 3px; font-variant-numeric: tabular-nums; }
+  .ticket .bar { height: 5px; border: 1.5px solid var(--ink); border-radius: 3px; margin-top: 6px; background: linear-gradient(90deg, var(--tomato) var(--p), transparent var(--p)); }
+  .ticket.check { background: var(--butter); }
+  .ticket.check .k { color: var(--ink); }
+  .t1 { top: 16px; right: 12px; width: 112px; transform: rotate(1.5deg); }
+  .t2 { top: 16px; right: 130px; width: 96px; transform: rotate(-2deg); }
+
+  .face { width: 84px; }
+  .speech { left: 12px; right: 12px; background: var(--cream); border: var(--line); border-radius: 18px; padding: 11px 14px 13px;
+    box-shadow: 5px 5px 0 var(--ink); font-weight: 800; font-size: 21px; line-height: 1.12; }
+  .speech::before { content: ""; position: absolute; top: -16px; left: 96px; width: 22px; height: 22px; background: inherit;
+    border-left: var(--line); border-top: var(--line); transform: skewX(-25deg) rotate(20deg); }
+  .speech .who { font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--tomato); display: block; margin-bottom: 4px; }
+  .speech.roast { background: var(--tomato); color: var(--cream); font-size: 24px; transform: rotate(-1.5deg); }
+  .speech.roast .who { color: var(--butter); }
+  .steps { left: 12px; right: 12px; bottom: 14px; background: var(--ink); color: var(--cream); border-radius: 14px; padding: 9px 12px; font-size: 13px; line-height: 1.3; }
+  .steps b { color: var(--butter); margin-right: 6px; }
+  .steps .tag { float: right; font-family: "IBM Plex Mono", monospace; font-size: 9px; letter-spacing: 1px; background: var(--mint); color: #fff; padding: 2px 6px; border-radius: 5px; margin-left: 6px; }
+
+  /* ---------- 1. start screen ---------- */
+  .start { background: var(--cream); }
+  .start .inner { inset: 0; padding: 30px 18px 18px; display: flex; flex-direction: column; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand .face { width: 76px; }
+  .brand h2 { margin: 0; font-size: 50px; font-weight: 800; line-height: .9; letter-spacing: -1px; }
+  .brand p { margin: 4px 0 0; font-size: 13px; color: #555; line-height: 1.25; }
+  .pick { font-weight: 800; font-size: 15px; margin-top: 4px; }
+  .mode { display: flex; align-items: center; gap: 10px; background: #fff; border: 2.5px solid var(--ink); border-radius: 14px; padding: 6px 10px;
+    box-shadow: 3px 3px 0 var(--ink); }
+  .mode svg { width: 46px; flex: none; }
+  .mode b { font-size: 17px; display: block; }
+  .mode small { font-size: 12px; color: #555; }
+  .mode.on { background: var(--butter); box-shadow: 5px 5px 0 var(--ink); transform: translate(-1px, -1px); }
+  .mode .age { font-family: "IBM Plex Mono", monospace; font-size: 9px; background: var(--tomato); color: #fff; padding: 2px 5px; border-radius: 4px; margin-left: 4px; vertical-align: 2px; }
+  .go { margin-top: auto; background: var(--tomato); color: var(--cream); border: var(--line); border-radius: 16px; box-shadow: 5px 5px 0 var(--ink);
+    font-weight: 800; font-size: 23px; padding: 13px 14px 12px; text-align: center; line-height: 1.1; }
+  .go small { display: block; font-size: 12px; white-space: nowrap; font-weight: 600; opacity: .9; margin-top: 3px; }
+  .fine { font-family: "IBM Plex Mono", monospace; font-size: 10px; color: #6b6b6b; text-align: center; margin-top: 2px; }
+  .fine u { text-decoration-thickness: 1.5px; text-underline-offset: 2px; color: var(--ink); }
+
+  /* ---------- 4. alert ---------- */
+  .alert .cam { filter: grayscale(1) brightness(.45); }
+  .alert-card { top: 150px; left: 18px; right: 18px; background: var(--tomato); color: var(--cream); border: 4px solid var(--ink); border-radius: 22px;
+    box-shadow: 7px 7px 0 var(--ink); padding: 16px 16px 18px; text-align: center; }
+  .alert-card .face { width: 92px; margin: -64px auto 4px; display: block; }
+  .alert-card h3 { margin: 0; font-size: 40px; line-height: .95; font-weight: 800; text-transform: uppercase; }
+  .alert-card p { margin: 8px 0 0; font-size: 16px; font-weight: 700; }
+  .alert-card .do { margin-top: 12px; background: var(--cream); color: var(--ink); border: 3px solid var(--ink); border-radius: 12px; padding: 8px; font-size: 13px; font-weight: 700; }
+</style>
+</head>
+<body>
+  <!-- Remy: one head + swappable faces (eyebrows, eyes, mouth). Felix can reuse this SVG as-is. -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <g id="head">
+        <path d="M24 44 C16 44 12 36 18 30 C16 20 28 14 36 20 C40 10 60 10 64 20 C72 14 84 20 82 30 C88 36 84 44 76 44 Z" fill="#fff" stroke="#1a1a1a" stroke-width="3.5" stroke-linejoin="round"/>
+        <rect x="24" y="40" width="52" height="10" rx="2" fill="#e8432c" stroke="#1a1a1a" stroke-width="3.5"/>
+        <path d="M20 58 C20 48 30 48 50 48 C70 48 80 48 80 58 L80 70 C80 88 66 98 50 98 C34 98 20 88 20 70 Z" fill="#ffd9a8" stroke="#1a1a1a" stroke-width="3.5"/>
+        <path d="M44 77 C46 81 54 81 56 77" fill="none" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="30" cy="80" r="4" fill="#f5a37a" opacity=".7"/><circle cx="70" cy="80" r="4" fill="#f5a37a" opacity=".7"/>
+      </g>
+      <g id="f-watch"><use href="#head"/><path d="M30 63 Q37 59 44 63" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M56 63 Q63 59 70 63" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><circle cx="38" cy="71" r="3.5" fill="#1a1a1a"/><circle cx="62" cy="71" r="3.5" fill="#1a1a1a"/><path d="M42 87 C46 90 54 90 58 87" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/></g>
+      <g id="f-sus"><use href="#head"/><path d="M30 66 L44 66" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/><path d="M56 61 Q63 56 70 60" fill="none" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/><path d="M33 72 L43 72" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><circle cx="62" cy="72" r="3.5" fill="#1a1a1a"/><path d="M42 88 L58 86" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/></g>
+      <g id="f-fury"><use href="#head"/><path d="M27 60 L44 67" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round"/><path d="M73 60 L56 67" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round"/><circle cx="38" cy="73" r="3.5" fill="#1a1a1a"/><circle cx="62" cy="73" r="3.5" fill="#1a1a1a"/><path d="M38 90 Q50 80 62 90 Q50 96 38 90 Z" fill="#1a1a1a"/></g>
+      <g id="f-proud"><use href="#head"/><path d="M30 62 Q37 58 44 62" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M56 62 Q63 58 70 62" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M33 73 Q38 68 43 73" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M57 73 Q62 68 67 73" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M38 84 Q50 96 62 84 Z" fill="#fff" stroke="#1a1a1a" stroke-width="3"/></g>
+
+      <!-- accessories: a halo for Gentle, steam from the ears for Savage -->
+      <g id="acc-halo"><ellipse cx="50" cy="2" rx="26" ry="7" fill="none" stroke="#1a1a1a" stroke-width="7"/><ellipse cx="50" cy="2" rx="26" ry="7" fill="none" stroke="#ffd166" stroke-width="3.5"/></g>
+      <g id="acc-steam" stroke="#1a1a1a" stroke-linecap="round" stroke-linejoin="round">
+        <!-- left ear: wavy jet + puffs blowing up and out -->
+        <path d="M18 74 C12 72 12 66 6 64 C0 62 0 56 -4 54" fill="none" stroke-width="3"/>
+        <path d="M-2 56 C-10 56 -12 48 -6 45 C-8 38 0 34 4 39 C6 33 14 34 13 41 C19 42 18 51 11 51 C10 56 4 58 -2 56 Z" fill="#fff" stroke-width="3"/>
+        <path d="M-12 34 C-16 32 -15 26 -11 26 C-10 22 -4 22 -4 27 C0 28 -1 34 -5 34 Z" fill="#fff" stroke-width="2.5"/>
+        <!-- right ear -->
+        <path d="M82 74 C88 72 88 66 94 64 C100 62 100 56 104 54" fill="none" stroke-width="3"/>
+        <path d="M102 56 C110 56 112 48 106 45 C108 38 100 34 96 39 C94 33 86 34 87 41 C81 42 82 51 89 51 C90 56 96 58 102 56 Z" fill="#fff" stroke-width="3"/>
+        <path d="M112 34 C116 32 115 26 111 26 C110 22 104 22 104 27 C100 28 101 34 105 34 Z" fill="#fff" stroke-width="2.5"/>
+      </g>
+      <g id="f-gentle"><use href="#f-proud"/><use href="#acc-halo"/></g>
+      <g id="f-savage"><use href="#acc-steam"/><use href="#f-fury"/></g>
+      <!-- alarmed: no comedy, wide eyes, flat mouth (safety alerts only) -->
+      <g id="f-alarm"><use href="#head"/><path d="M29 59 Q37 55 45 60" fill="none" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/><path d="M55 60 Q63 55 71 59" fill="none" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/><circle cx="38" cy="71" r="5.5" fill="#fff" stroke="#1a1a1a" stroke-width="3"/><circle cx="62" cy="71" r="5.5" fill="#fff" stroke="#1a1a1a" stroke-width="3"/><circle cx="38" cy="71" r="2.2" fill="#1a1a1a"/><circle cx="62" cy="71" r="2.2" fill="#1a1a1a"/><ellipse cx="50" cy="89" rx="6" ry="4.5" fill="#1a1a1a"/></g>
+    </defs>
+  </svg>
+
+  <h1>REMY: design draft</h1>
+  <p class="intro">Direction B (drawn Remy, sticker style) with A's ticket timers on a steel rail. Four key moments.</p>
+
+  <div class="row">
+    <!-- 1. START -->
+    <div class="shot">
+      <div class="phone start"><div class="inner">
+        <div class="brand"><svg class="face" viewBox="0 0 100 104"><use href="#f-watch"/></svg>
+          <div><h2>REMY</h2><p>Your live AI chef.<br>Watches. Judges. Helps.</p></div></div>
+        <div class="pick">Pick Remy's attitude</div>
+        <div class="mode"><svg viewBox="-4 -12 108 116"><use href="#f-gentle"/></svg><div><b>Gentle</b><small>Patient teacher. Never mean.</small></div></div>
+        <div class="mode on"><svg viewBox="0 0 100 104"><use href="#f-sus"/></svg><div><b>Honest</b><small>Cheeky. Tells it straight.</small></div></div>
+        <div class="mode"><svg viewBox="-18 -12 136 116"><use href="#f-savage"/></svg><div><b>Savage<span class="age">18+</span></b><small>Furious TV-chef. Swears.</small></div></div>
+        <div class="go">Start cooking<small>🎤 then tell Remy what you're making</small></div>
+        <div class="fine">🔒 Nothing is recorded · <u>Safety info ›</u></div>
+      </div></div>
+      <div class="label">1 · Start: a Remy face per attitude, one clean button</div>
+    </div>
+
+    <!-- 2. COOKING -->
+    <div class="shot">
+      <div class="phone"><div class="cam"></div>
+        <div class="rail"></div>
+        <div class="ticket t2"><div class="k"><span>#02</span><span>Garlic</span></div><div class="big">0:48</div><div class="bar" style="--p:45%"></div></div>
+        <div class="ticket t1"><div class="k"><span>#01</span><span>Rigatoni</span></div><div class="big">8:42</div><div class="bar" style="--p:22%"></div></div>
+        <svg class="face" style="bottom:196px;left:16px;width:78px;z-index:2" viewBox="0 0 100 104"><use href="#f-watch"/></svg>
+        <div style="top:130px;left:12px;display:flex;gap:6px"><span class="chip live">Listening</span><span class="chip">Honest</span></div>
+        <div class="chip stop" style="top:130px;right:12px">Stop</div>
+        <div class="speech" style="bottom:86px"><span class="who">Remy</span>Nice, gentle sizzle. Keep the garlic moving.</div>
+        <div class="steps"><span class="tag">✓ CHECKED</span><b>3/6</b>Warm the oil on medium-low, garlic in gently.</div>
+      </div>
+      <div class="label">2 · Cooking: timers hang on the rail, Remy talks from his bubble</div>
+    </div>
+
+    <!-- 3. ROAST -->
+    <div class="shot">
+      <div class="phone"><div class="cam"></div>
+        <div class="rail"></div>
+        <div class="ticket t2 check"><div class="k"><span>#02</span><span>Garlic</span></div><div class="big">0:04</div><div class="bar" style="--p:96%"></div></div>
+        <div class="ticket t1"><div class="k"><span>#01</span><span>Rigatoni</span></div><div class="big">8:01</div><div class="bar" style="--p:27%"></div></div>
+        <svg class="face" style="bottom:202px;left:14px;width:92px;transform:rotate(-8deg);z-index:2" viewBox="-18 -12 136 116"><use href="#f-savage"/></svg>
+        <div style="top:130px;left:12px;display:flex;gap:6px"><span class="chip live">Remy speaking</span></div>
+        <div class="chip stop" style="top:130px;right:12px">Stop</div>
+        <div class="speech roast" style="bottom:86px"><span class="who">Remy · level 2</span>That garlic is officially charcoal. Bin it, chef.</div>
+        <div class="steps"><span class="tag">✓ CHECKED</span><b>3/6</b>Warm the oil on medium-low, garlic in gently.</div>
+      </div>
+      <div class="label">3 · Roast: Remy fumes, tomato bubble, the timer at its check moment turns butter yellow</div>
+    </div>
+
+    <!-- 4. SAFETY ALERT -->
+    <div class="shot">
+      <div class="phone alert"><div class="cam"></div>
+        <div class="rail"></div>
+        <div class="ticket t1"><div class="k"><span>#01</span><span>Rigatoni</span></div><div class="big">7:55</div><div class="bar" style="--p:28%"></div></div>
+        <div class="alert-card">
+          <svg class="face" viewBox="0 0 100 104"><use href="#f-alarm"/></svg>
+          <h3>Off the heat!</h3>
+          <p>The oil is smoking.</p>
+          <div class="do">Turn the heat off · Lid on if it flames<br><b>Never use water on an oil fire</b></div>
+        </div>
+        <div class="steps" style="text-align:center">Tap anywhere once it's safe</div>
+      </div>
+      <div class="label">4 · Safety: no jokes. Grey camera, alarmed Remy, clear instructions</div>
+    </div>
+  </div>
+</body>
+</html>
