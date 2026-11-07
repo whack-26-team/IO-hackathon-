@@ -114,13 +114,30 @@ Being honest about the limits first: from a phone camera, **some things are easy
 
 ---
 
+## 💸 Voice options: we don't have to pay for OpenAI's live voice
+
+OpenAI's live voice API is the smoothest option but also the most expensive, and it needs a separate pay-as-you-go API account. **That's not a hard requirement.** Ahmed picks the route at C1 after trying the cheap options:
+
+| Option | How it works | Cost | Trade-off |
+|---|---|---|---|
+| **A. Free phone voice + cheap AI vision** (try first) | The phone does the listening (built-in speech recognition) and Remy's voice (built-in text-to-speech), for free. Only text + a camera picture every ~2s go to a cheap, fast vision model. | Very low (often a free tier) | Robotic-ish voice, ~2–4s delay, interrupting is clunkier. Speech recognition on iPhone Safari can be flaky, so test early |
+| **B. Gemini Live API** | Google's live voice + video API, with a free tier for development | Free tier, then low | A different provider, so Ahmed learns a new API. 1 picture/sec |
+| **C. OpenAI live voice** (current starter code) | The live call in `app/remy/live.js` | Highest (per minute) | The most natural voice, and you can interrupt it. Needs an API account + spending limit |
+| **D. Mix** | A or B for practising and testing, C only for the demo | Low | Two code paths to keep working |
+
+**Whatever we pick, nothing else changes.** Felix's screen only listens for the agreed events (`tip`, `roast`, `timer_start`…), so the voice route is swapped inside `app/remy/` without touching anyone else's work. Pretend Remy keeps everyone unblocked meanwhile.
+
+**⚠️ Questioning this:** a ChatGPT or Codex subscription still doesn't include API calls, so every option (except pretend Remy) needs *some* API key with a free tier or a spending limit. Free tiers have rate limits, which is fine for building but risky mid-demo, so do a full test run on the chosen route before C4.
+
+---
+
 ## ⚠️ Risks & boundaries: full list
 
 | # | Risk | What we do |
 |---|------|-----------|
 | 1 | **No AI sees *truly* continuous video yet.** OpenAI's live API takes voice live but video as quick still pictures (no release date for native video). Gemini Live: also 1 picture/sec. | ~1 picture/sec + sound + second-opinion checks. All AI code in one place, so we can switch when native video arrives. |
-| 2 | **A ChatGPT/Codex subscription is *not* API access.** The API is a separate pay-as-you-go account at platform.openai.com (Pro/Business may get API credits). | **Ahmed, hour 0:** one team API account, credits or billing, **spending limit** (e.g. $30). Without it Remy can't talk. |
-| 3 | **Cost:** live voice is charged per minute, the second-opinion check per picture. | 10-minute session cap, small pictures, pause in background, spending limit as the hard cap. Check the spend after the first test. |
+| 2 | **A ChatGPT/Codex subscription is *not* API access.** Any real AI route needs an API key (OpenAI, Gemini…). | See "Voice options": try free phone voice + a cheap vision model or the Gemini free tier first. OpenAI live voice is optional. Whatever key we use gets a spending limit. |
+| 3 | **Cost:** OpenAI live voice is charged per minute. | Cheaper voice options first. If we use OpenAI live voice: 10-minute cap, small pictures, pause in background, spending limit. Check the spend after the first test. |
 | 4 | **Secret key leaking.** | Only on the server in `.env` (never on GitHub). The phone gets temporary passes only. |
 | 5 | **Offensive or harmful roasts.** | Roast cooking not people, swearing opt-in 18+, safety first. |
 | 6 | **Wrong food-safety advice.** | Fixed safety table, "use a thermometer", disclaimer on the start screen. |
@@ -144,7 +161,7 @@ Being honest about the limits first: from a phone camera, **some things are easy
 |--------|-----------|------|------|-----------|
 | **Matthew** (lead) | Claude Code | Server, recipes & cooking knowledge, coordination | `server/`, `remy-brain/recipes/`, `remy-brain/knowledge/`, `tools/import_recipe.py` | https link works on iPhone; `/api/session` gives a pass with personality + recipe loaded; recipe importer (TheMealDB → Remy format); 3 checked demo recipes; cook-times + food-safety tables; online on Render; PRs reviewed |
 | **Felix** | Claude Code | The app screen & demo | `app/` (not `app/remy/`) | Camera, Start, personality picker (with 18+ confirm), tip bubble, steps, **timer countdowns**, red alert flash, home-screen install; demo script + pitch |
-| **Ahmed** | Codex | **Everything live voice**: the live call, Remy's voice, listening to you, sending camera pictures, plus the OpenAI account | `app/remy/`, `server/second_opinion.py` | Talk ↔ Remy live, interruptible; ~1 picture/sec; actions reach the screen; timer events go back to Remy; second-opinion check running; 10-min cap |
+| **Ahmed** | Codex | **Everything live voice**: the live call, Remy's voice, listening to you, sending camera pictures, plus picking the cheapest voice route that works | `app/remy/`, `server/second_opinion.py` | Talk ↔ Remy live, interruptible; ~1 picture/sec; actions reach the screen; timer events go back to Remy; second-opinion check running; 10-min cap |
 | **Pranav** | Codex | **All the insults, roasts, catchphrases & personality modes**, plus accuracy testing | `remy-brain/instructions.md`, `remy-brain/personality/`, `remy-brain/actions.json`, `tests/` | 3 modes written + roast library; Savage tested early; test clips recorded + score script; score improving across PRs |
 
 ### How the pieces plug together (written in `docs/CONTRACT.md`)
@@ -194,14 +211,14 @@ Each person's plan below becomes their GitHub issues (one issue per checkpoint t
 **Others depend on you for:** the iPhone check results (everyone, C1), the demo (C5).
 **Done when:** someone who's never seen it can install it from the home screen and cook with it without help.
 
-### Ahmed: Everything live voice · OpenAI account (Codex)
+### Ahmed: Everything live voice · choosing the voice route (Codex)
 **Your job in one line:** Remy's ears, eyes and mouth. The live call to OpenAI that hears you, sees the pan and talks back instantly.
 **You own:** `app/remy/` (`live.js`, `mock.js`), `server/second_opinion.py`, the OpenAI API account + spending limit.
 **Don't touch:** `app/` screens (Felix), `remy-brain/` (Matthew/Pranav).
 
 | Checkpoint | Tasks |
 |-----------|-------|
-| **C0** | **Hour 0, top priority:** create the team OpenAI **API** account (platform.openai.com, separate from ChatGPT), add credits, **set a $30 spending limit**, and give the key to Matthew privately (not in chat or GitHub). Confirm the current live/realtime model name in OpenAI's docs |
+| **C0** | **Pick the voice route** (see "Voice options"): quickly try free phone voice + a cheap vision model, and look at the Gemini Live free tier. Get whichever API key that route needs (free tier or a spending limit) and give it to Matthew privately. OpenAI live voice is optional |
 | **C1** | Smallest possible test: phone → live call → you say "hello", Remy answers out loud. Check you can interrupt it |
 | **C2** | `live.js`: get a temporary pass from `/api/session` → open the live call → send mic audio, play Remy's voice → send **a camera picture about every second** (small, ~512px) → turn Remy's actions (`show_tip`, `update_step`, `safety_alert`, `roast`, `start_timer`) into the agreed events for Felix's screen → pass Felix's `timer_check` / `timer_done` back to Remy → **10-minute auto stop**, pause when the app is hidden, reconnect if the call drops. Keep `mock.js` working the same way |
 | **C3** | Joining-up: real call with Felix's screen and Matthew's server. Measure the delay (something happens → Remy reacts) |
@@ -301,7 +318,7 @@ Remove GitHub's demo leftovers (`index.html`, `package.json`, the "Proof HTML" c
 ## Timeline (24h)
 | When | What |
 |------|------|
-| **0–1h** | Claude pushes the skeleton. **Ahmed:** OpenAI API account + limit. Issues created, branches started |
+| **0–1h** | Claude pushes the skeleton. **Ahmed:** picks the voice route + gets an API key. Issues created, branches started |
 | **1–2h** | **Early risk checks:** iPhone home-screen install, camera + mic + sound; **Savage mode swearing test** |
 | 2–8h | Everyone builds their part (Felix on pretend Remy; Pranav films test clips) |
 | **8h, first joining-up** | Real Remy in. First real cook-along: rigatoni with auto timer |

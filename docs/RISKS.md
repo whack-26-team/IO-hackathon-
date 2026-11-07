@@ -5,8 +5,8 @@ Summary from `docs/PLAN.md`. Add new risks here as we find them.
 | # | Risk | What we do | Owner |
 |---|------|-----------|-------|
 | 1 | No AI sees *truly* continuous video yet. OpenAI's realtime API takes voice live but video as still pictures. | ~1 picture/sec + sound + second-opinion checks. AI code in one place (`app/remy/`) so we can switch later. | Ahmed |
-| 2 | A ChatGPT/Codex subscription is **not** API access. | Team API account at platform.openai.com in hour 0, with a spending limit. | Ahmed |
-| 3 | Cost (live voice per minute + pictures). | 10-minute session cap, small pictures, pause in background, $30 limit. | Ahmed |
+| 2 | A ChatGPT/Codex subscription is **not** API access. | Try cheaper routes first (free phone voice + cheap vision model, Gemini free tier); OpenAI live voice optional. Any key gets a spending limit. See PLAN.md "Voice options". | Ahmed |
+| 3 | Cost (OpenAI live voice per minute + pictures). | Cheaper voice route first; if OpenAI live: 10-minute cap, small pictures, pause in background, spending limit. | Ahmed |
 | 4 | Secret key leaking. | Only in `server/.env` (git-ignored). Phone gets short-lived passes. If it leaks, revoke it. | Everyone |
 | 5 | Offensive/harmful roasts. | Roast cooking not people; swearing 18+ opt-in; safety first. | Pranav |
 | 6 | Wrong food-safety advice. | Fixed `food-safety.json`, "use a thermometer", disclaimer. | Matthew |

@@ -1,16 +1,16 @@
 # AGENTS.md: rulebook for AI coding assistants (Codex, Claude Code) and humans
 
-Read this fully before making changes. Full plan: `docs/PLAN.md`.
+Read this fully before making changes. Full plan: `docs/PLAN.md`. Each person's role and starter prompt: `ROLES/<name>.md`.
 
 ## What we're building
 **REMY**, a live AI chef. An iPhone (installable web app) streams the camera and mic
-to OpenAI's realtime model. Remy talks back, spots mistakes, starts timers itself,
+to an AI model (voice route chosen by Ahmed, see docs/PLAN.md "Voice options"). Remy talks back, spots mistakes, starts timers itself,
 guides the recipe, and has personality modes (Gentle / Honest / Savage).
 
 ## Who owns what: ONLY edit your own folder
 | Folder / file | Owner |
 |---|---|
-| `server/` (except `second_opinion.py`), `remy-brain/recipes/`, `remy-brain/knowledge/`, `tools/`, `docs/` | **Matthew** (Claude Code) |
+| `server/` (except `second_opinion.py`), `remy-brain/recipes/`, `remy-brain/knowledge/`, `tools/`, `docs/`, `ROLES/` | **Matthew** (Claude Code) |
 | `app/` (except `app/remy/`) | **Felix** (Claude Code) |
 | `app/remy/`, `server/second_opinion.py` | **Ahmed** (Codex) |
 | `remy-brain/instructions.md`, `remy-brain/actions.json`, `remy-brain/personality/`, `tests/` | **Pranav** (Codex) |
