@@ -7,6 +7,7 @@ What it does:
   * GET  /api/recipes        -> list of recipes
   * GET  /api/recipes/find?q=steak -> find a recipe by what the cook said (Remy's find_recipe)
   * POST /api/recipes/ai     -> safety-check a recipe Remy wrote itself (create_recipe)
+  * POST /api/chat           -> backup Remy: Gemini writes his reply when ElevenLabs is down
   * GET  /api/recipes/{id}   -> one full recipe
   * POST /api/brain          -> Remy's instructions + actions for ANY voice route
   * POST /api/session        -> a short-lived pass for the live OpenAI call,
@@ -35,6 +36,7 @@ from pydantic import BaseModel
 from server.recipe_check import check_ai_recipe
 from server.recipe_sources import IMPORT_DIR, find_recipe
 from server import vision
+from server import chat
 
 ROOT = Path(__file__).resolve().parent.parent
 APP_DIR = ROOT / "app"
@@ -278,6 +280,28 @@ def vision_look(req: LookRequest, request: Request):
         return vision.look(req.image, req.step, req.question, caller=caller.strip())
     except vision.VisionError as e:
         raise HTTPException(e.status, str(e)) from None
+
+
+class ChatRequest(BaseModel):
+    mode: str = "honest"
+    recipe_id: str | None = None
+    recipe: dict | None = None      # a recipe Remy wrote himself (not saved on the server)
+    history: list = []
+    note: str = ""
+
+
+@app.post("/api/chat")
+def chat_reply(req: ChatRequest, request: Request):
+    """Backup Remy (no ElevenLabs): Gemini writes his reply + actions. See server/chat.py."""
+    if req.mode not in MODES:
+        raise HTTPException(400, f"mode must be one of {MODES}")
+    recipe = req.recipe if isinstance(req.recipe, dict) else (load_recipe(req.recipe_id) if req.recipe_id else None)
+    caller = (request.headers.get("x-forwarded-for") or (request.client.host if request.client else "?")).split(",")[0]
+    try:
+        return chat.reply(build_instructions(recipe, req.mode, lite=True), load_tools(), req.history, req.note,
+                          caller=caller.strip())
+    except chat.ChatError as e:
+        raise HTTPException(e.status, e.message) from None
 
 
 @app.get("/api/vision/models")
