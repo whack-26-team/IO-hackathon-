@@ -25,7 +25,12 @@ priority over personality examples. The exact core prefix has an automated test.
 The configured ElevenLabs agent is `agent_9201m6v41z1he9eshw97vkqbyyvn` (public ID,
 not a secret), with a response-returning client tool named `remy_action` and two
 required string arguments: `action`, `arguments_json`. Tool timeout: 25 seconds.
-The existing GPT-6 Luna / Eric settings were retained when publishing the prompt.
+The GPT-6 Luna / Eric primary voice remains in place. ElevenLabs also has a
+secondary voice labeled `Savage` using its Marcus British male library voice.
+The published prompt requests `<Savage>...</Savage>` speech tags only when the
+selected mode is Savage after the screen's 18+ opt-in; Gentle and Honest use Eric.
+This is an original chef voice, not a Gordon Ramsay impersonation. Check the
+audible voice switch on a phone before treating it as verified.
 
 ## Current limits and owner handoffs
 
@@ -65,6 +70,8 @@ and start cooking. Test:
 3. Select a recipe, follow one step, and verify the next-step screen update.
 4. Interrupt Remy, hide/restore the page, then briefly disconnect the network.
 5. Stop and verify the camera indicator and voice both stop.
+6. Start a new call in Savage after the 18+ opt-in and confirm its voice differs
+   from Gentle. Trigger a safety alert and check that the warning stays clear.
 
 Record reply latency and failures before marking the PR ready for review.
 
