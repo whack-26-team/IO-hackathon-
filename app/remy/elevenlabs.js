@@ -125,7 +125,12 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', stream, v
         clientTools,
         onMessage: ({ source, message }) => {
           if (run !== generation || !alive()) return;
-          if (source === 'user') { actions.hear(message); lastUserAt = now(); }
+          if (source === 'user') {
+            const started = actions.hear(message);
+            // The app started a timer itself ("pasta's in"): tell Remy so he confirms it and doesn't start another
+            if (started?.seconds) context(`[TIMER STARTED BY APP] ${started.label}, ${started.seconds / 60} minutes. The cook said it's in. Confirm the timer once out loud; do not call start_timer for it.`);
+            lastUserAt = now();
+          }
           onTranscript({ source, message });
         },
         onVadScore: ({ vadScore }) => { if (run === generation && vadScore > 0.5) lastUserAt = now(); },

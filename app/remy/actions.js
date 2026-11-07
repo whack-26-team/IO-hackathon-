@@ -17,9 +17,45 @@ export function createActions({ emit, request, alive, now = Date.now }) {
   let recipe = null, step = 0, schemas = new Map(), suppliedTiming = null;
   const timers = new Map();
   const words = ['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty'];
+  let heard = ''; // recent things the cook said, to know which pasta shape they meant
+  // "Pasta's in", "it's in", "I've put the penne in", "they're in the pot"...
+  const SAID_IN = /\b(it'?s|it is|they'?re|they are|pasta'?s|pasta is|noodles are|that'?s|all|now) in\b|\bput (the |it |them )?(\w+ )?in\b|\b(in|into) the (pot|pan|water)\b|\b(gone|going) in\b/i;
+  // When the cook says the food is in, start the next recipe timer straight away, even if
+  // Remy hasn't called start_timer yet. Returns the timer so the voice route can tell Remy.
+  function autoStart(text) {
+    if (!recipe || !SAID_IN.test(text)) return null;
+    for (const index of [step, step + 1, step + 2]) {
+      const s = recipe.steps[index];
+      if (!s) continue;
+      let timer = s.timer;
+      if (!timer && s.timer_by_shape) {  // pick the shape the cook named (penne, fusilli...)
+        const said = heard.toLowerCase();
+        timer = Object.entries(s.timer_by_shape).find(([key, t]) =>
+          [key.split(/[ _(]/)[0], ...(t.label || '').toLowerCase().split(/[^a-z]+/)].some(w => w.length > 3 && said.includes(w)))?.[1];
+        if (!timer) return null;  // shape unknown: Remy asks which pasta it is
+      }
+      if (!timer) continue;
+      // A plain "it's in" only counts for the CURRENT step ("salt's in the water" must not start
+      // the pasta timer). Naming the food ("pasta's in", "penne's in") also reaches the next steps.
+      const food = [...(timer.label || '').toLowerCase().split(/[^a-z]+/), 'pasta', 'noodle'].filter(w => w.length > 3);
+      if (index !== step && !food.some(w => text.toLowerCase().includes(w))) continue;
+      const seconds = Math.round(timer.minutes * 60);
+      if ([...timers.values()].some(t => !t.done && t.label === timer.label && t.seconds === seconds)) return null;
+      const started = { id: timer.label.toLowerCase().replace(/[^a-z0-9]+/g, '-'), label: timer.label, seconds,
+        ...(timer.check_at ? { check_at: Math.round(timer.check_at * 60) } : {}) };
+      step = index;
+      emit('timer_start', started);
+      timers.set(started.id, { ...started, done: false, step, instruction: s.instruction, next_instruction: recipe.steps[step + 1]?.instruction });
+      return started;
+    }
+    return null;
+  }
   function hear(text) {
+    heard = (heard + ' ' + text).slice(-600);
+    const started = autoStart(text);
+    if (started) return started;
     // Complex durations deliberately require the cook to repeat them as a number.
-    if (!/\b(timer|remind|packet|minutes?|seconds?|hours?)\b/i.test(text)) return;
+    if (!/\b(timer|remind|packet|minutes?|seconds?|hours?)\b/i.test(text)) return null;
     const converted = text.toLowerCase().replace(new RegExp(`\\b(${words.join('|')})\\b`, 'g'), word => words.indexOf(word));
     suppliedTiming = null;
     // Never turn "twenty five" into 5 or "one minute thirty seconds" into 1.
@@ -28,6 +64,19 @@ export function createActions({ emit, request, alive, now = Date.now }) {
     if (matches.length !== 1) return;
     const match = matches[0];
     if (match) suppliedTiming = { minutes: Number(match[1]) * (match[2].startsWith('hour') ? 60 : match[2].startsWith('second') ? 1 / 60 : 1), at: now() };
+  }
+  // Timers the loaded recipe allows: each step's timer and every timer_by_shape option,
+  // searched from the current step forwards first, then earlier steps.
+  function findRecipeTimer(minutes, check) {
+    if (!recipe) return null;
+    const order = [...recipe.steps.keys()].sort((a, b) => ((a < step) - (b < step)) || a - b);
+    for (const index of order) {
+      const s = recipe.steps[index];
+      const options = [s.timer, ...Object.values(s.timer_by_shape || {})].filter(Boolean);
+      const timer = options.find(t => t.minutes === minutes && (check === undefined || t.check_at === check));
+      if (timer) return { timer, index };
+    }
+    return null;
   }
   function setRecipe(data) {
     if (!data.recipe || !Array.isArray(data.recipe.steps) || !data.recipe.steps.length) throw new Error('Recipe has no usable steps.');
@@ -55,12 +104,19 @@ export function createActions({ emit, request, alive, now = Date.now }) {
         case 'start_timer': {
           const { id, label, minutes, check_at_minutes: check } = args;
           if (!id.trim() || !label.trim() || minutes <= 0 || minutes > 240 || (check !== undefined && (check <= 0 || check >= minutes))) throw new Error('Timer duration must be positive and at most 240 minutes; check time must be before the end.');
-          const source = recipe?.steps[step]?.timer;
           const explicit = suppliedTiming && now() - suppliedTiming.at < 90000 && Math.abs(suppliedTiming.minutes - minutes) < 0.00001;
-          if (!explicit && (!source || source.minutes !== minutes || (check !== undefined && source.check_at !== check))) throw new Error('Ask the cook for an exact duration, or use the current recipe step timer. Do not guess.');
+          // The timer can come from ANY step of the loaded recipe, not only the current one: the cook
+          // often says "pasta's in" before Remy has moved the step on. Shape-dependent steps
+          // (timer_by_shape, e.g. boiled pasta) count too. If it matches, that step becomes current.
+          const found = findRecipeTimer(minutes, check);
+          const source = found?.timer;
+          if (!explicit && !source) throw new Error('Ask the cook for an exact duration, or use a timer from the loaded recipe. Do not guess.');
+          if (found && !explicit) step = found.index;
           if (explicit && check !== undefined && source?.check_at !== check) throw new Error('No source for that check time. Omit it.');
           const old = timers.get(id);
           const seconds = Math.round(minutes * 60);
+          const twin = [...timers.values()].find(t => !t.done && t.id !== id && t.label === label && t.seconds === seconds);
+          if (twin) return { ok: true, already_running: true, message: `The app already started the ${label} timer when the cook said it was in. Just confirm it once.` };
           if (old && old.seconds === seconds && old.label === label && !old.done) return { ok: true, already_running: true, message: 'Timer already running; not restarted.' };
           if (old && !old.done && !explicit) throw new Error('Ask the cook to confirm a changed duration before replacing a timer.');
           const timer = { id, label, seconds, ...(check !== undefined ? { check_at: Math.round(check * 60) } : {}) };

@@ -34,6 +34,7 @@
   "other_meat_and_fish": {
     "chicken_breast_pan_medium_heat": { "minutes_per_side": 6, "note": "~2cm thick. Must reach 74°C inside." },
     "chicken_thigh_boneless_pan": { "minutes_per_side": 6, "note": "Must reach 74°C inside." },
+    "chicken_pieces_pan": { "total_minutes": 7, "note": "Diced, strips or bite-sized pieces (~2cm), hot pan, stir often. No pink inside, 74°C." },
     "salmon_fillet_pan_skin_side_down": { "skin_side_minutes": 4, "flesh_side_minutes": 2, "note": "Flesh turns opaque, flakes easily; 63°C." },
     "bacon_rashers_pan": { "minutes_per_side": 3 },
     "sausages_pan_medium_low": { "total_minutes": 15, "note": "Turn often; no pink inside (71°C)." },

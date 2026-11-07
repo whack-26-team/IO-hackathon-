@@ -25,6 +25,10 @@ GENERIC = set("""boil boiled simmer pan minute minutes total default min max che
 medium low high heat oven from cold water whole chunk chunks sliced sheets soak off add adding after
 stock flesh skin down rest covered c thick dried and the a white""".split())  # 'white' rice is the default
 
+# Words meaning the food is cut small, and whole cuts whose times don't apply then
+CUT_WORDS = set("""diced dice cubed cube piece strip bite chunk chopped""".split())
+WHOLE_CUTS = set("""breast thigh fillet whole""".split())
+
 # Which safety entry applies, by words found in the title/ingredients (most specific first)
 SAFETY_RULES = [
     (r"\b(chicken|turkey|duck|poultry)\b", "poultry (chicken, turkey, duck), whole or minced, plus stuffing"),
@@ -126,7 +130,13 @@ def check_ai_recipe(data: dict) -> dict:
             if known is None:
                 # find the most specific cook-times entry mentioned in the label + instruction
                 said = _words(f"{timer['label']} {instruction}")
-                hits = [(kw, p, m, c) for kw, p, m, c in index if kw <= said]
+                if said & CUT_WORDS:
+                    # "diced chicken breast" is small pieces, not a whole breast: use the
+                    # pieces entry and skip whole-cut times (which would overcook it)
+                    said.add("piece")
+                    hits = [(kw, p, m, c) for kw, p, m, c in index if kw <= said and not kw & WHOLE_CUTS]
+                else:
+                    hits = [(kw, p, m, c) for kw, p, m, c in index if kw <= said and "piece" not in kw]
                 if hits:
                     kw, src, known, table_check = max(hits, key=lambda h: len(h[0]))
             if known is not None:

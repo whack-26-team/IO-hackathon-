@@ -130,3 +130,43 @@ test('ten-minute cap ends voice without clearing the screen timers',async()=>{
   assert.equal(f.closed,1); assert.equal(f.events.at(-1).data.status,'error');
   assert.match(f.events.at(-1).data.message,/Timers remain/);
 });
+
+test('timer from a later recipe step or a pasta shape starts without moving the step first',async()=>{
+  const events=[]; const actions=createActions({emit:(type,data)=>events.push({type,data}),request:async()=>({}),alive:()=>true});
+  const pasta={id:'boiled-pasta',title:'Pasta',steps:[{instruction:'Which shape?'},{instruction:'Boil water'},
+    {instruction:'Pasta in',timer_by_shape:{penne:{label:'Penne',minutes:11,check_at:10},spaghetti:{label:'Spaghetti',minutes:10,check_at:9}}},{instruction:'Taste'}]};
+  actions.configure({tools:[{name:'start_timer',parameters:{type:'object',required:['id','label','minutes'],properties:{id:{type:'string'},label:{type:'string'},minutes:{type:'number'},check_at_minutes:{type:'number'}}}}],recipe:pasta});
+  assert.equal((await actions.call('start_timer',{id:'pasta',label:'Penne',minutes:11,check_at_minutes:10})).ok,true);
+  assert.equal(actions.snapshot().current_step,2);
+  assert.equal((await actions.call('start_timer',{id:'other',label:'Guess',minutes:7})).ok,false);
+  assert.deepEqual(events.filter(e=>e.type==='timer_start').map(e=>e.data.seconds),[660]);
+});
+
+test('saying the pasta is in starts the timer for the shape the cook named',async()=>{
+  const events=[]; const actions=createActions({emit:(type,data)=>events.push({type,data}),request:async()=>({}),alive:()=>true});
+  const pasta={id:'boiled-pasta',title:'Pasta',steps:[{instruction:'Which shape?'},{instruction:'Boil water'},
+    {instruction:'Pasta in',timer_by_shape:{penne:{label:'Penne',minutes:11,check_at:10},spaghetti:{label:'Spaghetti',minutes:10,check_at:9}}},{instruction:'Taste'}]};
+  actions.configure({tools:[{name:'start_timer',parameters:{type:'object',required:['id','label','minutes'],properties:{id:{type:'string'},label:{type:'string'},minutes:{type:'number'},check_at_minutes:{type:'number'}}}}],recipe:pasta});
+  assert.equal(actions.hear("The water's boiling"), null);
+  assert.equal(actions.hear("Pasta's in"), null); // shape not known yet: Remy asks
+  actions.hear('I am using penne');
+  const started=actions.hear("OK, I've put the pasta in");
+  assert.equal(started.label,'Penne'); assert.equal(started.seconds,660); assert.equal(started.check_at,600);
+  assert.equal(actions.hear("it's in"), null); // no duplicate
+  // Remy then also calls start_timer with his own id: not a second countdown
+  assert.equal((await actions.call('start_timer',{id:'pasta',label:'Penne',minutes:11,check_at_minutes:10})).already_running,true);
+  assert.equal(events.filter(e=>e.type==='timer_start').length,1);
+});
+test('saying it is in starts a plain recipe step timer (rigatoni)',async()=>{
+  const events=[]; const actions=createActions({emit:(type,data)=>events.push({type,data}),request:async()=>({}),alive:()=>true});
+  actions.configure({tools:[],recipe:{id:'r',title:'R',steps:[{instruction:'Boil'},{instruction:'Rigatoni in',timer:{label:'Rigatoni',minutes:11,check_at:10}}]}});
+  assert.equal(actions.hear("Rigatoni's going in now, it's in the pot").seconds,660);
+});
+
+test('salt in the water does not start the pasta timer',async()=>{
+  const events=[]; const actions=createActions({emit:(type,data)=>events.push({type,data}),request:async()=>({}),alive:()=>true});
+  actions.configure({tools:[],recipe:{id:'r',title:'R',steps:[{instruction:'Boil and salt'},{instruction:'Rigatoni in',timer:{label:'Rigatoni',minutes:11,check_at:10}}]}});
+  assert.equal(actions.hear("Salt's in the water"), null);
+  assert.equal(actions.hear("Pasta's in").label, 'Rigatoni');
+  assert.equal(events.filter(e=>e.type==='timer_start').length,1);
+});
