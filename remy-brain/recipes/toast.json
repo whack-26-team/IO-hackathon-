@@ -1,0 +1,64 @@
+{
+  "id": "toast",
+  "title": "Toast with butter & jam",
+  "summary": "Two minutes, one toaster: a quick, safe demo.",
+  "aliases": [
+    "toast",
+    "buttered toast",
+    "toast and jam",
+    "jam on toast",
+    "toast with butter",
+    "toast with jam"
+  ],
+  "source": "Written for REMY by Claude as a simple demo. Waiting for Matthew's review.",
+  "checked_by_human": false,
+  "serves": 1,
+  "total_minutes": 4,
+  "equipment": [
+    "Toaster",
+    "Butter knife",
+    "Plate"
+  ],
+  "notes": "Never put a knife or fork into a toaster to get stuck bread out: unplug it first.",
+  "ingredients": [
+    "2 slices of bread",
+    "Butter, softened",
+    "Jam (any kind)"
+  ],
+  "steps": [
+    {
+      "instruction": "Put the bread in the toaster and push the lever down. Set it to medium.",
+      "looks_right": [
+        "bread down in the toaster slots"
+      ],
+      "looks_wrong": [
+        "bread too thick to fit (it can jam and burn)"
+      ],
+      "done_when": "The bread is toasting."
+    },
+    {
+      "instruction": "When it pops up, take the toast out and put it on the plate.",
+      "looks_right": [
+        "golden brown on both sides"
+      ],
+      "looks_wrong": [
+        "black, burnt edges (scrape or start again)",
+        "still pale (put it back down for a bit)",
+        "using a knife to fish out stuck bread (unplug the toaster first)"
+      ],
+      "done_when": "Golden toast is on the plate."
+    },
+    {
+      "instruction": "Spread the butter while it's hot, then add the jam all the way to the edges.",
+      "looks_right": [
+        "butter melting into the toast",
+        "jam spread right to the crust"
+      ],
+      "looks_wrong": [
+        "butter in cold lumps (the toast went cold first)",
+        "a blob of jam in the middle only"
+      ],
+      "done_when": "Buttered, jammed and ready to eat."
+    }
+  ]
+}

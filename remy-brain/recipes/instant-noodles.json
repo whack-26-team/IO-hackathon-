@@ -1,0 +1,72 @@
+{
+  "id": "instant-noodles",
+  "title": "Instant noodles",
+  "summary": "Boiling water, a 3-minute timer, done: the easiest way to show off Remy's timers.",
+  "aliases": [
+    "instant noodles",
+    "noodles",
+    "pot noodle",
+    "ramen",
+    "instant ramen",
+    "cup noodles",
+    "super noodles"
+  ],
+  "source": "Written for REMY by Claude as a simple demo. Waiting for Matthew's review.",
+  "checked_by_human": false,
+  "serves": 1,
+  "total_minutes": 5,
+  "equipment": [
+    "Kettle",
+    "Heatproof bowl",
+    "Plate or lid to cover the bowl",
+    "Fork"
+  ],
+  "notes": "Boiling water burns: pour slowly, away from you, and keep the bowl on a flat surface.",
+  "ingredients": [
+    "1 packet of instant noodles (with its flavour sachet)",
+    "About 400ml boiling water (check the packet)",
+    "Optional: a spring onion, sliced, or a soft-boiled egg"
+  ],
+  "steps": [
+    {
+      "instruction": "Boil the kettle. Put the noodles in the bowl and sprinkle the flavour sachet over them.",
+      "looks_right": [
+        "noodle block in the bowl",
+        "seasoning on top"
+      ],
+      "looks_wrong": [
+        "bowl not heatproof (thin plastic or glass that might crack)"
+      ],
+      "done_when": "Noodles in the bowl and the kettle is boiling."
+    },
+    {
+      "instruction": "Pour the boiling water over the noodles slowly, until they're just covered. Cover the bowl with a plate.",
+      "looks_right": [
+        "water just covering the noodles",
+        "bowl covered"
+      ],
+      "looks_wrong": [
+        "water splashing (pour slower)",
+        "bowl filled to the brim (hard to carry)"
+      ],
+      "done_when": "The noodles are covered and the timer is running.",
+      "timer": {
+        "label": "Noodles",
+        "minutes": 3,
+        "from": "quick_and_simple/instant_noodles_soak"
+      }
+    },
+    {
+      "instruction": "When the timer ends, take the plate off carefully (steam!), stir with the fork to separate the noodles, and add any toppings.",
+      "looks_right": [
+        "noodles soft and separated",
+        "stirred-in broth"
+      ],
+      "looks_wrong": [
+        "a hard block in the middle (cover for another minute)",
+        "face over the bowl when lifting the plate (steam burns)"
+      ],
+      "done_when": "Soft noodles, stirred and ready."
+    }
+  ]
+}

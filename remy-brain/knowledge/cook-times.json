@@ -79,6 +79,10 @@
     "garlic_sliced_gentle_heat": 1.5,
     "mushrooms_sliced_hot_pan": 5
   },
+  "quick_and_simple": {
+    "instant_noodles_soak": 3,
+    "_note": "Instant noodles: check the packet; most say 3 minutes in just-boiled water, covered."
+  },
   "sauces": {
     "tomato_sauce_simmer": 10,
     "garlic_butter_baste_steak": 1
