@@ -49,8 +49,27 @@ Only create a branch when the task changes files. Check-in-only tasks (e.g. the 
 1. Start from the latest `main`: `git checkout main && git pull && git checkout -b felix/c2-9-app-screens`
 2. Commit small, push at least every hour: `git push -u origin felix/c2-9-app-screens`
 3. Open a pull request with **`Closes #9`** in the description. It gets labelled automatically.
+   **It merges itself** once the checks pass (see "Auto-merge" below). Still working on it? Open it as a **draft**.
 4. Once merged, the branch is finished. **Don't keep working on it**: start the next one from fresh `main`.
 5. Merged branches get deleted (GitHub's "automatically delete head branches" setting).
 
 ## `main`
 `main` is always the working version. Nobody pushes to it directly. Everything goes in through a reviewed pull request with the automatic check passing.
+
+## Auto-merge: no one has to press the merge button
+When a pull request's checks pass, GitHub merges it into `main` by itself, **if** it's safe without a human:
+
+| Rule | Why |
+|---|---|
+| Not a draft, no `hold` label | Drafts are still being worked on |
+| Branch follows the naming rule above | So we know whose work it is |
+| Only changes **that person's own folders** (see `AGENTS.md`) | Nobody's work gets changed behind their back |
+| Nothing that looks like an API key or password | Secrets must never reach GitHub |
+
+Matthew's and Claude's PRs may touch any folder (team lead), but secrets are still blocked.
+
+If a rule fails, the PR gets the **`needs-review`** label and a comment explaining why. Matthew takes a look,
+then adds the **`approved`** label (or presses merge), and it goes in. Secrets block it even when approved.
+
+- **Stop a PR merging itself:** add the `hold` label, or convert it to a draft.
+- **Rules live in:** `.github/scripts/automerge.py`

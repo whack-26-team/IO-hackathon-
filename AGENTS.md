@@ -43,6 +43,9 @@ The iPhone needs **https** for the camera. Use `cloudflared tunnel --url http://
 - At every checkpoint (C0–C5, see `docs/PLAN.md`): open/update your PR, link your
   issue (`Closes #N`), and post a Done / Next / Blocked comment on your issue.
 - Never merge broken code to `main`. `python tools/validate.py` must pass.
+- **PRs merge themselves** when the checks pass and you only changed your own folders (no secrets).
+  Open a **draft** PR while still working, and mark it "Ready for review" when it's done. If a change must
+  touch someone else's folder, the PR waits for Matthew (`needs-review` label). Details: `docs/BRANCHES.md`.
 - **Never commit secrets.** `server/.env` is git-ignored; keep it that way. Don't
   paste keys in issues, PRs or chat. The phone only ever gets short-lived passes.
 
