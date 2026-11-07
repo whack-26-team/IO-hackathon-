@@ -25,7 +25,7 @@ html { touch-action: manipulation; overscroll-behavior: none; -webkit-text-size-
 html, body { margin: 0; height: 100%; color: var(--ink); overscroll-behavior: none; font-family: var(--font); }
 /* The page BEHIND the app also has the colour + utensil pattern, so any edge the iPhone shows past
    the app (under the home bar, behind Safari's toolbar, during bounce) looks the same. */
-html { background: var(--cream) var(--utensils); }
+html { background: var(--cream) var(--utensils); background-attachment: fixed; }
 html[data-mode="gentle"] { background: var(--sky) var(--utensils); }
 html[data-mode="savage"] { background: var(--night) var(--utensils-light); }
 html[data-mode="cooking"] { background: #000; }
@@ -41,34 +41,34 @@ button { font: inherit; color: inherit; cursor: pointer; }
 /* ================= START SCREEN ================= */
 /* Pinned to the real screen edges, like the cooking screen: 100dvh is sometimes too short in iPhone
    home-screen apps, which left a strip of the wrong colour at the bottom. Scrolls on tiny screens. */
-#start-screen { position: fixed; inset: 0; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+#start-screen { position: fixed; top: 0; left: 0; right: 0; height: 100vh; height: 100lvh;  /* whole screen, home bar included */ overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
   display: flex; flex-direction: column; gap: 10px;
   /* bottom: the footer sits close to the edge, just clear of the iPhone home bar */
   padding: calc(22px + var(--safe-top)) calc(18px + var(--safe-right)) max(6px, calc(var(--safe-bottom) - 22px)) calc(18px + var(--safe-left));
-  background: var(--cream) var(--utensils); transition: background-color .25s, color .25s; }
+  background: var(--cream) var(--utensils); background-attachment: fixed; transition: background-color .25s, color .25s; }
 #start-screen > * { width: 100%; max-width: 440px; margin-left: auto; margin-right: auto; }
-.wordmark { text-align: center; font-weight: 800; font-size: 40px; letter-spacing: -1px; line-height: 1; }
+.wordmark { text-align: center; font-weight: 800; font-size: clamp(34px, 5.4vh, 50px); letter-spacing: -1px; line-height: 1; }
 .wordmark small { display: block; font-size: 14px; letter-spacing: 0; font-weight: 600; color: var(--muted); margin-top: 3px; }
 
 /* Remy greets you: fixed height so nothing below moves when the attitude changes */
-.hero { display: flex; flex-direction: column; align-items: center; height: 196px; }
-.greeting { width: 100%; max-width: 300px; min-height: 66px; display: flex; align-items: center; justify-content: center;
+.hero { display: flex; flex-direction: column; align-items: center; height: clamp(170px, 28.5vh, 290px); }  /* fixed per screen: nothing jumps between attitudes */
+.greeting { width: 100%; max-width: 330px; min-height: clamp(62px, 8.5vh, 84px); font-size: clamp(17px, 2.3vh, 21px) !important; display: flex; align-items: center; justify-content: center;
   text-align: center; background: #fff; border: var(--line); border-radius: 18px; box-shadow: var(--shadow);
   padding: 9px 14px; font-weight: 800; font-size: 18px; line-height: 1.15; position: relative; transition: background .25s, transform .25s; }
 .greeting::after { content: ""; position: absolute; bottom: -13px; left: 50%; width: 20px; height: 20px; background: inherit;
   border-right: var(--line); border-bottom: var(--line); transform: translateX(-50%) rotate(45deg); }
-.hero-face { width: 150px; margin-top: 6px; animation: pop .3s ease-out; }
+.hero-face { width: clamp(130px, 20vh, 200px); margin-top: clamp(6px, 1.2vh, 14px); animation: pop .3s ease-out; }
 
-.modes { border: 0; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 9px; }
+.modes { border: 0; padding: 0; margin: 0; display: flex; flex-direction: column; gap: clamp(9px, 1.4vh, 14px); }
 .modes legend { font-weight: 800; font-size: 17px; margin-bottom: 9px; padding: 0; }
 .mode-bar { display: flex; align-items: center; gap: 10px; background: #fff; color: var(--ink); border: 2.5px solid var(--ink);
-  border-radius: 16px; box-shadow: 3px 3px 0 var(--ink); padding: 6px 12px 6px 8px; transition: transform .1s, box-shadow .1s, background .2s; }
+  border-radius: 16px; box-shadow: 3px 3px 0 var(--ink); padding: clamp(6px, 1.3vh, 13px) 12px clamp(6px, 1.3vh, 13px) 8px; transition: transform .1s, box-shadow .1s, background .2s; }
 .mode-bar:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
 .mode-bar input { position: absolute; opacity: 0; pointer-events: none; } /* the bar is the button */
-.mode-bar .face { width: 52px; flex: none; }
+.mode-bar .face { width: clamp(52px, 7vh, 66px); flex: none; }
 .mode-bar .txt { flex: 1; min-width: 0; }
-.mode-bar b { display: block; font-size: 18px; }
-.mode-bar small { display: block; font-size: 13px; color: #555; }
+.mode-bar b { display: block; font-size: clamp(18px, 2.4vh, 21px); }
+.mode-bar small { display: block; font-size: clamp(13px, 1.7vh, 15px); color: #555; }
 .mode-bar .tick { width: 24px; height: 24px; flex: none; border-radius: 50%; border: 2.5px solid var(--ink); background: #fff; }
 .mode-bar:has(input:checked) { box-shadow: 5px 5px 0 var(--ink); transform: translate(-1px, -1px); }
 .mode-bar:has(input:checked) .tick { background: var(--ink); box-shadow: inset 0 0 0 4px var(--butter); }
@@ -79,7 +79,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .go { display: block; width: 100%; border: var(--line); border-radius: 18px; box-shadow: 5px 5px 0 var(--ink); background: var(--tomato);
   color: var(--cream); font-weight: 800; font-size: 26px; padding: 16px; transition: transform .1s, box-shadow .1s; }
 .go:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--ink); }
-#start-btn { margin-top: auto; }   /* pushed down to just above the footer */
+#start-btn { margin-top: auto; font-size: clamp(24px, 3.2vh, 29px); padding: clamp(14px, 2.2vh, 20px); }   /* pushed down to just above the footer */
 .ghost { width: 100%; background: transparent; border: 2.5px solid currentColor; border-radius: 16px; padding: 13px; font-weight: 700; font-size: 17px; }
 .start-foot { margin-top: 0 !important; padding-top: 8px; gap: 4px; display: flex; flex-direction: column; align-items: center; gap: 6px;
   font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
