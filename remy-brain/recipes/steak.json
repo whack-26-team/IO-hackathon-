@@ -1,51 +1,75 @@
 {
   "id": "steak",
-  "title": "Pan-seared steak",
-  "summary": "A properly seared steak, the best test of 'too hot / not hot enough'.",
-  "source": "Starter outline written by Claude. Matthew: replace/compare with a TheMealDB import, then hand-check.",
+  "title": "Pan-seared steak with garlic butter",
+  "summary": "A restaurant-style steak with a proper crust: the best test of 'too hot or not hot enough'.",
+  "aliases": ["steak", "sirloin steak", "ribeye", "rib eye steak", "fillet steak", "rump steak", "pan steak", "beef steak"],
+  "source": "Written for REMY by Claude, timers from cook-times.json (2.5cm, medium-rare). Waiting for Matthew's review.",
   "checked_by_human": false,
   "serves": 1,
+  "total_minutes": 20,
+  "equipment": ["Heavy frying pan (cast iron is best)", "Tongs", "Kitchen paper", "Spoon", "Board", "Meat thermometer (recommended)"],
+  "notes": "Timers assume a steak about 2.5cm thick, cooked medium-rare. Remy should ask how thick it is and how they like it, and change the timers using the cook-times table (2cm / 2.5cm / 4cm × rare / medium-rare / medium / well done).",
   "ingredients": [
-    "1 sirloin or ribeye steak, ~2.5cm thick, at room temperature",
-    "1 tbsp high smoke point oil (vegetable, rapeseed)",
-    "Salt and black pepper",
+    "1 sirloin, ribeye or rump steak, about 2.5cm thick, out of the fridge for 20–30 minutes",
+    "1 tbsp oil with a high smoke point (vegetable or rapeseed)",
+    "Salt and freshly ground black pepper",
     "1 tbsp butter",
-    "1 garlic clove, crushed",
-    "Sprig of thyme or rosemary"
+    "1 garlic clove, crushed with the side of a knife",
+    "1 sprig of thyme or rosemary (optional)"
   ],
   "steps": [
     {
-      "instruction": "Pat the steak dry with kitchen paper and season well on both sides.",
-      "looks_right": ["dry surface", "visible salt and pepper"],
-      "looks_wrong": ["wet steak straight from the packet (it won't sear)"],
-      "done_when": "Steak is dry and seasoned."
+      "instruction": "Pat the steak really dry with kitchen paper, then season it generously with salt and pepper on both sides. Tell Remy how thick it is and how you like it cooked.",
+      "looks_right": ["dry surface with no shine of moisture", "salt and pepper visible on both sides"],
+      "looks_wrong": ["wet steak straight from the packet (it'll steam, not sear)", "raw meat juices touching other food, or the same board used for salad"],
+      "done_when": "The steak is dry and seasoned, and Remy knows the thickness and doneness."
     },
     {
-      "instruction": "Heat a heavy pan on high until very hot, then add the oil.",
-      "looks_right": ["oil shimmering", "first wisps of smoke"],
-      "looks_wrong": ["heavy smoke (too hot, take it off)", "cold pan, no shimmer"],
-      "done_when": "Oil shimmers and just starts to smoke."
+      "instruction": "Put the heavy pan on high heat for a few minutes until it's very hot, then add the oil.",
+      "looks_right": ["oil shimmering and rippling", "the first faint wisp of smoke"],
+      "looks_wrong": ["thick, heavy smoke (too hot: take it off the heat for a moment)", "oil lying still with no shimmer (not hot enough yet)"],
+      "done_when": "The oil shimmers and just starts to smoke."
     },
     {
-      "instruction": "Lay the steak in, away from you. Don't move it.",
-      "looks_right": ["loud sizzle as it goes in"],
-      "looks_wrong": ["no sizzle (pan not hot enough)", "steak being poked and moved around"],
-      "timer": { "label": "Steak, side 1", "minutes": 3, "check_at": 2.5 },
-      "done_when": "Steak is in. Start the side-1 timer (3 min for medium-rare)."
+      "instruction": "Lay the steak in the pan, away from you so the oil doesn't spit at you. Don't touch it, let the crust form.",
+      "looks_right": ["a loud sizzle the moment it goes in", "the edges slowly turning brown"],
+      "looks_wrong": ["no sizzle (pan not hot enough)", "steak being poked, pressed or moved around (no crust)"],
+      "timer": {
+        "label": "Steak: side 1",
+        "minutes": 3,
+        "check_at": 2.5,
+        "from": "steak_minutes_per_side_very_hot_pan/2.5cm_thick/medium_rare"
+      },
+      "done_when": "The first side has a deep brown crust (lift a corner with tongs to check)."
     },
     {
-      "instruction": "Flip the steak. Add the butter, garlic and herbs, and spoon the butter over.",
-      "looks_right": ["deep brown crust on the cooked side", "foaming butter"],
-      "looks_wrong": ["grey, pale side (not seared)", "black, burnt crust", "butter burning black"],
-      "timer": { "label": "Steak, side 2", "minutes": 3, "check_at": 2.5 },
-      "done_when": "Second side seared. Check with a thermometer: 57°C for medium-rare."
+      "instruction": "Flip the steak. Turn the heat down to medium, then add the butter, garlic and herbs. Tilt the pan and keep spooning the foaming butter over the steak.",
+      "looks_right": ["deep, even brown crust on the cooked side", "butter foaming and turning nutty brown"],
+      "looks_wrong": ["grey, pale cooked side (pan wasn't hot enough)", "black, burnt crust", "butter turning black and smoking"],
+      "timer": {
+        "label": "Steak: side 2",
+        "minutes": 3,
+        "check_at": 2.5,
+        "from": "steak_minutes_per_side_very_hot_pan/2.5cm_thick/medium_rare"
+      },
+      "done_when": "Both sides are seared. A thermometer in the thickest part reads about 54–55°C for medium-rare (it rises to ~57°C while resting). For other doneness, use the food-safety table."
     },
     {
-      "instruction": "Rest the steak on a board for 5 minutes, then slice against the grain.",
-      "looks_right": ["steak resting, not being cut straight away"],
-      "looks_wrong": ["slicing immediately (juices run out)"],
-      "timer": { "label": "Resting", "minutes": 5 },
-      "done_when": "Rested and sliced. Ask the cook to show the inside to the camera."
+      "instruction": "Move the steak to a board and let it rest. Spoon the garlic butter from the pan over the top.",
+      "looks_right": ["steak resting untouched on the board"],
+      "looks_wrong": ["cutting into it straight away (the juices run out)"],
+      "timer": {
+        "label": "Resting",
+        "minutes": 5,
+        "from": "steak_minutes_per_side_very_hot_pan/rest_minutes"
+      },
+      "done_when": "It has rested for 5 minutes."
+    },
+    {
+      "instruction": "Slice against the grain (across the lines in the meat) into strips, and show Remy the inside.",
+      "looks_right": ["slices cut across the grain", "an evenly cooked inside (pink all the way through for medium-rare)"],
+      "looks_wrong": ["cutting along the grain (chewy strips)"],
+      "done_when": "Sliced and plated. Remy can comment on the colour, but must not call it 'safe' from looks; that's what the thermometer is for."
     }
   ]
 }

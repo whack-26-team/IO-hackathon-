@@ -1,21 +1,51 @@
 {
-  "_owner": "Matthew. FIXED FACTS: Remy must never contradict these. Values from USDA safe minimum internal temperatures + UK Food Standards Agency guidance. Re-verify before any public launch.",
-  "_rule": "Remy cannot see inside food. For meat, fish and eggs always say: check with a thermometer in the thickest part.",
+  "_owner": "Matthew. FIXED FACTS: Remy must never contradict these.",
+  "_sources": [
+    "USDA FSIS Safe Minimum Internal Temperature Chart: https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/safe-temperature-chart",
+    "UK Food Standards Agency, cooking safely (core temp 70°C for 2 min, or equivalents e.g. 75°C for 30 s): https://www.food.gov.uk",
+    "UK gov.uk food hygiene for businesses, cooking (hot holding at or above 63°C): https://www.gov.uk/food-hygiene-businesses/cooking"
+  ],
+  "_checked": "Values checked against USDA FSIS and UK FSA guidance on 2026-11-07. Re-verify before any public launch.",
+  "_rule": "Remy cannot see inside food. For meat, fish and eggs always say: check with a thermometer in the thickest part. Never say 'safe to eat' from looks alone. These are MINIMUMS; cooking hotter is fine.",
   "minimum_internal_temps_c": {
-    "poultry (chicken, turkey, duck), whole or minced": { "temp_c": 74, "note": "UK FSA: steaming hot, 70°C for 2 min or 75°C for 30s; no pink, juices run clear" },
-    "minced meat (beef, pork, lamb burgers, sausages)": { "temp_c": 71, "note": "Burgers and sausages must be cooked through, no pink" },
-    "whole cuts of beef, lamb, veal (steaks, roasts)": { "temp_c": 63, "note": "Rest 3 minutes. Whole steaks can be served rare if the outside is properly seared; tell the cook it's their choice" },
-    "pork, whole cuts": { "temp_c": 63, "note": "Rest 3 minutes" },
-    "fish and shellfish": { "temp_c": 63, "note": "Flesh opaque and flakes easily" },
-    "egg dishes (quiche, frittata)": { "temp_c": 71 },
-    "reheated leftovers": { "temp_c": 74, "note": "Steaming hot all the way through; only reheat once" }
+    "poultry (chicken, turkey, duck), whole or minced, plus stuffing": {
+      "temp_c": 74, "temp_f": 165,
+      "note": "UK FSA: steaming hot all the way through, no pink, juices run clear (70°C for 2 min or 75°C for 30 s)."
+    },
+    "minced meat (beef, pork, lamb, veal), burgers, sausages": {
+      "temp_c": 71, "temp_f": 160,
+      "note": "Cooked through: no pink in the middle, juices run clear. Mincing spreads surface bacteria all through the meat."
+    },
+    "whole cuts of beef, lamb, veal (steaks, chops, roasts)": {
+      "temp_c": 63, "temp_f": 145,
+      "note": "Rest at least 3 minutes. Whole steaks are commonly served rare when the outside is properly seared (bacteria are on the surface); it's the cook's choice. Remy can say so, but must not call it 'safe' by looking."
+    },
+    "pork, whole cuts (chops, loin, roasts)": {
+      "temp_c": 63, "temp_f": 145, "note": "Rest at least 3 minutes."
+    },
+    "fresh or smoked raw ham": { "temp_c": 63, "temp_f": 145, "note": "Rest at least 3 minutes." },
+    "fish and shellfish": {
+      "temp_c": 63, "temp_f": 145,
+      "note": "Flesh opaque and flakes easily. Clams, mussels, oysters: cook until the shells open; throw away any that stay shut."
+    },
+    "eggs": { "note": "Cook until yolk and white are firm if serving to vulnerable people (pregnant, elderly, very young, unwell). Runny yolks are a personal choice for others." },
+    "egg dishes (quiche, frittata, casseroles)": { "temp_c": 71, "temp_f": 160 },
+    "leftovers and reheated food": {
+      "temp_c": 74, "temp_f": 165,
+      "note": "Steaming hot all the way through. Only reheat once."
+    }
   },
+  "hot_holding_c": { "temp_c": 63, "note": "Keep hot food at or above 63°C if not serving straight away." },
   "steak_doneness_c (taste, not safety)": {
+    "_note": "Pull the steak ~2-3°C before these; it keeps rising while resting.",
     "rare": 52, "medium_rare": 57, "medium": 63, "medium_well": 66, "well_done": 71
   },
   "hazards": {
-    "smoking_oil": "Oil smoking heavily is close to catching fire. Take the pan off the heat. Never use water on an oil fire; cover it with a lid or fire blanket and turn off the heat.",
-    "cross_contamination": "Raw meat must not touch ready-to-eat food. Separate boards or wash between, and wash hands after handling raw meat.",
-    "knife": "Fingertips tucked into a 'claw' grip; knife moving away from the body."
+    "smoking_oil": "Oil smoking heavily is close to catching fire. Take the pan off the heat. NEVER use water on an oil fire: turn off the heat and cover with a lid, damp tea towel or fire blanket.",
+    "pan_fire": "Turn off the heat, cover the pan, don't move it, don't use water. If it's not going out, get out and call the fire service.",
+    "cross_contamination": "Raw meat must not touch ready-to-eat food. Separate boards or wash between uses; wash hands after handling raw meat. Don't wash raw chicken (splashes bacteria).",
+    "knife": "Fingertips tucked into a 'claw' grip, knife moving away from the body, board steady (damp cloth underneath).",
+    "pan_handles": "Turn pan handles inwards, away from the edge of the hob.",
+    "allergens": "Remy can't detect allergens. If the cook mentions an allergy, remind them to check every label."
   }
 }

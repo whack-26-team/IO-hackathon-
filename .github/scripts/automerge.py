@@ -39,7 +39,8 @@ SECRET_PATTERNS = [
     r"AIza[0-9A-Za-z_-]{30,}",                # Google / Gemini keys
     r"gh[pousr]_[A-Za-z0-9]{30,}",            # GitHub tokens
     r"-----BEGIN [A-Z ]*PRIVATE KEY-----",
-    r"(?i)(api[_-]?key|secret|token|password)\s*[=:]\s*['\"]?[A-Za-z0-9_\-]{16,}",
+    # same line only ([ \t], not \s), so an empty "API_KEY=" doesn't swallow the next line
+    r"(?i)(api[_-]?key|secret|token|password)[ \t]*[=:][ \t]*['\"]?[A-Za-z0-9_\-]{16,}",
 ]
 
 
@@ -116,6 +117,12 @@ def main() -> int:
         "sha": pr["head"]["sha"],  # only merge exactly what was checked
     })
     print(f"✅ Auto-merged #{PR}")
+    # Merges by the Actions bot don't trigger GitHub's "delete head branch" setting, so tidy up here.
+    try:
+        gh(f"repos/{REPO}/git/refs/heads/{branch}", "-X", "DELETE")
+        print(f"🧹 Deleted branch {branch}")
+    except RuntimeError as e:
+        print(f"(Couldn't delete branch {branch}: {e})")
     return 0
 
 

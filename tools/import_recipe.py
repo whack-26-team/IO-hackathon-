@@ -1,14 +1,16 @@
 """Import a recipe from TheMealDB into REMY's recipe format (Owner: Matthew).
 
 Usage (from the repo root):
-    python tools/import_recipe.py "rigatoni"            # search by name, pick the first match
-    python tools/import_recipe.py "beef" --list         # just list matches
+    python tools/import_recipe.py "steak" --list        # list matches with their TheMealDB ids
+    python tools/import_recipe.py --id 52874            # import one exact dish by id
+    python tools/import_recipe.py "steak"               # import the first match
 
 What it does:
   1. Fetches the base recipe (name, ingredients + measures, method) from TheMealDB.
   2. Splits the method into steps.
-  3. Saves remy-brain/recipes/<id>.json with EMPTY looks_right / looks_wrong / done_when
-     and checked_by_human = false.
+  3. Saves remy-brain/recipes/_imported/<id>.json with EMPTY looks_right / looks_wrong /
+     done_when and checked_by_human = false. The app only lists remy-brain/recipes/*.json,
+     so raw imports never show up until they've been "Remy-ified" and moved up a folder.
 
 Next (C2, TODO Matthew): the "Remy-ify" step. Send the base recipe to an AI once to
 fill in looks_right / looks_wrong / done_when, and take timers from
@@ -26,81 +28,49 @@ import re
 import sys
 from pathlib import Path
 
-import httpx
 
 ROOT = Path(__file__).resolve().parent.parent
-RECIPES_DIR = ROOT / "remy-brain" / "recipes"
-KEY = os.getenv("THEMEALDB_KEY", "1")
-API = f"https://www.themealdb.com/api/json/v1/{KEY}"
-
-
-def slugify(text: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
-
-
-def search(name: str) -> list[dict]:
-    r = httpx.get(f"{API}/search.php", params={"s": name}, timeout=20)
-    r.raise_for_status()
-    return r.json().get("meals") or []
-
-
-def split_steps(method: str) -> list[str]:
-    # TheMealDB methods are sometimes numbered lines, sometimes one big paragraph.
-    lines = [l.strip() for l in re.split(r"\r?\n+", method) if l.strip()]
-    lines = [re.sub(r"^(step\s*)?\d+[.):]?\s*", "", l, flags=re.I) for l in lines]
-    lines = [l for l in lines if len(l) > 3]
-    if len(lines) <= 1:  # one paragraph -> split into sentences
-        lines = [s.strip() for s in re.split(r"(?<=[.!?])\s+", method) if len(s.strip()) > 3]
-    return lines
-
-
-def to_remy(meal: dict) -> dict:
-    ingredients = []
-    for i in range(1, 21):
-        ing = (meal.get(f"strIngredient{i}") or "").strip()
-        measure = (meal.get(f"strMeasure{i}") or "").strip()
-        if ing:
-            ingredients.append(f"{measure} {ing}".strip())
-    return {
-        "id": slugify(meal["strMeal"]),
-        "title": meal["strMeal"],
-        "summary": f"{meal.get('strArea') or ''} {meal.get('strCategory') or ''}".strip(),
-        "source": f"TheMealDB #{meal['idMeal']}",
-        "source_url": meal.get("strSource") or "",
-        "video": meal.get("strYoutube") or "",
-        "image": meal.get("strMealThumb") or "",
-        "checked_by_human": False,
-        "ingredients": ingredients,
-        "steps": [
-            {"instruction": s, "looks_right": [], "looks_wrong": [], "done_when": ""}
-            for s in split_steps(meal.get("strInstructions") or "")
-        ],
-    }
+sys.path.insert(0, str(ROOT))
+# One shared copy of the TheMealDB code (also used live by the server's recipe finder)
+from server.recipe_sources import (IMPORT_DIR, mealdb_lookup as lookup,  # noqa: E402
+                                   mealdb_search as search, mealdb_to_remy as to_remy)
 
 
 def main() -> int:
     p = argparse.ArgumentParser()
-    p.add_argument("name")
-    p.add_argument("--list", action="store_true")
+    p.add_argument("name", nargs="?", help="dish to search for, e.g. steak")
+    p.add_argument("--list", action="store_true", help="only list matches (with ids)")
+    p.add_argument("--id", help="import this exact TheMealDB id")
     p.add_argument("--force", action="store_true", help="overwrite an existing file")
     args = p.parse_args()
 
-    meals = search(args.name)
-    if not meals:
-        print(f"No TheMealDB results for '{args.name}'.")
-        return 1
-    if args.list:
-        for m in meals:
-            print(f"- {m['strMeal']} ({m.get('strArea')}, {m.get('strCategory')})")
-        return 0
+    if args.id:
+        meal = lookup(args.id)
+        if not meal:
+            print(f"No TheMealDB dish with id {args.id}.")
+            return 1
+    else:
+        if not args.name:
+            p.error("give a dish name or --id")
+        meals = search(args.name)
+        if not meals:
+            print(f"No TheMealDB results for '{args.name}'. Try a broader word (e.g. 'beef', 'pasta').")
+            return 1
+        if args.list:
+            for m in meals:
+                print(f"  --id {m['idMeal']:>6}  {m['strMeal']}  ({m.get('strArea')}, {m.get('strCategory')})")
+            return 0
+        meal = meals[0]
 
-    recipe = to_remy(meals[0])
-    out = RECIPES_DIR / f"{recipe['id']}.json"
+    recipe = to_remy(meal)
+    IMPORT_DIR.mkdir(parents=True, exist_ok=True)
+    out = IMPORT_DIR / f"{recipe['id']}.json"
     if out.exists() and not args.force:
-        print(f"{out} already exists (use --force to overwrite).")
+        print(f"{out.relative_to(ROOT)} already exists (use --force to overwrite).")
         return 1
     out.write_text(json.dumps(recipe, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(f"Saved {out} with {len(recipe['steps'])} steps. Next: Remy-ify + human check.")
+    print(f"Saved {out.relative_to(ROOT)}: {recipe['title']}, {len(recipe['ingredients'])} ingredients, "
+          f"{len(recipe['steps'])} steps.\nNext: commit + push it, then it gets Remy-ified and hand-checked.")
     return 0
 
 

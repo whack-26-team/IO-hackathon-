@@ -5,10 +5,13 @@ Owner: Matthew. Other people: please ask before editing.
 What it does:
   * serves the app (the `app/` folder) so the phone opens one link
   * GET  /api/recipes        -> list of recipes
+  * GET  /api/recipes/find?q=steak -> find a recipe by what the cook said (Remy's find_recipe)
+  * POST /api/recipes/ai     -> safety-check a recipe Remy wrote itself (create_recipe)
   * GET  /api/recipes/{id}   -> one full recipe
   * POST /api/brain          -> Remy's instructions + actions for ANY voice route
   * POST /api/session        -> a short-lived pass for the live OpenAI call,
                                 with Remy's instructions already built in
+  * POST /api/vision/look    -> Remy's eyes: what's in this camera picture? (Gemini)
   * GET  /api/health         -> quick "is it running and is the key set?" check
 
 Run it (from the repo root):
@@ -24,10 +27,14 @@ from pathlib import Path
 
 import httpx
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+
+from server.recipe_check import check_ai_recipe
+from server.recipe_sources import IMPORT_DIR, find_recipe
+from server import vision
 
 ROOT = Path(__file__).resolve().parent.parent
 APP_DIR = ROOT / "app"
@@ -59,14 +66,29 @@ def _read_text(path: Path) -> str:
 
 
 def load_recipe(recipe_id: str) -> dict:
-    path = RECIPES_DIR / f"{recipe_id}.json"
-    # Only allow plain file names, so nobody can ask for ../../secret
-    if path.parent != RECIPES_DIR or not path.exists():
-        raise HTTPException(404, f"No recipe called '{recipe_id}'")
-    return _read_json(path)
+    # Our recipes first, then ones found online earlier (cached in _imported/)
+    for folder in (RECIPES_DIR, IMPORT_DIR):
+        path = folder / f"{recipe_id}.json"
+        # Only allow plain file names, so nobody can ask for ../../secret
+        if path.parent == folder and path.exists():
+            return _read_json(path)
+    raise HTTPException(404, f"No recipe called '{recipe_id}'")
 
 
-def build_instructions(recipe: dict, mode: str) -> str:
+NO_RECIPE_YET = """# TODAY'S RECIPE
+Not chosen yet. The cook just pressed Start cooking. After your greeting and camera
+check, ask what they'd like to cook (they can also tell you what ingredients they have).
+1. Call find_recipe with their words. If it returns one of OUR recipes (found: true),
+   briefly confirm it, name the ingredients, and guide from step 1.
+2. Otherwise (or if they want changes, e.g. spicier, vegetarian, for 6 people, only
+   what's in their fridge): write the recipe yourself and call create_recipe. Give every
+   step looks_right / looks_wrong / done_when, and timers only where something is timed.
+   If find_recipe gave a "reference" recipe, you may adapt it.
+3. create_recipe returns the checked recipe: use ITS timers (they may have been
+   corrected), mention any estimates, and give the attached safe temperatures."""
+
+
+def build_instructions(recipe: dict | None, mode: str) -> str:
     """Glue Pranav's personality files + Matthew's recipe/knowledge into one prompt."""
     core = _read_text(BRAIN_DIR / "instructions.md")
     personality = _read_text(BRAIN_DIR / "personality" / f"{mode}.md")
@@ -79,7 +101,7 @@ def build_instructions(recipe: dict, mode: str) -> str:
         core,
         f"# PERSONALITY MODE: {mode.upper()}\n{personality}",
         "# ROAST & CATCHPHRASE LIBRARY (riff on these, don't just repeat them)\n" + roast_text,
-        "# TODAY'S RECIPE\n" + json.dumps(recipe, ensure_ascii=False),
+        ("# TODAY'S RECIPE\n" + json.dumps(recipe, ensure_ascii=False)) if recipe else NO_RECIPE_YET,
         "# COOKING TIMES (use these for start_timer, never guess)\n" + cook_times,
         "# FOOD SAFETY (fixed facts, never contradict these)\n" + safety,
     ])
@@ -93,7 +115,15 @@ def load_tools() -> list:
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "openai_key_set": bool(OPENAI_API_KEY), "model": REALTIME_MODEL}
+    return {
+        "ok": True,
+        "openai_key_set": bool(OPENAI_API_KEY),
+        "model": REALTIME_MODEL,
+        # just yes/no, never the values
+        "elevenlabs_key_set": bool(os.getenv("ELEVENLABS_API_KEY", "").strip()),
+        "elevenlabs_agent_set": bool(os.getenv("ELEVENLABS_AGENT_ID", "").strip()),
+        **vision.key_status(),
+    }
 
 
 @app.get("/api/recipes")
@@ -111,13 +141,33 @@ def list_recipes():
     return out
 
 
+@app.get("/api/recipes/find")
+def find(q: str):
+    """Find a recipe from what the cook said, e.g. ?q=I want to make steak.
+    Remy's find_recipe action calls this. See server/recipe_sources.py for the order."""
+    if not q.strip():
+        raise HTTPException(400, "Say what you'd like to cook")
+    return find_recipe(q[:200])
+
+
+class AIRecipe(BaseModel):
+    recipe: dict
+
+
+@app.post("/api/recipes/ai")
+def ai_recipe(req: AIRecipe):
+    """Safety-check a recipe Remy wrote (create_recipe): fixes timers from cook-times.json,
+    marks the rest as estimates, attaches safe temperatures. See server/recipe_check.py."""
+    return check_ai_recipe(req.recipe)
+
+
 @app.get("/api/recipes/{recipe_id}")
 def get_recipe(recipe_id: str):
     return load_recipe(recipe_id)
 
 
 class SessionRequest(BaseModel):
-    recipe_id: str
+    recipe_id: str | None = None   # None = Remy asks the cook what to make
     mode: str = "honest"
 
 
@@ -130,7 +180,7 @@ def get_brain(req: SessionRequest):
     """
     if req.mode not in MODES:
         raise HTTPException(400, f"mode must be one of {MODES}")
-    recipe = load_recipe(req.recipe_id)
+    recipe = load_recipe(req.recipe_id) if req.recipe_id else None
     return {
         "instructions": build_instructions(recipe, req.mode),
         "tools": load_tools(),
@@ -144,7 +194,7 @@ def get_brain(req: SessionRequest):
 async def create_session(req: SessionRequest):
     if req.mode not in MODES:
         raise HTTPException(400, f"mode must be one of {MODES}")
-    recipe = load_recipe(req.recipe_id)
+    recipe = load_recipe(req.recipe_id) if req.recipe_id else None
     instructions = build_instructions(recipe, req.mode)
 
     if not OPENAI_API_KEY:
@@ -183,6 +233,36 @@ async def create_session(req: SessionRequest):
         "recipe": recipe,
         "mode": req.mode,
     }
+
+
+# ---------- Remy's eyes ----------
+
+class LookRequest(BaseModel):
+    image: str                       # JPEG/PNG/WebP, base64 or a data: URL
+    step: dict | None = None         # current recipe step (instruction, looks_right, ...)
+    question: str = ""               # optional, e.g. "is that smoke or steam?"
+
+
+@app.post("/api/vision/look")
+def vision_look(req: LookRequest, request: Request):
+    """What's happening in the pan? See server/vision.py for the reply shape."""
+    caller = (request.headers.get("x-forwarded-for") or (request.client.host if request.client else "?")).split(",")[0]
+    try:
+        return vision.look(req.image, req.step, req.question, caller=caller.strip())
+    except vision.VisionError as e:
+        raise HTTPException(e.status, str(e)) from None
+
+
+@app.get("/api/vision/models")
+def vision_models():
+    """Which Gemini models this key can use, in the order we'd try them (names only)."""
+    if not vision.api_key():
+        raise HTTPException(503, "Vision key missing.")
+    try:
+        with vision.httpx.Client(timeout=10) as client:
+            return {"try_order": vision.candidates(client), "current": vision.key_status()["vision_model"]}
+    except (vision.httpx.HTTPError, vision.VisionError) as e:
+        raise HTTPException(502, f"Couldn't list Gemini models: {e}") from None
 
 
 # ---------- the app itself ----------
