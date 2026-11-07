@@ -2,6 +2,8 @@
 
 Read this fully before making changes. Full plan: `docs/PLAN.md`. Each person's role and starter prompt: `ROLES/<name>.md`.
 
+**Before you start work, check `docs/TEAM-TODO.md`**: it lists changes the team has decided that are waiting in *your* files.
+
 ## What we're building
 **REMY**, a live AI chef. An iPhone (installable web app) streams the camera and mic
 to an AI model (voice route chosen by Ahmed, see docs/PLAN.md "Voice options"). Remy talks back, spots mistakes, starts timers itself,

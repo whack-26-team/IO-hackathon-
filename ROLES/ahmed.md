@@ -1,3 +1,5 @@
+> **📌 Waiting for you:** check [`docs/TEAM-TODO.md`](../docs/TEAM-TODO.md) for changes the team has decided that need doing in your files.
+
 # Ahmed: everything live voice (Remy's ears, eyes and mouth)
 
 ## 📩 Message to Ahmed
