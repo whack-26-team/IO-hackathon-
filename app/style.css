@@ -13,9 +13,6 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
-  /* faint kitchen utensils behind the start screen */
-  --utensils: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90' fill='none' stroke='%231a1a1a' stroke-opacity='.07' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M12 8v22M8 8v8a4 4 0 0 0 8 0V8M12 30v14'/%3E%3Cpath d='M58 10c6 0 8 8 8 14s-3 8-8 8V48'/%3E%3Ccircle cx='30' cy='66' r='12'/%3E%3Cpath d='M42 66h14'/%3E%3Cpath d='M70 60l12 12M76 56c4 4 4 8 0 12'/%3E%3C/svg%3E");
-  --utensils-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90' fill='none' stroke='%23fff4e0' stroke-opacity='.07' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M12 8v22M8 8v8a4 4 0 0 0 8 0V8M12 30v14'/%3E%3Cpath d='M58 10c6 0 8 8 8 14s-3 8-8 8V48'/%3E%3Ccircle cx='30' cy='66' r='12'/%3E%3Cpath d='M42 66h14'/%3E%3Cpath d='M70 60l12 12M76 56c4 4 4 8 0 12'/%3E%3C/svg%3E");
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -25,21 +22,19 @@ html { touch-action: manipulation; overscroll-behavior: none; -webkit-text-size-
 html, body { margin: 0; height: 100%; color: var(--ink); overscroll-behavior: none; font-family: var(--font); }
 /* The page BEHIND the app also has the colour + utensil pattern, so any edge the iPhone shows past
    the app (under the home bar, behind Safari's toolbar, during bounce) looks the same. */
-/* ONE background for the whole start screen, painted on the page itself (html) and on a backdrop
-   layer that overhangs every edge (#backdrop). No "background-attachment: fixed": iOS doesn't
-   support it and only painted the pattern inside the viewport, leaving a plain band at the bottom. */
-html { background: var(--cream) var(--utensils) repeat; }
-html[data-mode="gentle"] { background: var(--sky) var(--utensils) repeat; }
-html[data-mode="savage"] { background: var(--night) var(--utensils-light) repeat; }
+/* Plain colour per attitude, on the page itself (html) and on a backdrop layer that overhangs every
+   edge (#backdrop). It matches the strip iOS draws itself at the bottom of the screen (theme-color),
+   which can't show a pattern, so there's no visible join. (The utensil pattern was dropped for this.) */
+html { background: var(--cream); }
+html[data-mode="gentle"] { background: var(--sky); }
+html[data-mode="savage"] { background: var(--night); }
 html[data-mode="cooking"] { background: #000; }
 #backdrop { position: fixed; z-index: 0; pointer-events: none; left: -200px; right: -200px;
   top: calc(-200px - var(--safe-top)); bottom: calc(-200px - var(--safe-bottom));
-  background: var(--cream) var(--utensils) repeat; }
-html[data-mode="gentle"] #backdrop { background: var(--sky) var(--utensils) repeat; }
-html[data-mode="savage"] #backdrop { background: var(--night) var(--utensils-light) repeat; }
+  background: var(--cream); }
+html[data-mode="gentle"] #backdrop { background: var(--sky); }
+html[data-mode="savage"] #backdrop { background: var(--night); }
 html[data-mode="cooking"] #backdrop { display: none; }
-/* line the backdrop's pattern up with the page's (the backdrop starts 200px + notch above/left of the screen) */
-#backdrop { background-position: 200px calc(200px + var(--safe-top)) !important; }
 body { background: transparent; }
 /* App shell: the page itself is exactly the screen and never scrolls or grows. Each screen is
    pinned to the edges and scrolls inside itself if it ever needs to. This stops the iPhone zooming
