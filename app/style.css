@@ -57,13 +57,23 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 /* ================= START SCREEN ================= */
 /* Pinned to the real screen edges, like the cooking screen: 100dvh is sometimes too short in iPhone
-   home-screen apps, which left a strip of the wrong colour at the bottom. Scrolls on tiny screens. */
-#start-screen { position: fixed; inset: 0;  /* exactly the visible area: in a web app that's the whole screen; in Safari it stops above the toolbar so the footer stays visible */ overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+   home-screen apps, which left a strip of the wrong colour at the bottom. Never scrolls: sizes shrink on short screens instead. */
+#start-screen { position: fixed; inset: 0;  /* exactly the visible area: in a web app that's the whole screen; in Safari it stops above the toolbar so the footer stays visible */ overflow: hidden; overscroll-behavior: none;  /* never scrolls: everything fits on one screen */
   display: flex; flex-direction: column; gap: 10px;
   /* bottom: the footer sits close to the edge, just clear of the iPhone home bar */
   padding: calc(22px + var(--safe-top)) calc(18px + var(--safe-right)) max(6px, calc(var(--safe-bottom) - 22px)) calc(18px + var(--safe-left));
   background: transparent; z-index: 1; transition: color .25s; }
 #start-screen > * { width: 100%; max-width: 440px; margin-left: auto; margin-right: auto; }
+/* Short screens (small iPhones in Safari): shrink so the whole start screen still fits without scrolling */
+@media (max-height: 620px) {
+  #start-screen { gap: 6px; padding-top: calc(12px + var(--safe-top)); }
+  .wordmark { font-size: 30px !important; }
+  .hero { height: clamp(128px, 25vh, 290px) !important; }
+  .hero-face { width: clamp(92px, 15vh, 200px) !important; margin-top: 4px !important; }
+  .greeting { min-height: 54px !important; font-size: 16px !important; }
+  .modes legend { margin-bottom: 5px; font-size: 16px; }
+  .mode-bar .face { width: 46px !important; }
+}
 .wordmark { text-align: center; font-weight: 800; font-size: clamp(34px, 5.4vh, 50px); letter-spacing: -1px; line-height: 1; }
 .wordmark small { display: block; font-size: 14px; letter-spacing: 0; font-weight: 600; color: var(--muted); margin-top: 3px; }
 
