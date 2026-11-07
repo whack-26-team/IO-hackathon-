@@ -11,6 +11,7 @@ What it does:
   * POST /api/brain          -> Remy's instructions + actions for ANY voice route
   * POST /api/session        -> a short-lived pass for the live OpenAI call,
                                 with Remy's instructions already built in
+  * POST /api/vision/look    -> Remy's eyes: what's in this camera picture? (Gemini)
   * GET  /api/health         -> quick "is it running and is the key set?" check
 
 Run it (from the repo root):
@@ -26,13 +27,14 @@ from pathlib import Path
 
 import httpx
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from server.recipe_check import check_ai_recipe
 from server.recipe_sources import IMPORT_DIR, find_recipe
+from server import vision
 
 ROOT = Path(__file__).resolve().parent.parent
 APP_DIR = ROOT / "app"
@@ -120,6 +122,7 @@ def health():
         # just yes/no, never the values
         "elevenlabs_key_set": bool(os.getenv("ELEVENLABS_API_KEY", "").strip()),
         "elevenlabs_agent_set": bool(os.getenv("ELEVENLABS_AGENT_ID", "").strip()),
+        **vision.key_status(),
     }
 
 
@@ -230,6 +233,24 @@ async def create_session(req: SessionRequest):
         "recipe": recipe,
         "mode": req.mode,
     }
+
+
+# ---------- Remy's eyes ----------
+
+class LookRequest(BaseModel):
+    image: str                       # JPEG/PNG/WebP, base64 or a data: URL
+    step: dict | None = None         # current recipe step (instruction, looks_right, ...)
+    question: str = ""               # optional, e.g. "is that smoke or steam?"
+
+
+@app.post("/api/vision/look")
+def vision_look(req: LookRequest, request: Request):
+    """What's happening in the pan? See server/vision.py for the reply shape."""
+    caller = (request.headers.get("x-forwarded-for") or (request.client.host if request.client else "?")).split(",")[0]
+    try:
+        return vision.look(req.image, req.step, req.question, caller=caller.strip())
+    except vision.VisionError as e:
+        raise HTTPException(e.status, str(e)) from None
 
 
 # ---------- the app itself ----------

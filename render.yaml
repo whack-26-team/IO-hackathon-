@@ -18,6 +18,8 @@ services:
         sync: false
       - key: ELEVENLABS_AGENT_ID     # the Remy agent in Ahmed's ElevenLabs workspace
         sync: false
+      - key: GEMINI_API_KEY          # Remy's eyes (vision). REMY_API_KEY also works
+        sync: false
       - key: OPENAI_API_KEY          # only if we use OpenAI's realtime voice
         sync: false
       - key: OPENAI_REALTIME_MODEL
