@@ -35,6 +35,7 @@ Events Remy sends to the screen:
 | `timer_check` | `{ id, label }` |
 | `timer_done` | `{ id, label }` |
 | `mode_changed` | `{ mode }` |
+| `goodbye` | `{ text }`: the cook tapped Stop. Real Remy says goodbye out loud in his attitude; the screen disconnects him when the goodbye screen ends (about 6 s) |
 
 ## 3. Remy's actions (OpenAI tools)
 Defined in `remy-brain/actions.json`: `find_recipe`, `create_recipe`, `show_tip`, `roast`, `safety_alert`,

@@ -179,6 +179,10 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', stream, v
       await connect();
     },
     send(type, data = {}) {
+      // The cook tapped Stop: Remy says goodbye in his attitude before the screen disconnects him
+      if (type === 'goodbye' && typeof data.text === 'string') {
+        return speak(`[GOODBYE] The cook tapped Stop. Say goodbye now, once, out loud, in your current ${mode} attitude, like: "${data.text.slice(0, 200)}" Keep it to one short sentence. No actions.`, true, true);
+      }
       if (type === 'mode_changed' && ['gentle','honest','savage'].includes(data.mode)) {
         mode = data.mode;
         // Screen is responsible for the 18+ opt-in before emitting Savage mode.

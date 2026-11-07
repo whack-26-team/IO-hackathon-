@@ -123,9 +123,20 @@ $("stop-btn").addEventListener("click", stopCooking);
 function stopCooking() {
   if (!state.cooking) return; // Remy's "stopped" status can call this too; only run once
   state.cooking = false;
-  state.remy?.stop();
+  const remy = state.remy, wasLive = state.live;
   state.remy = null;
-  state.stream?.getTracks().forEach((t) => t.stop());
+  // Remy says goodbye out loud in his attitude. Real Remy speaks it himself, so his voice
+  // stays connected until the goodbye screen ends; Pretend Remy uses the phone's own voice.
+  const bye = GOODBYES[state.mode] || GOODBYES.honest;
+  if (wasLive && remy) {
+    remy.send("goodbye", { text: bye.text });
+    pendingStop = remy;
+    state.stream?.getVideoTracks().forEach((t) => t.stop()); // camera off now, mic until he's done
+  } else {
+    remy?.stop();
+    state.stream?.getTracks().forEach((t) => t.stop());
+    sayLocally(bye.text);
+  }
   timers.clearAll();
   clearTimeout(showBubble.t);
   hideAlert();
@@ -142,7 +153,19 @@ const GOODBYES = {
   honest: { face: "f-proud", text: "Plate it. Take the credit. I'm an app." },
   savage: { face: "f-savage", text: "Bloody hell, we survived. Plate it and get out of my kitchen." },
 };
-const GOODBYE_MS = 4000;
+const GOODBYE_MS = 6000; // long enough for Remy to say it
+let pendingStop = null;   // real Remy, kept on until he's said goodbye
+
+// Pretend Remy has no voice of his own, so the phone reads the goodbye (Stop was a tap, so iOS allows it)
+function sayLocally(text) {
+  try {
+    if (!("speechSynthesis" in window)) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "en-GB"; u.rate = state.mode === "savage" ? 1.1 : state.mode === "gentle" ? 0.95 : 1;
+    speechSynthesis.speak(u);
+  } catch { /* no voice available: the goodbye is still on screen */ }
+}
 function showGoodbye() {
   const g = GOODBYES[state.mode] || GOODBYES.honest;
   $("goodbye-text").textContent = g.text;
@@ -155,6 +178,8 @@ function showGoodbye() {
 }
 function backToStart() {
   clearTimeout(showGoodbye.t);
+  pendingStop?.stop(); pendingStop = null;
+  state.stream?.getTracks().forEach((t) => t.stop());
   $("goodbye").classList.add("hidden");
   $("start-screen").classList.remove("hidden");
   // back to the top-left at 100%, in case the iPhone shifted the view while the camera was up
@@ -414,7 +439,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v78`,
+      `version  v79`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
