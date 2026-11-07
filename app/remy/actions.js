@@ -46,7 +46,7 @@ export function createActions({ emit, request, alive, now = Date.now }) {
       step = index;
       emit('timer_start', started);
       timers.set(started.id, { ...started, done: false, step, instruction: s.instruction, next_instruction: recipe.steps[step + 1]?.instruction });
-      return started;
+      return { ...started, announce: announce(timer.label, timer.minutes) };
     }
     return null;
   }
@@ -77,6 +77,14 @@ export function createActions({ emit, request, alive, now = Date.now }) {
       if (timer) return { timer, index };
     }
     return null;
+  }
+  // What Remy says when a timer starts: "11-minute timer for the rigatoni pasta."
+  function announce(label, minutes) {
+    const m = Math.round(minutes * 10) / 10;
+    const length = m >= 1 ? `${m}-minute` : `${Math.round(m * 60)}-second`;
+    const pasta = recipe?.steps?.some(s => (s.timer?.label === label && /pasta/i.test(s.timer?.from || '')) ||
+      Object.values(s.timer_by_shape || {}).some(t => t.label === label));
+    return `${length} timer for the ${label.toLowerCase()}${pasta && !/pasta|noodle/i.test(label) ? ' pasta' : ''}.`;
   }
   function setRecipe(data) {
     if (!data.recipe || !Array.isArray(data.recipe.steps) || !data.recipe.steps.length) throw new Error('Recipe has no usable steps.');
@@ -116,13 +124,13 @@ export function createActions({ emit, request, alive, now = Date.now }) {
           const old = timers.get(id);
           const seconds = Math.round(minutes * 60);
           const twin = [...timers.values()].find(t => !t.done && t.id !== id && t.label === label && t.seconds === seconds);
-          if (twin) return { ok: true, already_running: true, message: `The app already started the ${label} timer when the cook said it was in. Just confirm it once.` };
+          if (twin) return { ok: true, already_running: true, message: `The app already started this timer when the cook said it was in. Announce it once if you haven't: "${announce(label, minutes)}"` };
           if (old && old.seconds === seconds && old.label === label && !old.done) return { ok: true, already_running: true, message: 'Timer already running; not restarted.' };
           if (old && !old.done && !explicit) throw new Error('Ask the cook to confirm a changed duration before replacing a timer.');
           const timer = { id, label, seconds, ...(check !== undefined ? { check_at: Math.round(check * 60) } : {}) };
           emit('timer_start', timer);
           timers.set(id, { ...timer, done: false, step, instruction: recipe?.steps[step]?.instruction, next_instruction: recipe?.steps[step + 1]?.instruction });
-          return { ok: true, ...timer, message: 'Countdown started on the cooking screen. Confirm the label and duration once.' };
+          return { ok: true, ...timer, message: `Countdown started on the cooking screen. Announce it once, out loud, saying what it's for: "${announce(label, minutes)}"` };
         }
         case 'cancel_timer': emit('timer_cancel', { id: args.id }); timers.delete(args.id); break;
         case 'update_step':

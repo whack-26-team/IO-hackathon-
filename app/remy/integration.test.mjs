@@ -170,3 +170,11 @@ test('salt in the water does not start the pasta timer',async()=>{
   assert.equal(actions.hear("Pasta's in").label, 'Rigatoni');
   assert.equal(events.filter(e=>e.type==='timer_start').length,1);
 });
+
+test('timer announcements say what the timer is for',async()=>{
+  const actions=createActions({emit:()=>{},request:async()=>({}),alive:()=>true});
+  actions.configure({tools:[{name:'start_timer',parameters:{type:'object',required:['id','label','minutes'],properties:{id:{type:'string'},label:{type:'string'},minutes:{type:'number'},check_at_minutes:{type:'number'}}}}],
+    recipe:{id:'rigatoni',title:'Rigatoni',steps:[{instruction:'Boil'},{instruction:'In',timer:{label:'Rigatoni',minutes:11,check_at:10,from:'pasta_dried_minutes_al_dente/rigatoni/default'}},{instruction:'Garlic',timer:{label:'Garlic',minutes:1.5,from:'veg_minutes/garlic'}}]}});
+  assert.equal(actions.hear("Pasta's in").announce,'11-minute timer for the rigatoni pasta.');
+  assert.match((await actions.call('start_timer',{id:'garlic',label:'Garlic',minutes:1.5})).message,/1\.5-minute timer for the garlic\./);
+});
