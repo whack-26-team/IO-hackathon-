@@ -129,7 +129,10 @@ def look(image: str, step: dict | None = None, question: str = "", caller: str =
             {"inline_data": {"mime_type": mime, "data": b64}},
         ]}],
         "generationConfig": {"responseMimeType": "application/json", "temperature": 0.2,
-                             "maxOutputTokens": 500},
+                             "maxOutputTokens": 500,
+                             # Newer Gemini models "think" before answering by default: great for
+                             # puzzles, pure delay for "what's in the pan?". Ask for minimal thinking.
+                             "thinkingConfig": {"thinkingLevel": "minimal"}},
     }
     started = time.monotonic()
     try:
@@ -149,10 +152,15 @@ def look(image: str, step: dict | None = None, question: str = "", caller: str =
 
 def _generate(body: dict) -> tuple[httpx.Response, str]:
     """POST to Gemini, switching model if one is retired (404) or overloaded (503)."""
-    with httpx.Client(timeout=httpx.Timeout(15, connect=5)) as client:
+    with httpx.Client(timeout=httpx.Timeout(25, connect=5)) as client:
         model = _pick_model(client)
         r = client.post(f"{API}/models/{model}:generateContent",
                         headers={"x-goog-api-key": api_key()}, json=body)
+        if r.status_code == 400 and "think" in r.text.lower():
+            # this model doesn't accept the thinking setting: send it without
+            body["generationConfig"].pop("thinkingConfig", None)
+            r = client.post(f"{API}/models/{model}:generateContent",
+                            headers={"x-goog-api-key": api_key()}, json=body)
         if r.status_code in (500, 503):  # overloaded: one quick retry, then a different flash model
             time.sleep(0.8)
             r = client.post(f"{API}/models/{model}:generateContent",
