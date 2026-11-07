@@ -46,6 +46,12 @@ Same rule as above.
 - [ ] If the ElevenLabs agent has its own copy of the Savage personality (not loaded from `/api/brain`), update it to match `remy-brain/personality/savage.md`: occasional swearing in roasts, aimed at the food, never in safety alerts
 - [ ] Check the Savage voice actually says the words (ElevenLabs may soften them) and note the result on #55
 
+### 3. Timers now start when the cook says it's in (Matthew edited your files with his approval, PR on 2026-11-07)
+- `app/remy/actions.js`: `start_timer` accepts a timer from **any** step of the loaded recipe (and `timer_by_shape`), not only the current step. That was why timers were refused. When the cook says "pasta's in" / "it's in", `hear()` starts the next recipe timer itself (using the pasta shape the cook named) and returns it. A duplicate `start_timer` with the same label and length returns `already_running`.
+- `app/remy/elevenlabs.js`: when `hear()` starts a timer, Remy gets a `[TIMER STARTED BY APP]` context update so he confirms it and doesn't start another.
+- New tests at the end of `app/remy/integration.test.mjs` (all pass; the "exact prefix of the agent prompt" test was already failing and your PR #85 syncs it).
+- [ ] Have a look and keep it in your style; tell Matthew if anything clashes with your PR #85
+
 ### Done
 - [x] Timer beeps skipped in real sessions, plus an accurate privacy note (Matthew, PR #73).
 
