@@ -37,8 +37,8 @@ function applyMode(mode) {
   setUse(face, m.face);
   face.style.animation = "none"; void face.offsetWidth; face.style.animation = ""; // replay the pop
   document.querySelector('meta[name="theme-color"]').setAttribute("content", m.page);
-  // the page behind everything (seen during iPhone bounce/rotation) matches too
-  document.documentElement.style.background = document.body.style.background = m.page;
+  // the page behind everything (seen under the home bar / during bounce) matches too: see style.css
+  document.documentElement.dataset.mode = mode;
 }
 const checkedMode = () => document.querySelector('input[name="mode"]:checked').value;
 
@@ -70,6 +70,7 @@ $("start-btn").addEventListener("click", async () => {
 
   $("start-screen").classList.add("hidden");
   $("cook-screen").classList.remove("hidden");
+  document.documentElement.dataset.mode = "cooking";
   $("mode-badge").textContent = MODE_NAMES[state.mode];
   showRecipe(null);
   setStatus({ status: "connecting", message: "connecting…" });
@@ -115,6 +116,7 @@ function stopCooking() {
   $("speech").className = "speech hidden";
   $("cook-screen").classList.add("hidden");
   $("start-screen").classList.remove("hidden");
+  document.documentElement.dataset.mode = state.mode;
 }
 
 // ---------- events from Remy ----------
