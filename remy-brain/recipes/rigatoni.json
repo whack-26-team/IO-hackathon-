@@ -2,7 +2,7 @@
   "id": "rigatoni",
   "title": "Rigatoni with tomato & garlic",
   "summary": "A simple weeknight pasta, ready in 20 minutes. Great for the auto pasta timer.",
-  "aliases": ["rigatoni", "pasta", "tomato pasta", "pasta with tomato sauce", "penne", "arrabbiata", "pasta sauce"],
+  "aliases": ["rigatoni", "rigatoni with tomato", "tomato pasta", "pasta with tomato sauce", "arrabbiata", "pasta sauce"],
   "source": "Written for REMY by Claude, timers from cook-times.json. Checked by Matthew on 2026-11-07.",
   "checked_by_human": true,
   "serves": 2,

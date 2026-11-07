@@ -56,4 +56,5 @@ New tasks while Matthew is on a break: **issue #83**. Read `docs/DEMO.md` first.
 Remy finds these by name (see `aliases` in each file):
 - `rigatoni`, `steak`, `scrambled-eggs` (all ✓ checked by Matthew)
 - `cereal` ✓: no-cook demo, safe to use anywhere (no hob, no knife)
+- `boiled-pasta` (unchecked): Remy asks which shape, then uses that shape's timer from `timer_by_shape` (cook-times.json). Say "pasta", "penne", "fusilli"…
 - Simple demos ✓: `toast`, `cheese-sandwich`, `overnight-oats`, `fruit-salad` (knife), `instant-noodles` (3-min timer)

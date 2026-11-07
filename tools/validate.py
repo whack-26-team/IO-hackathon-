@@ -61,6 +61,13 @@ for path in sorted((BRAIN / "recipes").glob("*.json")):  # not _imported/ (raw i
         for key in ("looks_right", "looks_wrong", "done_when"):
             if not step.get(key):
                 (errors if checked else warnings).append(f"{where} is missing '{key}'")
+        # A timer that depends on the cook's answer, e.g. the pasta shape: every option is checked too
+        for key, opt in (step.get("timer_by_shape") or {}).items():
+            if not (isinstance(opt, dict) and isinstance(opt.get("minutes"), (int, float)) and opt["minutes"] > 0):
+                errors.append(f"{where} timer_by_shape '{key}' needs positive numeric 'minutes'")
+            elif COOK_TIMES is not None and cook_time(opt.get("from", "")) != opt["minutes"]:
+                errors.append(f"{where} timer_by_shape '{key}' is {opt['minutes']} min but cook-times.json "
+                              f"{opt.get('from')} says {cook_time(opt.get('from', ''))}")
         t = step.get("timer")
         if not t:
             continue
