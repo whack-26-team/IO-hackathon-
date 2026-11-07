@@ -1,6 +1,7 @@
 name: Check
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, labeled]
   push:
     branches: [main]
 jobs:
@@ -21,3 +22,22 @@ jobs:
           curl -fsS http://localhost:8000/api/health
           curl -fsS http://localhost:8000/api/recipes
           curl -fsS http://localhost:8000/ > /dev/null
+
+  # Merges the PR automatically once the checks above pass, if it's safe without a
+  # human (own folders only, no secrets, not a draft, no "hold" label).
+  # Rules: .github/scripts/automerge.py · Stop it: "hold" label or draft PR · Approve a flagged PR: "approved" label.
+  automerge:
+    needs: check
+    if: github.event_name == 'pull_request' && !github.event.pull_request.draft
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Merge if safe
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: python .github/scripts/automerge.py
