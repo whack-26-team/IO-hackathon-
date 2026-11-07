@@ -60,12 +60,20 @@ test('invalid and unknown tool calls cannot create screen events',async()=>{
   assert.equal(events.length,count);
 });
 function visionFixture(response) {
-  let clock=1000; const tasks=[],events=[],context=[],speech=[];
+  let clock=1000; const tasks=[],events=[],context=[],speech=[],requests=[];
   const vision=createVision({video:{videoWidth:1280,videoHeight:720,readyState:2},canvas:{getContext:()=>({drawImage(){}}),toDataURL:()=> 'data:image/jpeg;base64,abc'},
-    request:response,actions:{currentStep:()=>recipe.steps[0]},context:t=>context.push(t),speak:(t,u)=>speech.push({t,u}),emit:(type,data)=>events.push({type,data}),alive:()=>true,
+    request:async(...args)=>{requests.push(args);return response(...args);},actions:{currentStep:()=>recipe.steps[0]},context:t=>context.push(t),speak:(t,u)=>speech.push({t,u}),emit:(type,data)=>events.push({type,data}),alive:()=>true,
     now:()=>clock,schedule:fn=>{tasks.push(fn);return fn;},cancel:()=>{}});
-  return {vision,tasks,events,context,speech,setTime:t=>clock=t};
+  return {vision,tasks,events,context,speech,requests,setTime:t=>clock=t};
 }
+test('camera sends the current recipe step as an object accepted by the vision API',async()=>{
+  const f=visionFixture(async()=>({summary:'pan',issues:[],safety:''}));
+  f.vision.start(); await tick();
+  assert.equal(f.requests[0][0],'/api/vision/look');
+  assert.deepEqual(f.requests[0][1].step,recipe.steps[0]);
+  assert.equal(typeof f.requests[0][1].step,'object');
+  f.vision.stop();
+});
 test('camera safety is immediate, and repeated frames do not repeat ordinary warnings',async()=>{
   const f=visionFixture(async()=>({summary:'pan',issues:[{type:'burning',confidence:0.9,detail:'black edges'}],safety:''}));
   f.vision.start(); await tick(); await f.tasks.shift()();
