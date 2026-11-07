@@ -80,6 +80,7 @@ $("start-btn").addEventListener("click", async () => {
   unlockSound();
   state.mode = checkedMode();
   state.recipe = null; // no recipe yet: Remy asks what you're cooking
+  resetStats();
   state.cooking = true;
 
   $("start-screen").classList.add("hidden");
@@ -153,7 +154,7 @@ const GOODBYES = {
   honest: { face: "f-proud", text: "Plate it. Take the credit. I'm an app." },
   savage: { face: "f-savage", text: "Bloody hell, we survived. Plate it and get out of my kitchen." },
 };
-const GOODBYE_MS = 6000; // long enough for Remy to say it
+const GOODBYE_MS = 8000; // long enough for Remy to say it and to read the recap
 let pendingStop = null;   // real Remy, kept on until he's said goodbye
 
 // Pretend Remy has no voice of his own, so the phone reads the goodbye (Stop was a tap, so iOS allows it)
@@ -173,6 +174,7 @@ function sayLocally(text) {
 function showGoodbye() {
   const g = GOODBYES[state.mode] || GOODBYES.honest;
   $("goodbye-text").textContent = g.text;
+  renderRecap();
   const face = $("goodbye-face");
   setUse(face, g.face);
   face.setAttribute("viewBox", g.face === "f-savage" ? "-28 -12 156 116" : "-18 -12 136 116");
@@ -197,19 +199,53 @@ $("goodbye").addEventListener("click", backToStart);
 // "check" and "done" beeps are skipped (Ahmed's request on #10). Pretend Remy keeps the beeps.
 // The cards still turn yellow/red, and the safety-alert sound always plays.
 const timerSound = (kind) => { if (state.live && (kind === "check" || kind === "done")) return; beep(kind); };
-const timers = createTimers($("timers"), (type, data) => state.remy?.send(type, data), timerSound);
+const timers = createTimers($("timers"), (type, data) => {
+  if (type === "timer_done") stats.timersDone++;
+  state.remy?.send(type, data);
+}, timerSound);
+
+// ---------- session recap (shown on the goodbye screen) ----------
+let stats;
+function resetStats() { stats = { timers: new Set(), timersDone: 0, alerts: 0, roasts: 0, stepsDone: 0, recipe: null }; }
+resetStats();
+// Remy's score out of 10: starts at 7, timers finished and steps done help, roasts and safety
+// alerts cost points. Just for fun.
+function recapScore() {
+  const steps = state.recipe?.steps?.length || 0;
+  let score = 7 + (stats.timersDone > 0 ? 1 : 0) + (steps && stats.stepsDone >= steps / 2 ? 1 : 0)
+    - Math.min(stats.roasts, 3) - Math.min(stats.alerts, 2) * 1.5;
+  return Math.max(1, Math.min(10, Math.round(score)));
+}
+const SCORE_LINES = {
+  gentle: (n) => n >= 7 ? `${n}/10. Proud of you, chef!` : `${n}/10. Every cook starts somewhere!`,
+  honest: (n) => n >= 8 ? `${n}/10. Suspiciously competent.` : n >= 5 ? `${n}/10. Edible. Probably.` : `${n}/10. We'll call it practice.`,
+  savage: (n) => n >= 8 ? `${n}/10. Don't let it go to your head.` : n >= 5 ? `${n}/10. My nan cooks better, and she's an app too.` : `${n}/10. A fish could cook better than you.`,
+};
+function renderRecap() {
+  const chips = [
+    stats.recipe && `🍽 ${stats.recipe}`,
+    `⏱ ${stats.timers.size} timer${stats.timers.size === 1 ? "" : "s"}`,
+    stats.alerts && `🛟 ${stats.alerts} safety save${stats.alerts === 1 ? "" : "s"}`,
+    `🔥 ${stats.roasts} roast${stats.roasts === 1 ? "" : "s"}`,
+  ].filter(Boolean);
+  const box = $("recap");
+  box.replaceChildren(...chips.map((t) => Object.assign(document.createElement("span"), { className: "recap-chip", textContent: t })));
+  $("recap-score").textContent = (SCORE_LINES[state.mode] || SCORE_LINES.honest)(recapScore());
+}
 
 function wireRemy(remy) {
   remy.on("status", setStatus);
-  remy.on("recipe", (d) => showRecipe(d));
+  remy.on("recipe", (d) => { showRecipe(d); stats.recipe = d.recipe?.title || stats.recipe; });
   remy.on("tip", (d) => showBubble(d));
   remy.on("roast", (d) => showRoast(d));
   remy.on("alert", (d) => showAlert(d.text));
   remy.on("step", (d) => {
+    if (d.step_complete) stats.stepsDone = Math.max(stats.stepsDone, (d.current_step ?? 0) + 1);
     renderSteps(d.current_step, d.step_complete);
     if (d.next_instruction) showBubble({ text: d.next_instruction, severity: "info" });
   });
   remy.on("timer_start", (d) => {
+    stats.timers.add(d.id);
     timers.start({ ...d, estimate: isEstimate(d.label) });
     // Say on screen what the timer is for ("⏱ 11-minute timer for the rigatoni pasta"),
     // unless a safety alert is up (that always wins)
@@ -267,6 +303,7 @@ function showBubble({ text, severity = "info", level }) {
 // Safety beats comedy: a roast that arrives during a safety alert waits until it's gone.
 let pendingRoast = null;
 function showRoast({ text, level = 1 }) {
+  stats.roasts++;
   if (alertShowing()) { pendingRoast = { text, level }; return; }
   showBubble({ text, severity: "roast", level: Math.min(Math.max(level, 1), 3) });
 }
@@ -290,6 +327,7 @@ const ALERT_MS = 7000;
 function alertShowing() { return !$("alert-flash").classList.contains("hidden"); }
 
 function showAlert(text) {
+  stats.alerts++;
   $("alert-text").textContent = text;
   const f = $("alert-flash");
   f.classList.remove("hidden");
@@ -443,7 +481,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v87`,
+      `version  v88`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
