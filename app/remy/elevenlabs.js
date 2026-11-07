@@ -83,7 +83,10 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', stream, v
     // Keep screen timers visible when voice fails. "stopped" clears Felix's timers.
     status('error', message);
   }
-  let lastDrop = '';  // why ElevenLabs hung up last time, shown if we give up
+  let lastDrop = '';
+  // WebRTC (LiveKit) is the fastest link but some Wi-Fi / mobile networks block it. If it drops,
+  // the next attempt uses a plain WebSocket, which works almost everywhere.
+  let transport = 'webrtc';  // why ElevenLabs hung up last time, shown if we give up
   function why(details) {
     if (!details) return '';
     if (typeof details === 'string') return details;
@@ -92,10 +95,11 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', stream, v
   }
   function lost(run, details) {
     if (run !== generation || !active) return;
-    if (details) { lastDrop = why(details).slice(0, 140); console.error('[Remy] voice dropped:', details); }
+    if (details) { lastDrop = why(details).slice(0, 140); console.error('[Remy] voice dropped:', transport, details); }
+    if (transport === 'webrtc') transport = 'websocket';
     void disconnect().then(() => {
       if (!active || page.hidden) return;
-      if (++attempts > 2 || now() >= deadline) return exhausted(`Voice disconnected${lastDrop ? ` (${lastDrop})` : ''}. Timers remain on screen; Stop and Start to reconnect.`);
+      if (++attempts > 2 || now() >= deadline) return exhausted(`Voice disconnected (${[lastDrop, transport].filter(Boolean).join(' · ')}). Timers remain on screen; Stop and Start to reconnect.`);
       status('connecting', 'Voice dropped. Reconnecting…');
       reconnectTimer = schedule(connect, attempts * 1500);
     });
@@ -130,7 +134,7 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', stream, v
           return await dispatch(action, JSON.parse(arguments_json));
         } catch { return JSON.stringify({ ok: false, message: 'arguments_json must be a valid JSON object using the supplied action schema.' }); }
       };
-      const options = { ...credentials, connectionType: 'webrtc',
+      const options = { ...credentials, connectionType: transport,
         dynamicVariables: { session_brain: brain.instructions + '\n\n# ACTION SCHEMAS\n' + JSON.stringify(brain.tools) },
         clientTools,
         onMessage: ({ source, message }) => {
