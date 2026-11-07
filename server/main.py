@@ -113,7 +113,14 @@ def load_tools() -> list:
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "openai_key_set": bool(OPENAI_API_KEY), "model": REALTIME_MODEL}
+    return {
+        "ok": True,
+        "openai_key_set": bool(OPENAI_API_KEY),
+        "model": REALTIME_MODEL,
+        # just yes/no, never the values
+        "elevenlabs_key_set": bool(os.getenv("ELEVENLABS_API_KEY", "").strip()),
+        "elevenlabs_agent_set": bool(os.getenv("ELEVENLABS_AGENT_ID", "").strip()),
+    }
 
 
 @app.get("/api/recipes")

@@ -13,8 +13,12 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: "3.12.7"
-      # Secret: Render asks for it when you create the Blueprint. Never put it in this file.
-      - key: OPENAI_API_KEY
+      # Secrets: set them in Render → remy → Environment. Never put them in this file.
+      - key: ELEVENLABS_API_KEY      # Ahmed's voice route (issue #13)
+        sync: false
+      - key: ELEVENLABS_AGENT_ID     # the Remy agent in Ahmed's ElevenLabs workspace
+        sync: false
+      - key: OPENAI_API_KEY          # only if we use OpenAI's realtime voice
         sync: false
       - key: OPENAI_REALTIME_MODEL
         value: gpt-realtime    # Ahmed: change to the confirmed model name
