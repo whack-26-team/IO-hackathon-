@@ -40,7 +40,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 #start-screen { position: fixed; inset: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
   display: flex; flex-direction: column; gap: 10px;
   /* bottom: the footer sits close to the edge, just clear of the iPhone home bar */
-  padding: calc(22px + var(--safe-top)) calc(18px + var(--safe-right)) max(8px, calc(var(--safe-bottom) - 12px)) calc(18px + var(--safe-left));
+  padding: calc(22px + var(--safe-top)) calc(18px + var(--safe-right)) max(6px, calc(var(--safe-bottom) - 22px)) calc(18px + var(--safe-left));
   background: var(--cream) var(--utensils); transition: background-color .25s, color .25s; }
 #start-screen > * { width: 100%; max-width: 440px; margin-left: auto; margin-right: auto; }
 .wordmark { text-align: center; font-weight: 800; font-size: 40px; letter-spacing: -1px; line-height: 1; }
@@ -77,7 +77,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .go:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--ink); }
 #start-btn { margin-top: auto; }   /* pushed down to just above the footer */
 .ghost { width: 100%; background: transparent; border: 2.5px solid currentColor; border-radius: 16px; padding: 13px; font-weight: 700; font-size: 17px; }
-.start-foot { margin-top: 0 !important; padding-top: 10px; display: flex; flex-direction: column; align-items: center; gap: 6px;
+.start-foot { margin-top: 0 !important; padding-top: 8px; gap: 4px; display: flex; flex-direction: column; align-items: center; gap: 6px;
   font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
 .link { background: none; border: 0; padding: 0; text-decoration: underline; text-underline-offset: 2px; color: var(--ink); font-family: var(--mono); font-size: 11.5px; }
 .pretend { display: flex; align-items: center; gap: 6px; }
