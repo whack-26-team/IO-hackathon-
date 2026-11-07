@@ -63,17 +63,18 @@ def match_local(query: str) -> dict | None:
     q = set(words(query))
     if not q:
         return None
-    best, best_score = None, 0.0
+    best, best_score = None, (0.0, 0)
     for r in local_recipes():
         for name in [r.get("title", ""), r.get("id", ""), *r.get("aliases", [])]:
             n = set(words(name.replace("-", " ")))
             if not n:
                 continue
-            # every word of the alias said by the cook = strong match ("pasta" -> rigatoni)
-            score = len(q & n) / len(n)
+            # every word of the alias said by the cook = strong match ("pasta" -> boiled pasta).
+            # On a tie, the alias with more matching words wins ("tomato pasta" -> rigatoni).
+            score = (len(q & n) / len(n), len(q & n))
             if score > best_score:
                 best, best_score = r, score
-    return best if best_score >= 1.0 else None
+    return best if best_score[0] >= 1.0 else None
 
 
 # ---------- 2. TheMealDB ----------

@@ -1,0 +1,179 @@
+{
+  "id": "boiled-pasta",
+  "title": "Boiled pasta (any shape)",
+  "summary": "Perfect al dente pasta. Remy asks which shape you're boiling and sets the right timer.",
+  "aliases": [
+    "boiled pasta",
+    "boiling pasta",
+    "boil pasta",
+    "plain pasta",
+    "pasta",
+    "cook pasta",
+    "penne",
+    "fusilli",
+    "farfalle",
+    "macaroni",
+    "spaghetti",
+    "linguine",
+    "orecchiette",
+    "tagliatelle",
+    "ravioli",
+    "tortellini"
+  ],
+  "source": "Written for REMY by Claude, timers from cook-times.json (pasta_dried_minutes_al_dente). Waiting for Matthew's review.",
+  "checked_by_human": false,
+  "serves": 2,
+  "total_minutes": 20,
+  "equipment": [
+    "Large pot with a lid",
+    "Colander",
+    "Wooden spoon or tongs",
+    "Mug (to save pasta water)"
+  ],
+  "notes": "REMY: before starting the timer, ASK which pasta shape it is and use step 3's timer_by_shape (from cook-times.json). Say the timer out loud and that the packet time wins: 'Penne, 11 minutes. Shout if your packet says different.' If the shape isn't listed, ask for the packet time and use that. Never guess.",
+  "ingredients": [
+    "200g dried pasta, any shape (about 100g per person)",
+    "2 litres water (about 1 litre per 100g)",
+    "20g salt (about 1 heaped tbsp, 10g per litre)",
+    "Optional: butter, olive oil or your sauce to serve"
+  ],
+  "steps": [
+    {
+      "instruction": "Tell Remy which pasta you're boiling (penne, fusilli, spaghetti…) and check the cooking time on the packet.",
+      "ask": "Which pasta shape are you boiling? And what time does the packet say?",
+      "looks_right": [
+        "the pasta packet held up to the camera"
+      ],
+      "looks_wrong": [
+        "no packet in view and no shape given (ask again)"
+      ],
+      "done_when": "Remy knows the shape (and the packet time if there is one)."
+    },
+    {
+      "instruction": "Fill a large pot with about 2 litres of water, cover it and bring it to a big rolling boil on high. Then add the salt.",
+      "looks_right": [
+        "big bubbles breaking the surface all over",
+        "lots of steam"
+      ],
+      "looks_wrong": [
+        "only tiny bubbles on the bottom (not boiling yet)",
+        "a small pot with too little water (the pasta will stick)"
+      ],
+      "done_when": "The water is at a big rolling boil and salted."
+    },
+    {
+      "instruction": "Tip in the pasta and stir straight away so it doesn't stick. Remy starts the timer for your shape as soon as it's in.",
+      "timer_by_shape": {
+        "rigatoni": {
+          "label": "Rigatoni",
+          "minutes": 11,
+          "check_at": 10,
+          "from": "pasta_dried_minutes_al_dente/rigatoni/default"
+        },
+        "penne": {
+          "label": "Penne",
+          "minutes": 11,
+          "check_at": 10,
+          "from": "pasta_dried_minutes_al_dente/penne/default"
+        },
+        "fusilli": {
+          "label": "Fusilli",
+          "minutes": 11,
+          "check_at": 10,
+          "from": "pasta_dried_minutes_al_dente/fusilli/default"
+        },
+        "farfalle": {
+          "label": "Farfalle (bow ties)",
+          "minutes": 11,
+          "check_at": 10,
+          "from": "pasta_dried_minutes_al_dente/farfalle/default"
+        },
+        "macaroni": {
+          "label": "Macaroni",
+          "minutes": 9,
+          "check_at": 8,
+          "from": "pasta_dried_minutes_al_dente/macaroni/default"
+        },
+        "orecchiette": {
+          "label": "Orecchiette",
+          "minutes": 12,
+          "check_at": 11,
+          "from": "pasta_dried_minutes_al_dente/orecchiette/default"
+        },
+        "spaghetti": {
+          "label": "Spaghetti",
+          "minutes": 10,
+          "check_at": 9,
+          "from": "pasta_dried_minutes_al_dente/spaghetti/default"
+        },
+        "linguine": {
+          "label": "Linguine",
+          "minutes": 10,
+          "check_at": 9,
+          "from": "pasta_dried_minutes_al_dente/linguine/default"
+        },
+        "tagliatelle_dried": {
+          "label": "Dried tagliatelle",
+          "minutes": 8,
+          "check_at": 7,
+          "from": "pasta_dried_minutes_al_dente/tagliatelle_dried/default"
+        },
+        "fresh_egg_pasta": {
+          "label": "Fresh egg pasta",
+          "minutes": 3,
+          "check_at": 2,
+          "from": "pasta_dried_minutes_al_dente/fresh_egg_pasta/default"
+        },
+        "fresh_filled_pasta (ravioli, tortellini)": {
+          "label": "Fresh ravioli / tortellini",
+          "minutes": 4,
+          "check_at": 3,
+          "from": "pasta_dried_minutes_al_dente/fresh_filled_pasta (ravioli, tortellini)/default"
+        }
+      },
+      "looks_right": [
+        "pasta moving freely in the bubbling water",
+        "spaghetti softened and pushed under the water"
+      ],
+      "looks_wrong": [
+        "pasta clumped together or stuck to the bottom",
+        "foam about to boil over (turn the heat down a little)"
+      ],
+      "done_when": "The pasta is in, stirred, and the timer for that shape is running."
+    },
+    {
+      "instruction": "Stir every couple of minutes, especially in the first two, and keep it at a lively boil.",
+      "looks_right": [
+        "steady bubbling",
+        "pasta separate, not clumped"
+      ],
+      "looks_wrong": [
+        "foam rising to the rim (heat down a notch)",
+        "boil dropped to a simmer (heat up)"
+      ],
+      "done_when": "The timer reaches its check point."
+    },
+    {
+      "instruction": "When the timer says check, taste a piece. Al dente means tender with a little bite in the middle. Scoop out a mug of pasta water, then drain.",
+      "looks_right": [
+        "pasta holding its shape",
+        "the bite shows no chalky white core"
+      ],
+      "looks_wrong": [
+        "swollen, splitting or falling apart (overcooked)",
+        "chalky white centre (needs another minute)"
+      ],
+      "done_when": "The pasta passes the bite test and is drained, with a mug of water saved. Ask the cook to bite a piece or hold one up to the camera."
+    },
+    {
+      "instruction": "Toss it straight away with butter, olive oil or your sauce, adding a splash of pasta water if it looks dry. Serve hot.",
+      "looks_right": [
+        "glossy pasta, nicely coated"
+      ],
+      "looks_wrong": [
+        "drained pasta left sitting in the colander (it sticks together)"
+      ],
+      "done_when": "Tossed and served."
+    }
+  ]
+}
