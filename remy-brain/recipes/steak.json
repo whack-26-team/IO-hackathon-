@@ -26,9 +26,9 @@
     },
     {
       "instruction": "Put the heavy pan on high heat for a few minutes until it's very hot, then add the oil.",
-      "looks_right": ["oil shimmering and rippling", "the first faint wisp of smoke"],
-      "looks_wrong": ["thick, heavy smoke (too hot: take it off the heat for a moment)", "oil lying still with no shimmer (not hot enough yet)"],
-      "done_when": "The oil shimmers and just starts to smoke."
+      "looks_right": ["oil shimmering and rippling"],
+      "looks_wrong": ["oil lying still with no shimmer (not hot enough yet)"],
+      "done_when": "The oil shimmers and ripples when the pan is tilted."
     },
     {
       "instruction": "Lay the steak in the pan, away from you so the oil doesn't spit at you. Don't touch it, let the crust form.",
@@ -45,7 +45,7 @@
     {
       "instruction": "Flip the steak. Turn the heat down to medium, then add the butter, garlic and herbs. Tilt the pan and keep spooning the foaming butter over the steak.",
       "looks_right": ["deep, even brown crust on the cooked side", "butter foaming and turning nutty brown"],
-      "looks_wrong": ["grey, pale cooked side (pan wasn't hot enough)", "black, burnt crust", "butter turning black and smoking"],
+      "looks_wrong": ["grey, pale cooked side (pan wasn't hot enough)", "black, burnt crust", "butter turning black (turn the heat down)"],
       "timer": {
         "label": "Steak: side 2",
         "minutes": 3,

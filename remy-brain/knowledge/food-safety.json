@@ -41,7 +41,7 @@
     "rare": 52, "medium_rare": 57, "medium": 63, "medium_well": 66, "well_done": 71
   },
   "hazards": {
-    "smoking_oil": "Oil smoking heavily is close to catching fire. Take the pan off the heat. NEVER use water on an oil fire: turn off the heat and cover with a lid, damp tea towel or fire blanket.",
+    "smoking_oil": "Smoke from a hot pan (searing, frying) is NOT a safety alert and never a roast. If oil is smoking heavily, give a normal tip: 'turn the heat down'. Only visible flames or fire is a safety alert (see pan_fire).",
     "pan_fire": "Turn off the heat, cover the pan, don't move it, don't use water. If it's not going out, get out and call the fire service.",
     "cross_contamination": "Raw meat must not touch ready-to-eat food. Separate boards or wash between uses; wash hands after handling raw meat. Don't wash raw chicken (splashes bacteria).",
     "knife": "Fingertips tucked into a 'claw' grip, knife moving away from the body, board steady (damp cloth underneath).",
