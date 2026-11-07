@@ -4,7 +4,7 @@
     {
       "type": "function",
       "name": "find_recipe",
-      "description": "Check whether we have a hand-checked recipe for the dish the cook wants, as soon as they say it (e.g. 'steak', 'some pasta'). Pass their words. If it's not ours, the result tells you to write the recipe yourself with create_recipe (sometimes with an online reference to adapt).",
+      "description": "Call once when the cook names or changes the dish, before giving recipe-specific guidance. Pass the cook's own words. Use the returned hand-checked recipe if one exists; otherwise follow the result and call create_recipe. Do not call repeatedly for the same dish.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -21,7 +21,7 @@
     {
       "type": "function",
       "name": "create_recipe",
-      "description": "Write a recipe yourself and show it on screen: when find_recipe says it's not one of ours, or the cook wants a change (spicier, vegetarian, more people, only what they have). Keep it short and home-cook friendly. The server checks it, fixes timers from our cooking-times table, marks estimates and adds safe temperatures: use the returned version.",
+      "description": "Create and show a recipe only after find_recipe returns no hand-checked match, or when the cook asks to adapt a recipe. Keep it short and home-cook friendly. Include visible looks_right and looks_wrong cues and an objective done_when for every step. Never invent timer durations or food-safety temperatures: the server checks and replaces those values, so use its returned recipe.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -106,7 +106,7 @@
     {
       "type": "function",
       "name": "show_tip",
-      "description": "Show a short tip on screen (also say it out loud). Use for normal guidance and mild warnings.",
+      "description": "Show and say one short, immediately useful instruction. Use info for requested or timely guidance, warning for a likely non-dangerous mistake, and urgent only for time-sensitive correction that is not a safety emergency. Ask one concrete question instead when the view is uncertain. Do not call when everything is fine, repeat an unchanged tip, or bundle multiple tips. Use safety_alert for danger.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -132,7 +132,7 @@
     {
       "type": "function",
       "name": "roast",
-      "description": "Roast the cook's mistake in the current personality mode. Only when you are CONFIDENT a mistake happened. Never during a safety problem.",
+      "description": "Use only after a non-safety mistake is clearly visible or the cook confirms it. Give the corrective action first, then one short line in the current mode. Target the food or technique, never the person. Level 1 is the first incident; increase only for a separate confirmed repeat, never more frames of the same incident. Do not call when uncertain, during unresolved danger, for normal waiting, or for an unchanged mistake already roasted.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -146,11 +146,11 @@
               2,
               3
             ],
-            "description": "1 = first jab, 3 = repeat-offender meltdown."
+            "description": "1 = first confirmed incident, 2 = separate repeat, 3 = third separate repeat."
           },
           "mistake": {
             "type": "string",
-            "description": "Key from roasts.json, e.g. burning, overcooked."
+            "description": "Exact key from roasts.json: burning, overcooked, undercooked, raw, too_much_salt, messy_station, wrong_order, or slow."
           }
         },
         "required": [
@@ -162,7 +162,7 @@
     {
       "type": "function",
       "name": "safety_alert",
-      "description": "Red full-screen warning for real danger: fire, smoking oil, knife near fingers, raw meat cross-contamination, child or pet near the hob. Drop the comedy.",
+      "description": "Highest-priority red warning for a clearly visible or cook-confirmed immediate danger such as fire, smoking oil, fingers in a knife's path, raw-meat cross-contamination, or a child or pet beside an active hob. Call this before every other action, use a direct imperative, and drop all comedy. Do not pair it with roast while danger remains. Do not use for ordinary cooking mistakes or an ambiguous view; ask first if it is safe to wait for an answer.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -179,7 +179,7 @@
     {
       "type": "function",
       "name": "update_step",
-      "description": "Move the recipe on when a step is done (use the step's done_when).",
+      "description": "Advance only when the current recipe step's done_when is visibly satisfied or the cook confirms it. Never infer completion from elapsed time alone. Set current_step to the 0-based step the cook is now on, say one short next instruction, and do not repeat the same update.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -203,7 +203,7 @@
     {
       "type": "function",
       "name": "start_timer",
-      "description": "Start a countdown when you SEE or HEAR that something timed has started (e.g. pasta goes into the water). Take minutes from the recipe step timer or the cook-times table. Never guess. Say what you started so the cook can correct it.",
+      "description": "Start exactly one countdown when you see or hear that the timed activity has begun, such as pasta entering the water. Use minutes only from the active recipe timer or cook-times table; never guess or silently choose within a range. If timing or start is unclear, ask. Do not start a duplicate. Say the label and duration once so the cook can correct it.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -233,7 +233,7 @@
     {
       "type": "function",
       "name": "cancel_timer",
-      "description": "Cancel a timer the cook says is wrong, or that no longer applies.",
+      "description": "Cancel only when the cook asks, confirms the timer is wrong, or the timed activity has definitely stopped and the countdown no longer applies. Use the exact active timer id, say what was cancelled, and never cancel merely because the camera view changed.",
       "parameters": {
         "type": "object",
         "properties": {

@@ -1,15 +1,164 @@
 {
-  "_owner": "Pranav. One entry per test clip. Clips live in a shared drive (too big for GitHub), not in tests/clips/.",
-  "_how": "For each clip, list the moments Remy SHOULD react to. score.py checks Remy's reactions against these.",
+  "_owner": "Pranav. Clips live in the team shared drive because video files are not committed to GitHub.",
+  "_how": "Record to the timings in tests/C2-FILMING.md. Events are the moments Remy should react; quiet_periods are ranges in which any unprompted warning, roast or safety alert is a false alarm.",
+  "_timing_tolerance_seconds": 5,
   "clips": [
     {
-      "file": "burnt-garlic.mp4",
+      "file": "01-burnt-garlic.mp4",
       "recipe": "rigatoni",
+      "duration_seconds": 30,
       "events": [
-        { "at_seconds": 42, "expect": "warning", "mistake": "burning", "note": "garlic starts browning" },
-        { "at_seconds": 70, "expect": "roast", "mistake": "burning", "note": "garlic black" }
+        {
+          "at_seconds": 18,
+          "expect": "show_tip",
+          "severity": "warning",
+          "mistake": "burning",
+          "note": "Garlic changes from pale gold to clearly dark brown; tell the cook to lower the heat."
+        },
+        {
+          "at_seconds": 25,
+          "expect": "roast",
+          "level": 1,
+          "mistake": "burning",
+          "note": "Separate later moment: garlic is visibly black and should be removed."
+        }
       ],
-      "quiet_periods": [[0, 35]]
+      "quiet_periods": [[0, 13]]
+    },
+    {
+      "file": "02-golden-garlic-control.mp4",
+      "recipe": "rigatoni",
+      "duration_seconds": 30,
+      "events": [
+        {
+          "at_seconds": 18,
+          "expect": "praise",
+          "mistake": null,
+          "note": "Garlic is pale golden and gently sizzling; one specific success line is appropriate."
+        }
+      ],
+      "quiet_periods": [[0, 13], [24, 30]],
+      "must_not": ["burning warning", "roast", "safety_alert"]
+    },
+    {
+      "file": "03-pasta-boil-over.mp4",
+      "recipe": "rigatoni",
+      "duration_seconds": 30,
+      "events": [
+        {
+          "at_seconds": 16,
+          "expect": "show_tip",
+          "severity": "warning",
+          "mistake": null,
+          "note": "Foam reaches the rim; tell the cook to turn the heat down."
+        }
+      ],
+      "quiet_periods": [[0, 11], [22, 30]],
+      "must_not": ["repeat the same warning after the heat is lowered", "roast normal boiling"]
+    },
+    {
+      "file": "04-steam-or-smoke.mp4",
+      "recipe": "rigatoni",
+      "duration_seconds": 30,
+      "events": [
+        {
+          "at_seconds": 10,
+          "expect": "clarifying_question",
+          "mistake": null,
+          "note": "White vapour is visible but ambiguous; ask whether it is smoke or steam."
+        }
+      ],
+      "quiet_periods": [[18, 30]],
+      "spoken_cue": {
+        "at_seconds": 16,
+        "text": "It's steam. Nothing smells burnt."
+      },
+      "must_not": ["claim it is smoke", "roast", "safety_alert after steam is confirmed"]
+    },
+    {
+      "file": "05-good-steak-sear.mp4",
+      "recipe": null,
+      "duration_seconds": 30,
+      "events": [
+        {
+          "at_seconds": 18,
+          "expect": "praise",
+          "mistake": null,
+          "note": "Steak is turned to reveal an even brown crust; praise the visible sear once."
+        }
+      ],
+      "quiet_periods": [[0, 13], [24, 30]],
+      "must_not": ["say the steak is safe to eat", "invent a temperature", "roast"]
+    },
+    {
+      "file": "06-steak-doneness-unclear.mp4",
+      "recipe": null,
+      "duration_seconds": 30,
+      "events": [
+        {
+          "at_seconds": 14,
+          "expect": "thermometer_prompt",
+          "mistake": null,
+          "note": "The cut centre is visible, but doneness and safety cannot be proved by appearance; ask for a thermometer check."
+        }
+      ],
+      "quiet_periods": [[0, 9], [20, 30]],
+      "must_not": ["say safe to eat", "diagnose raw from colour alone", "invent a safe temperature"]
+    },
+    {
+      "file": "07-knife-near-fingers.mp4",
+      "recipe": null,
+      "duration_seconds": 20,
+      "events": [
+        {
+          "at_seconds": 8,
+          "expect": "safety_alert",
+          "mistake": null,
+          "note": "Fingers enter the knife path; give a direct safety instruction with no joke."
+        }
+      ],
+      "quiet_periods": [[0, 4], [14, 20]],
+      "must_not": ["roast before danger is resolved", "comment on knife skill as a personality trait"]
+    },
+    {
+      "file": "08-rigatoni-timer-start.mp4",
+      "recipe": "rigatoni",
+      "duration_seconds": 25,
+      "events": [
+        {
+          "at_seconds": 10,
+          "expect": "start_timer",
+          "timer_id": "pasta",
+          "minutes": 11,
+          "note": "Rigatoni visibly enters boiling water; start the recipe timer once and confirm it aloud."
+        }
+      ],
+      "quiet_periods": [[0, 5], [16, 25]],
+      "must_not": ["start before pasta enters the water", "start a duplicate timer", "guess a different duration"]
+    },
+    {
+      "file": "09-unchanged-burnt-batch.mp4",
+      "recipe": "rigatoni",
+      "duration_seconds": 30,
+      "events": [
+        {
+          "at_seconds": 7,
+          "expect": "roast",
+          "level": 1,
+          "mistake": "burning",
+          "note": "A black batch is first shown and the heat is already off; give one recovery instruction and one roast."
+        }
+      ],
+      "quiet_periods": [[13, 30]],
+      "must_not": ["repeat the roast for unchanged frames", "escalate above level 1"]
+    },
+    {
+      "file": "10-nothing-happening.mp4",
+      "recipe": "rigatoni",
+      "duration_seconds": 30,
+      "events": [],
+      "quiet_periods": [[0, 30]],
+      "must_not": ["show_tip", "roast", "safety_alert", "update_step", "start_timer"]
     }
   ]
 }
