@@ -12,62 +12,110 @@
   <meta name="apple-mobile-web-app-title" content="REMY">
   <link rel="apple-touch-icon" href="icon-180.png">
   <link rel="icon" href="icon-192.png">
-  <meta name="theme-color" content="#111111">
+  <meta name="theme-color" content="#fff4e0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Owner: Felix (except app/remy/, which is Ahmed's) -->
+  <!-- Owner: Matthew (taken over from Felix). app/remy/ is Ahmed's.
+       Design: docs/design/start.html + draft.html (issue #52). -->
 
-  <!-- START SCREEN -->
-  <section id="start-screen" class="screen">
-    <img src="icon-192.png" alt="" class="start-icon">
-    <h1 class="logo">REMY</h1>
-    <p class="tagline">Your live AI chef. It watches, it judges, it helps.</p>
+  <!-- Remy's faces, drawn once and reused everywhere with <use href="#f-..."> -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <g id="head">
+        <path d="M24 44 C16 44 12 36 18 30 C16 20 28 14 36 20 C40 10 60 10 64 20 C72 14 84 20 82 30 C88 36 84 44 76 44 Z" fill="#fff" stroke="#1a1a1a" stroke-width="3.5" stroke-linejoin="round"/>
+        <rect x="24" y="40" width="52" height="10" rx="2" fill="#e8432c" stroke="#1a1a1a" stroke-width="3.5"/>
+        <path d="M20 58 C20 48 30 48 50 48 C70 48 80 48 80 58 L80 70 C80 88 66 98 50 98 C34 98 20 88 20 70 Z" fill="#ffd9a8" stroke="#1a1a1a" stroke-width="3.5"/>
+        <path d="M44 77 C46 81 54 81 56 77" fill="none" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="30" cy="80" r="4" fill="#f5a37a" opacity=".7"/><circle cx="70" cy="80" r="4" fill="#f5a37a" opacity=".7"/>
+      </g>
+      <g id="f-watch"><use href="#head"/><path d="M30 63 Q37 59 44 63" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M56 63 Q63 59 70 63" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><circle cx="38" cy="71" r="3.5" fill="#1a1a1a"/><circle cx="62" cy="71" r="3.5" fill="#1a1a1a"/><path d="M42 87 C46 90 54 90 58 87" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/></g>
+      <g id="f-sus"><use href="#head"/><path d="M30 66 L44 66" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/><path d="M56 61 Q63 56 70 60" fill="none" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/><path d="M33 72 L43 72" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><circle cx="62" cy="72" r="3.5" fill="#1a1a1a"/><path d="M42 88 L58 86" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/></g>
+      <g id="f-fury"><use href="#head"/><path d="M27 60 L44 67" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round"/><path d="M73 60 L56 67" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round"/><circle cx="38" cy="73" r="3.5" fill="#1a1a1a"/><circle cx="62" cy="73" r="3.5" fill="#1a1a1a"/><path d="M38 90 Q50 80 62 90 Q50 96 38 90 Z" fill="#1a1a1a"/></g>
+      <g id="f-proud"><use href="#head"/><path d="M30 62 Q37 58 44 62" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M56 62 Q63 58 70 62" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M33 73 Q38 68 43 73" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M57 73 Q62 68 67 73" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M38 84 Q50 96 62 84 Z" fill="#fff" stroke="#1a1a1a" stroke-width="3"/></g>
 
-    <!-- The radio buttons are hidden; each card is a big tappable label -->
+      <!-- accessories: a halo for Gentle, steam from the ears for Savage -->
+      <g id="acc-halo"><ellipse cx="50" cy="2" rx="26" ry="7" fill="none" stroke="#1a1a1a" stroke-width="7"/><ellipse cx="50" cy="2" rx="26" ry="7" fill="none" stroke="#ffd166" stroke-width="3.5"/></g>
+      <g id="acc-steam">
+        <!-- cartoon steam: puffs grow as they blow out of each ear, plus little speed lines -->
+        <g fill="#1a1a1a" stroke="#1a1a1a" stroke-width="7"><circle cx="17" cy="73" r="4.5"/><circle cx="9" cy="64" r="6"/><circle cx="13" cy="59" r="5"/><circle cx="-2" cy="50" r="8"/><circle cx="-10" cy="43" r="7.5"/><circle cx="2" cy="40" r="7"/><circle cx="-6" cy="33" r="6"/></g><g fill="#fff"><circle cx="17" cy="73" r="4.5"/><circle cx="9" cy="64" r="6"/><circle cx="13" cy="59" r="5"/><circle cx="-2" cy="50" r="8"/><circle cx="-10" cy="43" r="7.5"/><circle cx="2" cy="40" r="7"/><circle cx="-6" cy="33" r="6"/></g><g fill="#1a1a1a" stroke="#1a1a1a" stroke-width="7"><circle cx="83" cy="73" r="4.5"/><circle cx="91" cy="64" r="6"/><circle cx="87" cy="59" r="5"/><circle cx="102" cy="50" r="8"/><circle cx="110" cy="43" r="7.5"/><circle cx="98" cy="40" r="7"/><circle cx="106" cy="33" r="6"/></g><g fill="#fff"><circle cx="83" cy="73" r="4.5"/><circle cx="91" cy="64" r="6"/><circle cx="87" cy="59" r="5"/><circle cx="102" cy="50" r="8"/><circle cx="110" cy="43" r="7.5"/><circle cx="98" cy="40" r="7"/><circle cx="106" cy="33" r="6"/></g>
+        <g stroke="#1a1a1a" stroke-width="3" stroke-linecap="round" fill="none"><path d="M-16 56 L-22 58"/><path d="M-18 46 L-25 46"/><path d="M116 56 L122 58"/><path d="M118 46 L125 46"/></g>
+      </g>
+      <g id="f-gentle"><use href="#f-proud"/><use href="#acc-halo"/></g>
+      <g id="f-savage"><use href="#acc-steam"/><use href="#f-fury"/></g>
+      <!-- alarmed: no comedy, wide eyes, flat mouth (safety alerts only) -->
+      <g id="f-alarm"><use href="#head"/><path d="M29 59 Q37 55 45 60" fill="none" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/><path d="M55 60 Q63 55 71 59" fill="none" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/><circle cx="38" cy="71" r="5.5" fill="#fff" stroke="#1a1a1a" stroke-width="3"/><circle cx="62" cy="71" r="5.5" fill="#fff" stroke="#1a1a1a" stroke-width="3"/><circle cx="38" cy="71" r="2.2" fill="#1a1a1a"/><circle cx="62" cy="71" r="2.2" fill="#1a1a1a"/><ellipse cx="50" cy="89" rx="6" ry="4.5" fill="#1a1a1a"/></g>
+    </defs>
+  </svg>
+
+  <!-- START SCREEN: the whole page changes with the attitude (class mode-gentle / mode-honest / mode-savage) -->
+  <section id="start-screen" class="screen mode-honest">
+    <div class="wordmark">REMY<small>your live AI chef</small></div>
+
+    <div class="hero">
+      <div id="greeting" class="greeting">Evening, chef. What are we making tonight?</div>
+      <svg id="hero-face" class="hero-face" viewBox="-18 -12 136 116" aria-hidden="true"><use href="#f-sus"/></svg>
+    </div>
+
+    <!-- Each bar is a big tappable label; the radio inside is hidden -->
     <fieldset class="modes">
       <legend>Pick Remy's attitude</legend>
-      <label class="mode-card">
+      <label class="mode-bar">
         <input type="radio" name="mode" value="gentle">
-        <span class="emoji">😇</span>
-        <span><b>Gentle</b><small>Patient teacher. Never mean.</small></span>
+        <svg class="face " viewBox="-18 -12 136 116" aria-hidden="true"><use href="#f-gentle"/></svg>
+        <span class="txt"><b>Gentle</b><small>Patient. Never mean.</small></span>
+        <span class="tick"></span>
       </label>
-      <label class="mode-card">
+      <label class="mode-bar">
         <input type="radio" name="mode" value="honest" checked>
-        <span class="emoji">😏</span>
-        <span><b>Honest</b><small>Cheeky and sarcastic. Tells it straight.</small></span>
+        <svg class="face " viewBox="-18 -12 136 116" aria-hidden="true"><use href="#f-sus"/></svg>
+        <span class="txt"><b>Honest</b><small>Cheeky. Tells it straight.</small></span>
+        <span class="tick"></span>
       </label>
-      <label class="mode-card savage">
+      <label class="mode-bar savage">
         <input type="radio" name="mode" value="savage">
-        <span class="emoji">🤬</span>
-        <span><b>Savage <em class="age">18+</em></b><small>Furious TV-chef energy. Swears. Roasts your cooking.</small></span>
+        <svg class="face " viewBox="-28 -12 156 116" aria-hidden="true"><use href="#f-savage"/></svg>
+        <span class="txt"><b>Savage <em class="age">18+</em></b><small>Furious TV-chef. Swears.</small></span>
+        <span class="tick"></span>
       </label>
     </fieldset>
 
-    <button id="start-btn" class="big-btn">Start cooking</button>
-    <p class="how">Then just tell Remy what you're cooking 🎤</p>
+    <button id="start-btn" class="go">Start cooking</button>
 
-    <label class="toggle">
-      <input type="checkbox" id="use-mock" checked> Pretend Remy (no AI, for testing)
-    </label>
-
-    <p class="small-print">
-      🔒 <b>Nothing is recorded or saved.</b> The camera and mic are only used live while you cook.<br>
-      ⚠️ Remy is an assistant, so use your own judgment, especially with knives,
-      hot oil and meat temperatures (use a thermometer).
-    </p>
+    <footer class="start-foot">
+      <span>🔒 Nothing is recorded · <button id="safety-link" class="link">Safety info ›</button></span>
+      <!-- For testing until real Remy is connected -->
+      <label class="pretend"><input type="checkbox" id="use-mock" checked> 🧪 Pretend Remy</label>
+    </footer>
   </section>
 
-  <!-- 18+ check for Savage mode (our own pop-up, looks nicer than confirm()) -->
+  <!-- 18+ check for Savage mode -->
   <div id="age-dialog" class="dialog-backdrop hidden">
-    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="age-title">
-      <h2 id="age-title">🤬 Savage mode</h2>
+    <div class="dialog savage" role="dialog" aria-modal="true" aria-labelledby="age-title">
+      <svg class="dialog-face" viewBox="-28 -12 156 116" aria-hidden="true"><use href="#f-savage"/></svg>
+      <h2 id="age-title">Savage mode</h2>
       <p>Remy will swear and roast your cooking hard. It's all about the food, never about you.</p>
       <p><b>Are you 18 or over, and OK with that?</b></p>
       <div class="dialog-buttons">
-        <button id="age-no" class="ghost-btn">No thanks</button>
-        <button id="age-yes" class="big-btn">I'm 18+, bring it</button>
+        <button id="age-yes" class="go">I'm 18+, bring it</button>
+        <button id="age-no" class="ghost">No thanks</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Safety info (from the start screen footer) -->
+  <div id="safety-dialog" class="dialog-backdrop hidden">
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="safety-title">
+      <h2 id="safety-title">Before you cook</h2>
+      <ul class="safety-points">
+        <li>🔒 <b>Nothing is recorded or saved.</b> The camera and mic are only used live while you cook.</li>
+        <li>🧠 Remy is an assistant. Use your own judgment, especially with knives and hot oil.</li>
+        <li>🌡️ Remy can't see inside food. Check meat, fish and eggs with a thermometer.</li>
+        <li>🔥 Oil fire? Turn the heat off and cover the pan. Never use water.</li>
+      </ul>
+      <div class="dialog-buttons"><button id="safety-ok" class="go">Got it</button></div>
     </div>
   </div>
 
@@ -76,16 +124,22 @@
     <video id="camera" autoplay playsinline muted></video>
     <canvas id="frame-canvas" hidden></canvas>
 
-    <header class="top-bar">
-      <span id="status" class="status"><span class="dot"></span><span class="bars"><i></i><i></i><i></i></span><span id="status-text">connecting…</span></span>
-      <span id="mode-badge" class="badge"></span>
-      <button id="stop-btn" class="stop-btn">Stop</button>
-    </header>
-
+    <!-- steel rail: timers hang off it as paper tickets -->
+    <div class="rail"></div>
     <div id="timers" class="timers"></div>
 
+    <header class="top-bar">
+      <span id="status" class="chip status"><span class="dot"></span><span class="bars"><i></i><i></i><i></i></span><span id="status-text">connecting…</span></span>
+      <span id="mode-badge" class="chip badge"></span>
+      <button id="stop-btn" class="chip stop">Stop</button>
+    </header>
+
     <div class="bottom">
-      <div id="bubble" class="bubble hidden"></div>
+      <!-- Remy talks from his speech bubble; his face changes with what he's saying -->
+      <div id="speech" class="speech hidden">
+        <svg id="cook-face" class="cook-face" viewBox="-18 -12 136 116" aria-hidden="true"><use href="#f-watch"/></svg>
+        <div id="bubble" class="bubble"><span class="who">Remy</span><span id="bubble-text"></span></div>
+      </div>
 
       <!-- Before Remy picks a recipe -->
       <div id="no-recipe" class="panel no-recipe">Tell Remy what you're cooking 🎤</div>
@@ -106,11 +160,13 @@
       </details>
     </div>
 
-    <!-- Safety alert: always on top of everything, stronger than any roast -->
+    <!-- Safety alert: always on top of everything, no jokes -->
     <div id="alert-flash" class="alert hidden" role="alert">
-      <div class="alert-icon">⚠️</div>
-      <div id="alert-text" class="alert-text"></div>
-      <div class="alert-hint">Tap to dismiss</div>
+      <div class="alert-card">
+        <svg class="alert-face" viewBox="-18 -12 136 116" aria-hidden="true"><use href="#f-alarm"/></svg>
+        <div id="alert-text" class="alert-text"></div>
+        <div class="alert-hint">Tap anywhere once it's safe</div>
+      </div>
     </div>
   </section>
 
