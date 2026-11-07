@@ -30,6 +30,10 @@ html[data-mode="gentle"] { background: var(--sky) var(--utensils); }
 html[data-mode="savage"] { background: var(--night) var(--utensils-light); }
 html[data-mode="cooking"] { background: #000; }
 body { background: transparent; }
+/* App shell: the page itself is exactly the screen and never scrolls or grows. Each screen is
+   pinned to the edges and scrolls inside itself if it ever needs to. This stops the iPhone zooming
+   the whole app out when something (like the oversized camera picture) is wider than the screen. */
+html, body { width: 100%; height: 100%; overflow: hidden; position: fixed; inset: 0; }
 button { font: inherit; color: inherit; cursor: pointer; }
 .hidden { display: none !important; }
 .screen { min-height: 100dvh; }
@@ -37,7 +41,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 /* ================= START SCREEN ================= */
 /* Pinned to the real screen edges, like the cooking screen: 100dvh is sometimes too short in iPhone
    home-screen apps, which left a strip of the wrong colour at the bottom. Scrolls on tiny screens. */
-#start-screen { position: fixed; inset: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+#start-screen { position: fixed; inset: 0; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
   display: flex; flex-direction: column; gap: 10px;
   /* bottom: the footer sits close to the edge, just clear of the iPhone home bar */
   padding: calc(22px + var(--safe-top)) calc(18px + var(--safe-right)) max(6px, calc(var(--safe-bottom) - 22px)) calc(18px + var(--safe-left));
@@ -114,7 +118,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 /* ================= COOKING SCREEN ================= */
 /* Pinned to the real screen edges. (100dvh is sometimes too short in iPhone home-screen apps.) */
-#cook-screen { position: fixed; inset: 0; overflow: hidden; background: #000; color: var(--ink); }
+#cook-screen { position: fixed; inset: 0; overflow: hidden; overflow: clip; contain: paint; background: #000; color: var(--ink); }
+/* overflow: clip + contain: paint = the oversized camera can never make the page wider (iPhone zoom-out bug) */
 /* The camera video is sized by fitCamera() in app.js so it always covers the screen.
    These values are just the starting point before the camera reports its size. */
 #camera { position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; background: #000;
