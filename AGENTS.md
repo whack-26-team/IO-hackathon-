@@ -13,7 +13,8 @@ guides the recipe, and has personality modes (Gentle / Honest / Savage).
 | Folder / file | Owner |
 |---|---|
 | `server/` (except `second_opinion.py`), `remy-brain/recipes/`, `remy-brain/knowledge/`, `tools/`, `docs/`, `ROLES/` | **Matthew** (Claude Code) |
-| `app/` (except `app/remy/`) | **Matthew** (Claude Code), taken over from Felix |
+| `app/` (except `app/remy/` and `app/demo/`) | **Matthew** (Claude Code), taken over from Felix |
+| `app/demo/` (demo mode), `docs/pitch/` (slides) | **Felix** (Claude Code) |
 | `app/remy/`, `server/second_opinion.py` | **Ahmed** (Codex) |
 | `remy-brain/instructions.md`, `remy-brain/actions.json`, `remy-brain/personality/`, `tests/` | **Pranav** (Codex) |
 

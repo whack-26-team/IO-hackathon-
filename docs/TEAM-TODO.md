@@ -1,4 +1,4 @@
-# Changes waiting for Pranav and Ahmed
+# Changes waiting for Pranav, Ahmed and Felix
 
 Matthew (team lead) keeps this list. These are changes in **your** files that come from a
 team decision, so nobody else edits them for you. Check this file whenever you start a
@@ -35,6 +35,17 @@ Same rule as above.
 
 ### Done
 - [x] Timer beeps skipped in real sessions, plus an accurate privacy note (Matthew, PR #73).
+
+---
+
+## Felix (`app/demo/`, `docs/pitch/`)
+
+New tasks while Matthew is on a break: **issue #83**. Read `docs/DEMO.md` first.
+
+- [ ] Demo mode: make `app/demo/demo-remy.js` (opened with `?demo=1`) play the beats of `docs/DEMO.md`
+- [ ] Pitch slides in `docs/pitch/` (6 slides max, plus a PDF)
+- [ ] Rehearse the demo on your iPhone, post the timings on #83
+- [ ] Record the backup video once demo mode works (shared drive, link on #83)
 
 ---
 

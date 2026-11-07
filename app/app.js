@@ -6,6 +6,7 @@ import { createTimers } from "./timers.js";
 import { unlockSound, beep } from "./sound.js";
 import { createMockRemy } from "./remy/mock.js";
 import { createLiveRemy } from "./remy/live.js";
+import { createDemoRemy } from "./demo/demo-remy.js"; // ?demo=1 (Felix)
 
 const $ = (id) => document.getElementById(id);
 const state = { recipe: null, mode: "honest", remy: null, stream: null, cooking: false, live: false };
@@ -89,9 +90,10 @@ $("start-btn").addEventListener("click", async () => {
   }
 
   quietRemy(); // Remy on screen from the start, with this attitude's face
+  const useDemo = new URLSearchParams(location.search).get("demo") === "1"; // scripted demo (docs/DEMO.md)
   const useMock = $("use-mock").checked;
-  state.live = !useMock; // real Remy speaks timer reminders himself (see the timers' sound below)
-  const factory = useMock ? createMockRemy : createLiveRemy;
+  state.live = !useMock && !useDemo; // real Remy speaks timer reminders himself (see the timers' sound below)
+  const factory = useDemo ? createDemoRemy : useMock ? createMockRemy : createLiveRemy;
   state.remy = factory({
     recipe: null,
     mode: state.mode,
@@ -357,7 +359,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v74`,
+      `version  v75`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
