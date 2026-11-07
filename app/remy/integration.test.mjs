@@ -188,3 +188,13 @@ test('iPhone mic: an exact-device "Invalid constraint" error retries with the de
   assert.ok(!f.events.some(e=>e.type==='status'&&e.data.status==='error'));
   await f.remy.stop();
 });
+
+test('a dropped WebRTC call reconnects over WebSocket',async()=>{
+  const types=[]; const f=voiceFixture((session,o)=>{ types.push(o.connectionType); return session; });
+  await f.remy.start();
+  f.options.onDisconnect({reason:'error',message:'LiveKit connection state changed to disconnected'});
+  await tick(); await tick();
+  const retry=f.tasks.find(t=>!t.cancelled && t.ms===1500); assert.ok(retry); await retry.fn(); for(let i=0;i<5;i++) await tick();
+  assert.deepEqual(types,['webrtc','websocket']);
+  await f.remy.stop();
+});
