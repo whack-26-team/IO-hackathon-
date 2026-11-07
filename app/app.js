@@ -8,7 +8,7 @@ import { createMockRemy } from "./remy/mock.js";
 import { createLiveRemy } from "./remy/live.js";
 
 const $ = (id) => document.getElementById(id);
-const state = { recipe: null, mode: "honest", remy: null, stream: null, cooking: false };
+const state = { recipe: null, mode: "honest", remy: null, stream: null, cooking: false, live: false };
 
 // ---------- no zooming ----------
 // Safari on iPhone ignores "user-scalable=no" in index.html, so we also block the
@@ -89,6 +89,7 @@ $("start-btn").addEventListener("click", async () => {
   }
 
   const useMock = $("use-mock").checked;
+  state.live = !useMock; // real Remy speaks timer reminders himself (see the timers' sound below)
   const factory = useMock ? createMockRemy : createLiveRemy;
   state.remy = factory({
     recipe: null,
@@ -123,7 +124,11 @@ function stopCooking() {
 
 // ---------- events from Remy ----------
 
-const timers = createTimers($("timers"), (type, data) => state.remy?.send(type, data), beep);
+// Timer sounds: with real Remy, he says the reminder out loud ("taste one now"), so the
+// "check" and "done" beeps are skipped (Ahmed's request on #10). Pretend Remy keeps the beeps.
+// The cards still turn yellow/red, and the safety-alert sound always plays.
+const timerSound = (kind) => { if (state.live && (kind === "check" || kind === "done")) return; beep(kind); };
+const timers = createTimers($("timers"), (type, data) => state.remy?.send(type, data), timerSound);
 
 function wireRemy(remy) {
   remy.on("status", setStatus);
@@ -341,7 +346,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v72`,
+      `version  v73`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);

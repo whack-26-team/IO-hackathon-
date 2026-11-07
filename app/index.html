@@ -16,7 +16,7 @@
   <meta name="theme-color" content="#fff4e0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=72">
+  <link rel="stylesheet" href="style.css?v=73">
 </head>
 <body>
   <!-- the start screen's colour, overhanging every edge of the screen -->
@@ -88,7 +88,7 @@
     <button id="start-btn" class="go">Start cooking</button>
 
     <footer class="start-foot">
-      <span>🔒 Nothing is recorded · <button id="safety-link" class="link">Safety info ›</button></span>
+      <span>🔒 REMY doesn't save anything · <button id="safety-link" class="link">Privacy &amp; safety ›</button></span>
       <!-- For testing until real Remy is connected -->
       <label class="pretend"><input type="checkbox" id="use-mock" checked> 🧪 Pretend Remy</label>
     </footer>
@@ -111,9 +111,10 @@
   <!-- Safety info (from the start screen footer) -->
   <div id="safety-dialog" class="dialog-backdrop hidden">
     <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="safety-title">
-      <h2 id="safety-title">Before you cook</h2>
+      <h2 id="safety-title">Privacy &amp; safety</h2>
       <ul class="safety-points">
-        <li>🔒 <b>Nothing is recorded or saved.</b> The camera and mic are only used live while you cook.</li>
+        <li>🔒 <b>REMY doesn't record or keep anything.</b> The camera and mic are only used while you cook.</li>
+        <li>☁️ With real Remy (Pretend Remy off), your <b>voice goes to ElevenLabs</b> (Remy's voice) and <b>a picture every few seconds goes to Google Gemini</b> (Remy's eyes) so he can respond. Their own privacy policies apply.</li>
         <li>🧠 Remy is an assistant. Use your own judgment, especially with knives and hot oil.</li>
         <li>🌡️ Remy can't see inside food. Check meat, fish and eggs with a thermometer.</li>
         <li>🔥 Oil fire? Turn the heat off and cover the pan. Never use water.</li>
@@ -173,6 +174,6 @@
     </div>
   </section>
 
-  <script type="module" src="app.js?v=72"></script>
+  <script type="module" src="app.js?v=73"></script>
 </body>
 </html>
