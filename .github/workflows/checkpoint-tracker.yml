@@ -1,0 +1,31 @@
+name: Checkpoint tracker
+# Keeps the "📍 Checkpoint tracker" issue up to date. See .github/scripts/checkpoint_tracker.py
+on:
+  issues:
+    types: [opened, edited, closed, reopened, labeled, unlabeled, assigned, milestoned, demilestoned]
+  issue_comment:
+    types: [created, edited]
+  pull_request:
+    types: [opened, closed, reopened, edited]
+  schedule:
+    - cron: "17 * * * *"   # hourly, so "x hours ago" stays fresh
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: read
+  contents: read
+
+concurrency:
+  group: checkpoint-tracker
+  cancel-in-progress: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rebuild tracker issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python .github/scripts/checkpoint_tracker.py
