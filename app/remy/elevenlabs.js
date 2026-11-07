@@ -128,7 +128,8 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', stream, v
           if (source === 'user') {
             const started = actions.hear(message);
             // The app started a timer itself ("pasta's in"): tell Remy so he confirms it and doesn't start another
-            if (started?.seconds) context(`[TIMER STARTED BY APP] ${started.label}, ${started.seconds / 60} minutes. The cook said it's in. Confirm the timer once out loud; do not call start_timer for it.`);
+            // Remy must say it out loud, so this is spoken (not a silent context update)
+            if (started?.seconds) speak(`[TIMER STARTED BY APP] The cook said it's in and the countdown is running. Announce it now, once, out loud: "${started.announce}" Do not call start_timer for it.`, false, true);
             lastUserAt = now();
           }
           onTranscript({ source, message });

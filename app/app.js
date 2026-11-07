@@ -156,7 +156,12 @@ function wireRemy(remy) {
     renderSteps(d.current_step, d.step_complete);
     if (d.next_instruction) showBubble({ text: d.next_instruction, severity: "info" });
   });
-  remy.on("timer_start", (d) => timers.start({ ...d, estimate: isEstimate(d.label) }));
+  remy.on("timer_start", (d) => {
+    timers.start({ ...d, estimate: isEstimate(d.label) });
+    // Say on screen what the timer is for ("⏱ 11-minute timer for the rigatoni pasta"),
+    // unless a safety alert is up (that always wins)
+    if (!alertShowing()) showBubble({ text: `⏱ ${timerPhrase(d.label, d.seconds / 60, state.recipe)}`, severity: "info" });
+  });
   remy.on("timer_cancel", (d) => timers.cancel(d));
 }
 
@@ -211,6 +216,19 @@ let pendingRoast = null;
 function showRoast({ text, level = 1 }) {
   if (alertShowing()) { pendingRoast = { text, level }; return; }
   showBubble({ text, severity: "roast", level: Math.min(Math.max(level, 1), 3) });
+}
+
+// "11-minute timer for the rigatoni pasta". Pasta shapes get "pasta" added so it's obvious.
+function timerPhrase(label, minutes, recipe) {
+  const m = Math.round(minutes * 10) / 10;
+  const length = m >= 1 ? `${m}-minute` : `${Math.round(m * 60)}-second`;
+  const food = label.toLowerCase();
+  const pastaRecipe = /pasta|rigatoni|penne|spaghetti|fusilli|noodle/i.test(`${recipe?.id} ${recipe?.title}`) ||
+    recipe?.steps?.some((st) => st.timer_by_shape);
+  const isPastaShape = recipe?.steps?.some((st) => st.timer?.label === label && /pasta/i.test(st.timer?.from || "")) ||
+    recipe?.steps?.some((st) => Object.values(st.timer_by_shape || {}).some((t) => t.label === label));
+  const suffix = pastaRecipe && isPastaShape && !/pasta|noodle/.test(food) ? " pasta" : "";
+  return `${length} timer for the ${food}${suffix}`;
 }
 
 // ---------- safety alert ----------
@@ -372,7 +390,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v76`,
+      `version  v77`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
