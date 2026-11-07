@@ -53,12 +53,16 @@ in a judging room and works on any table.
 - **Remy says** a greeting and asks what you're making.
 - **On screen:** the camera, Remy's face, and "Tell Remy what you're cooking 🎤".
 
+**Cook:** "Remy?" → **Remy:** "Yes, chef?" (he always answers to his name).
+
 ### 0:20 · Beat 1, automatic timer: instant noodles (40 s)
 **Cook:** "Remy, I'm making instant noodles."
 - **On screen:** the "✓ Checked recipe" card with the steps.
 
-**Cook** puts the noodles in the bowl and pours water from the flask: "Water's in."
-- **Remy** starts a **3-minute Noodles timer** on his own and says so out loud. A paper ticket drops from the rail.
+**Cook** puts the noodles in the bowl, pours water from the flask and says: **"Noodles are in."**
+(Say the food's name, e.g. "noodles are in" or "pasta's in": that's what starts the timer.)
+- The **3-minute Noodles timer starts by itself** the moment he hears it. A paper ticket drops
+  from the rail, the bubble says "⏱ 3-minute timer for the noodles", and Remy says it out loud.
 
 **Talker:**
 > "Nobody touched the screen. The times come from our own cooking-times table, not
@@ -95,13 +99,21 @@ slow and exaggerated: this is staged, never fast.
 > which is opt-in and 18+."
 
 **Cook:** "Remy, bowl of cereal." The cook then pours the **milk in first**, then the cereal.
-- **Remy** gives a Savage roast. It's about the food and never the person; that's one of Remy's built-in rules.
+- **Remy** gives a Savage roast (it may swear: Savage is 18+).
+
+**Cook** fires back: **"Remy, you're rubbish."**
+- **Remy** insults straight back, e.g. "Big words from someone who just turned garlic into charcoal."
+
+**Talker:**
+> "Ignore him and it escalates. Insult him and he bites back."
 
 ### 2:45 · Close (Talker, 15 s)
 > "Live voice, live eyes, timers from real cooking data, and food-safety facts that
 > never come from AI guesses. REMY: a chef in your pocket who actually watches."
 
-- **Remy's sign-off:** "Plate it. Take the credit. I'm an app."
+**Phone** taps **Stop**.
+- The **goodbye screen**: Remy signs off out loud in his attitude (Savage: "Bloody hell, we
+  survived. Plate it and get out of my kitchen."), then the app returns to the start screen by itself.
 
 ---
 
@@ -111,13 +123,14 @@ slow and exaggerated: this is staged, never fast.
 |---|---|
 | Remy doesn't answer within 5 s | Cook repeats the line, closer to the phone |
 | Remy still silent / "error" chip | **Phone:** Stop, tick **Pretend Remy**, Start (or open `?demo=1` demo mode, #83, once it's built). **Talker** narrates. |
-| No timer after "water's in" | Cook: "Remy, start a 3-minute noodle timer." |
+| No timer after "noodles are in" | Cook: "Remy, start a 3-minute noodle timer." |
+| ElevenLabs down / out of credits | Nothing to do: Remy **switches to his backup voice by itself** (the phone's voice, with Gemini writing his lines) and says so on screen. To skip ElevenLabs entirely, open `https://remy-2wc2.onrender.com/?backup=1`. |
 | No safety alert on the knife | Cook: "Remy, how's my knife grip?" Never speed up the knife to force it. |
 | Wi-Fi drops | Switch the phone to the hotspot, Stop, Start |
 | Anything worse | **Backup:** "Let's show you the recording", and play the video (#12) |
 
 ## Rehearsal checklist
 - [ ] Run it 3 times start to finish with a timer. Target: under 3:15.
-- [ ] Once on Pretend Remy only (the backup path).
+- [ ] Once with `?backup=1` (the backup voice) and once on Pretend Remy only.
 - [ ] Once with the room's big screen, if you can get access.
 - [ ] Write what Remy actually said in each beat under this line, then update the script.
