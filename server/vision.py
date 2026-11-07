@@ -23,9 +23,11 @@ import time
 import httpx
 
 API = "https://generativelanguage.googleapis.com/v1beta"
-DEFAULT_MODEL = "gemini-3.8-flash"   # Google retired 2.5-flash for new accounts (Nov 2026)
+DEFAULT_MODEL = ""   # empty = pick automatically: newest "flash-lite" (fastest), then newest "flash"
 MAX_IMAGE_BYTES = 1_500_000      # ~1.5 MB JPEG is plenty; phones should send ~512–1024px
-MIN_SECONDS_BETWEEN = 1.0        # per caller, so one phone can't drain the free quota
+MIN_SECONDS_BETWEEN = 2.0        # per caller, so one phone can't drain the quota
+MAX_ATTEMPTS = 2                 # model tries per picture (keeps quota use low)
+ATTEMPT_TIMEOUT = 10             # seconds; an answer slower than this is useless for live feedback
 
 _model_cache: dict[str, str] = {}
 _refused: set[str] = set()       # models that answered 404 "not available" on this account
@@ -61,7 +63,7 @@ def key_status() -> dict:
     name = "GEMINI_API_KEY" if os.getenv("GEMINI_API_KEY", "").strip() else (
         "REMY_API_KEY" if os.getenv("REMY_API_KEY", "").strip() else None)
     return {"vision_key_set": bool(name), "vision_key_name": name,
-            "vision_model": _model_cache.get("model") or os.getenv("GEMINI_MODEL") or DEFAULT_MODEL}
+            "vision_model": _model_cache.get("model") or os.getenv("GEMINI_MODEL") or "auto (flash-lite first)"}
 
 
 class VisionError(Exception):
@@ -93,21 +95,31 @@ def list_models(client: httpx.Client) -> list[str]:
             if "generateContent" in m.get("supportedGenerationMethods", [])]
 
 
+def _version(name: str) -> tuple:
+    return tuple(int(n) for n in re.findall(r"\d+", name)) or (0,)
+
+
+def candidates(client: httpx.Client) -> list[str]:
+    """Models to try, best first: GEMINI_MODEL if set, then flash-lite (fastest), then flash."""
+    usable = [n for n in list_models(client) if n not in _refused and "gemini" in n
+              and not any(x in n for x in ("image", "tts", "live", "audio", "embedding", "preview-tts"))]
+    lite = sorted([n for n in usable if "flash-lite" in n], key=_version, reverse=True)
+    flash = sorted([n for n in usable if "flash" in n and "lite" not in n], key=_version, reverse=True)
+    order = []
+    wanted = (os.getenv("GEMINI_MODEL") or DEFAULT_MODEL).strip()
+    if wanted and wanted in usable:
+        order.append(wanted)
+    order += [n for n in lite + flash if n not in order]
+    if not order:
+        raise VisionError(502, "No suitable Gemini model is available on this key.")
+    return order
+
+
 def _pick_model(client: httpx.Client, suggested: str = "") -> str:
     if "model" in _model_cache:
         return _model_cache["model"]
-    wanted = os.getenv("GEMINI_MODEL") or DEFAULT_MODEL
-    names = [n for n in list_models(client) if n not in _refused]
-    if suggested and suggested in names:
-        choice = suggested                      # Google told us which model to use instead
-    elif wanted in names:
-        choice = wanted
-    else:  # e.g. the default was renamed/retired: take the newest-looking flash model
-        flash = sorted([n for n in names if "flash" in n and "image" not in n and "tts" not in n
-                        and "live" not in n and "audio" not in n], reverse=True)
-        if not flash:
-            raise VisionError(502, f"No suitable Gemini model available (wanted {wanted}).")
-        choice = flash[0]
+    order = candidates(client)
+    choice = suggested if suggested in order else order[0]
     _model_cache["model"] = choice
     return choice
 
@@ -117,7 +129,7 @@ def look(image: str, step: dict | None = None, question: str = "", caller: str =
         raise VisionError(503, "Vision key missing: add GEMINI_API_KEY in Render → remy → Environment.")
     now = time.monotonic()
     if now - _last_call.get(caller, 0) < MIN_SECONDS_BETWEEN:
-        raise VisionError(429, "Too many pictures. Send one every ~2–3 seconds.")
+        raise VisionError(429, "Too many pictures. Send one every ~3 seconds.")
     _last_call[caller] = now
 
     mime, b64 = _decode_image(image)
@@ -142,7 +154,7 @@ def look(image: str, step: dict | None = None, question: str = "", caller: str =
     except httpx.HTTPError as e:
         raise VisionError(503, f"Couldn't reach Gemini ({type(e).__name__}). Try again shortly.") from None
     if r.status_code == 429:
-        raise VisionError(429, "Gemini free-tier limit reached. Slow down the picture rate.")
+        raise VisionError(429, "Gemini rate limit reached (free tier, or billing not on yet). Slow down the picture rate.")
     if r.status_code in (500, 503):
         raise VisionError(503, "Gemini is busy right now (Google's side). Try the next picture.")
     if r.status_code >= 400:
@@ -151,43 +163,41 @@ def look(image: str, step: dict | None = None, question: str = "", caller: str =
 
 
 def _generate(body: dict) -> tuple[httpx.Response, str]:
-    """POST to Gemini, switching model if one is retired (404) or overloaded (503)."""
-    with httpx.Client(timeout=httpx.Timeout(25, connect=5)) as client:
+    """POST to Gemini. At most MAX_ATTEMPTS models per picture: if one is retired (404),
+    busy (500/503) or too slow, the next candidate is tried once. No same-model retries,
+    so a busy moment doesn't burn through the quota."""
+    with httpx.Client(timeout=httpx.Timeout(ATTEMPT_TIMEOUT, connect=5)) as client:
         model = _pick_model(client)
-        r = client.post(f"{API}/models/{model}:generateContent",
-                        headers={"x-goog-api-key": api_key()}, json=body)
-        if r.status_code == 400 and "think" in r.text.lower():
-            # this model doesn't accept the thinking setting: send it without
-            body["generationConfig"].pop("thinkingConfig", None)
-            r = client.post(f"{API}/models/{model}:generateContent",
-                            headers={"x-goog-api-key": api_key()}, json=body)
-        if r.status_code in (500, 503):  # overloaded: one quick retry, then a different flash model
-            time.sleep(0.8)
-            r = client.post(f"{API}/models/{model}:generateContent",
-                            headers={"x-goog-api-key": api_key()}, json=body)
-            if r.status_code in (500, 503):
-                alt = _other_flash(client, model)
-                if alt:
-                    model = alt
+        last_error: Exception | None = None
+        r = None
+        for attempt in range(MAX_ATTEMPTS):
+            try:
+                r = client.post(f"{API}/models/{model}:generateContent",
+                                headers={"x-goog-api-key": api_key()}, json=body)
+                if r.status_code == 400 and "think" in r.text.lower():
+                    # this model doesn't accept the thinking setting: send it without
+                    body["generationConfig"].pop("thinkingConfig", None)
                     r = client.post(f"{API}/models/{model}:generateContent",
                                     headers={"x-goog-api-key": api_key()}, json=body)
-        for _ in range(3):  # model retired / not available to this account: try another
-            if r.status_code != 404:
+                last_error = None
+            except httpx.TimeoutException as e:
+                last_error, r = e, None
+            retired = r is not None and r.status_code == 404
+            busy = r is None or r.status_code in (500, 503)
+            if not (retired or busy) or attempt == MAX_ATTEMPTS - 1:
                 break
-            _refused.add(model)
-            _model_cache.pop("model", None)
-            hint = re.search(r"use models/([a-z0-9.\-]+)", r.text)
-            model = _pick_model(client, suggested=hint.group(1) if hint else "")
-            r = client.post(f"{API}/models/{model}:generateContent",
-                            headers={"x-goog-api-key": api_key()}, json=body)
+            # move on to the next candidate (and remember a retired one for good)
+            if retired:
+                _refused.add(model)
+            hint = re.search(r"use models/([a-z0-9.\-]+)", r.text) if retired else None
+            order = [n for n in candidates(client) if n != model]
+            if not order:
+                break
+            model = hint.group(1) if hint and hint.group(1) in order else order[0]
+            _model_cache["model"] = model
+        if r is None and last_error:
+            raise last_error
     return r, model
-
-
-def _other_flash(client: httpx.Client, current: str) -> str | None:
-    names = [n for n in list_models(client) if n not in _refused and n != current]
-    flash = sorted([n for n in names if "flash" in n and not any(x in n for x in ("image", "tts", "live", "audio"))],
-                   reverse=True)
-    return flash[0] if flash else None
 
 
 def _parse(r: httpx.Response, model: str, started: float) -> dict:
