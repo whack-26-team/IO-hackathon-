@@ -132,10 +132,37 @@ def look(image: str, step: dict | None = None, question: str = "", caller: str =
                              "maxOutputTokens": 500},
     }
     started = time.monotonic()
-    with httpx.Client(timeout=20) as client:
+    try:
+        r, model = _generate(body)
+    except httpx.TimeoutException:
+        raise VisionError(504, "Gemini took too long. Try the next picture.") from None
+    except httpx.HTTPError as e:
+        raise VisionError(503, f"Couldn't reach Gemini ({type(e).__name__}). Try again shortly.") from None
+    if r.status_code == 429:
+        raise VisionError(429, "Gemini free-tier limit reached. Slow down the picture rate.")
+    if r.status_code in (500, 503):
+        raise VisionError(503, "Gemini is busy right now (Google's side). Try the next picture.")
+    if r.status_code >= 400:
+        raise VisionError(502, f"Gemini error {r.status_code}: {r.text[:300]}")
+    return _parse(r, model, started)
+
+
+def _generate(body: dict) -> tuple[httpx.Response, str]:
+    """POST to Gemini, switching model if one is retired (404) or overloaded (503)."""
+    with httpx.Client(timeout=httpx.Timeout(15, connect=5)) as client:
         model = _pick_model(client)
         r = client.post(f"{API}/models/{model}:generateContent",
                         headers={"x-goog-api-key": api_key()}, json=body)
+        if r.status_code in (500, 503):  # overloaded: one quick retry, then a different flash model
+            time.sleep(0.8)
+            r = client.post(f"{API}/models/{model}:generateContent",
+                            headers={"x-goog-api-key": api_key()}, json=body)
+            if r.status_code in (500, 503):
+                alt = _other_flash(client, model)
+                if alt:
+                    model = alt
+                    r = client.post(f"{API}/models/{model}:generateContent",
+                                    headers={"x-goog-api-key": api_key()}, json=body)
         for _ in range(3):  # model retired / not available to this account: try another
             if r.status_code != 404:
                 break
@@ -145,11 +172,17 @@ def look(image: str, step: dict | None = None, question: str = "", caller: str =
             model = _pick_model(client, suggested=hint.group(1) if hint else "")
             r = client.post(f"{API}/models/{model}:generateContent",
                             headers={"x-goog-api-key": api_key()}, json=body)
-    if r.status_code == 429:
-        raise VisionError(429, "Gemini free-tier limit reached. Slow down the picture rate.")
-    if r.status_code >= 400:
-        raise VisionError(502, f"Gemini error {r.status_code}: {r.text[:300]}")
+    return r, model
 
+
+def _other_flash(client: httpx.Client, current: str) -> str | None:
+    names = [n for n in list_models(client) if n not in _refused and n != current]
+    flash = sorted([n for n in names if "flash" in n and not any(x in n for x in ("image", "tts", "live", "audio"))],
+                   reverse=True)
+    return flash[0] if flash else None
+
+
+def _parse(r: httpx.Response, model: str, started: float) -> dict:
     try:
         text = r.json()["candidates"][0]["content"]["parts"][0]["text"]
         result = json.loads(re.sub(r"^```(?:json)?|```$", "", text.strip()).strip())
