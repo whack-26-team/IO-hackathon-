@@ -1,69 +1,51 @@
 {
   "id": "scrambled-eggs",
-  "title": "Creamy scrambled eggs",
-  "summary": "Quick, cheap and easy to overcook: perfect for a demo.",
-  "aliases": [
-    "scrambled eggs",
-    "scrambled egg",
-    "eggs",
-    "egg",
-    "eggs on toast"
-  ],
-  "source": "Starter outline written by Claude. Matthew: replace/compare with a TheMealDB import, then hand-check.",
+  "title": "Creamy scrambled eggs on toast",
+  "summary": "Five minutes, three eggs, and very easy to overcook: perfect for a demo.",
+  "aliases": ["scrambled eggs", "scrambled egg", "eggs", "egg", "eggs on toast", "breakfast eggs"],
+  "source": "Written for REMY by Claude. No timer: scrambled eggs are judged by eye (3–5 min on low, see cook-times.json). Waiting for Matthew's review.",
   "checked_by_human": false,
   "serves": 1,
+  "total_minutes": 8,
+  "equipment": ["Non-stick frying pan", "Bowl", "Fork or whisk", "Silicone spatula", "Toaster"],
+  "notes": "Runny, soft eggs are a personal choice. For anyone vulnerable (pregnant, elderly, very young, unwell), cook until firm: see food-safety.json.",
   "ingredients": [
     "3 eggs",
     "1 tbsp butter",
-    "Salt and pepper",
-    "Chives (optional)",
-    "Toast to serve"
+    "Pinch of salt and black pepper",
+    "1 slice of bread for toast (plus butter)",
+    "A few chives, snipped (optional)"
   ],
   "steps": [
     {
-      "instruction": "Crack the eggs into a bowl and whisk until smooth.",
-      "looks_right": [
-        "even yellow colour, no streaks of white"
-      ],
-      "looks_wrong": [
-        "bits of shell in the bowl",
-        "streaky whites"
-      ],
-      "done_when": "Smooth, even yellow."
+      "instruction": "Crack the eggs into a bowl, add a pinch of salt, and beat with a fork until completely smooth. Put the bread in the toaster now.",
+      "looks_right": ["an even yellow colour with no streaks of white", "a few small bubbles on top"],
+      "looks_wrong": ["bits of shell in the bowl (scoop them out with a bigger piece of shell)", "streaky, unmixed whites"],
+      "done_when": "The eggs are smooth and evenly yellow."
     },
     {
-      "instruction": "Melt the butter in a non-stick pan on LOW heat.",
-      "looks_right": [
-        "butter melting gently, light foam"
-      ],
-      "looks_wrong": [
-        "butter browning or smoking (heat too high)"
-      ],
-      "done_when": "Butter melted and foaming gently."
+      "instruction": "Melt the butter in the non-stick pan on LOW heat. Patience is the whole trick.",
+      "looks_right": ["butter melting slowly with a light foam"],
+      "looks_wrong": ["butter browning, sizzling hard or smoking (heat too high: take it off for a moment)"],
+      "done_when": "The butter has melted and is gently foaming."
     },
     {
-      "instruction": "Pour in the eggs and stir slowly and constantly with a spatula.",
-      "looks_right": [
-        "soft, small curds forming slowly",
-        "eggs still glossy"
-      ],
-      "looks_wrong": [
-        "eggs setting instantly at the edges (too hot)",
-        "big rubbery lumps",
-        "eggs browning"
-      ],
-      "done_when": "Curds forming but still a bit wet."
+      "instruction": "Pour in the eggs. Stir slowly and constantly with the spatula, sweeping from the edges to the middle.",
+      "looks_right": ["soft, small curds forming slowly", "eggs still glossy and a little wet"],
+      "looks_wrong": ["eggs setting instantly around the edges (too hot: lift the pan off the heat)", "big, rubbery lumps", "eggs turning brown"],
+      "done_when": "Soft curds have formed, but they still look a bit wet and shiny."
     },
     {
-      "instruction": "Take the pan off the heat while still slightly runny. Season and serve on toast.",
-      "looks_right": [
-        "soft, glossy, creamy curds"
-      ],
-      "looks_wrong": [
-        "dry, crumbly, rubbery eggs (overcooked)",
-        "water leaking out of the eggs"
-      ],
-      "done_when": "Off the heat while glossy. They keep cooking in the pan."
+      "instruction": "Take the pan off the heat while the eggs still look slightly underdone, because they keep cooking. Season with pepper and stir in the chives.",
+      "looks_right": ["soft, creamy, glossy curds"],
+      "looks_wrong": ["dry, crumbly or rubbery eggs (overcooked)", "water seeping out of the eggs (overcooked)"],
+      "done_when": "The pan is off the heat and the eggs are creamy and glossy."
+    },
+    {
+      "instruction": "Butter the toast and pile the eggs on top straight away.",
+      "looks_right": ["eggs sitting soft on the toast"],
+      "looks_wrong": ["eggs left in the hot pan while the toast is buttered (they go dry)"],
+      "done_when": "Served immediately."
     }
   ]
 }
