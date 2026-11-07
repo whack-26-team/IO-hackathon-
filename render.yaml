@@ -1,0 +1,24 @@
+# Render "Blueprint": a permanent https link for REMY (issue #5). Owner: Matthew.
+# How to use it: docs/DEPLOY.md. Render reads this file when you pick the repo.
+services:
+  - type: web
+    name: remy
+    runtime: python
+    plan: free                 # sleeps after ~15 min idle; first visit then takes ~1 min to wake
+    branch: main               # deploys whatever is on main, automatically after each merge
+    autoDeploy: true
+    buildCommand: pip install -r server/requirements.txt
+    startCommand: uvicorn server.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      # Secret: Render asks for it when you create the Blueprint. Never put it in this file.
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_REALTIME_MODEL
+        value: gpt-realtime    # Ahmed: change to the confirmed model name
+      - key: REMY_VOICE
+        value: marin
+      - key: SESSION_MINUTES
+        value: "10"
