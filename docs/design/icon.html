@@ -1,0 +1,35 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+body { margin:0; padding:24px; background:#2b2b2b; font-family: sans-serif; color:#eee; display:flex; gap:28px; }
+.icon { width:512px; height:512px; display:grid; place-items:center; }
+.icon svg { width:400px; height:auto; margin-top:16px; }
+.opt p { text-align:center; font-size:20px; }
+/* preview: as iOS shows it (rounded, small) */
+.small .icon { transform: scale(.35); transform-origin: top left; border-radius: 115px; }
+</style></head><body><svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <g id="head">
+        <path d="M24 44 C16 44 12 36 18 30 C16 20 28 14 36 20 C40 10 60 10 64 20 C72 14 84 20 82 30 C88 36 84 44 76 44 Z" fill="#fff" stroke="#1a1a1a" stroke-width="3.5" stroke-linejoin="round"/>
+        <rect x="24" y="40" width="52" height="10" rx="2" fill="#e8432c" stroke="#1a1a1a" stroke-width="3.5"/>
+        <path d="M20 58 C20 48 30 48 50 48 C70 48 80 48 80 58 L80 70 C80 88 66 98 50 98 C34 98 20 88 20 70 Z" fill="#ffd9a8" stroke="#1a1a1a" stroke-width="3.5"/>
+        <path d="M44 77 C46 81 54 81 56 77" fill="none" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="30" cy="80" r="4" fill="#f5a37a" opacity=".7"/><circle cx="70" cy="80" r="4" fill="#f5a37a" opacity=".7"/>
+      </g>
+      <g id="f-watch"><use href="#head"/><path d="M30 63 Q37 59 44 63" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M56 63 Q63 59 70 63" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><circle cx="38" cy="71" r="3.5" fill="#1a1a1a"/><circle cx="62" cy="71" r="3.5" fill="#1a1a1a"/><path d="M42 87 C46 90 54 90 58 87" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/></g>
+      <g id="f-sus"><use href="#head"/><path d="M30 66 L44 66" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/><path d="M56 61 Q63 56 70 60" fill="none" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/><path d="M33 72 L43 72" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><circle cx="62" cy="72" r="3.5" fill="#1a1a1a"/><path d="M42 88 L58 86" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/></g>
+      <g id="f-fury"><use href="#head"/><path d="M27 60 L44 67" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round"/><path d="M73 60 L56 67" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round"/><circle cx="38" cy="73" r="3.5" fill="#1a1a1a"/><circle cx="62" cy="73" r="3.5" fill="#1a1a1a"/><path d="M38 90 Q50 80 62 90 Q50 96 38 90 Z" fill="#1a1a1a"/></g>
+      <g id="f-proud"><use href="#head"/><path d="M30 62 Q37 58 44 62" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M56 62 Q63 58 70 62" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M33 73 Q38 68 43 73" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M57 73 Q62 68 67 73" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M38 84 Q50 96 62 84 Z" fill="#fff" stroke="#1a1a1a" stroke-width="3"/></g>
+
+      <!-- accessories: a halo for Gentle, steam from the ears for Savage -->
+      <g id="acc-halo"><ellipse cx="50" cy="2" rx="26" ry="7" fill="none" stroke="#1a1a1a" stroke-width="7"/><ellipse cx="50" cy="2" rx="26" ry="7" fill="none" stroke="#ffd166" stroke-width="3.5"/></g>
+      <g id="acc-steam">
+        <!-- cartoon steam: puffs grow as they blow out of each ear, plus little speed lines -->
+        <g fill="#1a1a1a" stroke="#1a1a1a" stroke-width="7"><circle cx="17" cy="73" r="4.5"/><circle cx="9" cy="64" r="6"/><circle cx="13" cy="59" r="5"/><circle cx="-2" cy="50" r="8"/><circle cx="-10" cy="43" r="7.5"/><circle cx="2" cy="40" r="7"/><circle cx="-6" cy="33" r="6"/></g><g fill="#fff"><circle cx="17" cy="73" r="4.5"/><circle cx="9" cy="64" r="6"/><circle cx="13" cy="59" r="5"/><circle cx="-2" cy="50" r="8"/><circle cx="-10" cy="43" r="7.5"/><circle cx="2" cy="40" r="7"/><circle cx="-6" cy="33" r="6"/></g><g fill="#1a1a1a" stroke="#1a1a1a" stroke-width="7"><circle cx="83" cy="73" r="4.5"/><circle cx="91" cy="64" r="6"/><circle cx="87" cy="59" r="5"/><circle cx="102" cy="50" r="8"/><circle cx="110" cy="43" r="7.5"/><circle cx="98" cy="40" r="7"/><circle cx="106" cy="33" r="6"/></g><g fill="#fff"><circle cx="83" cy="73" r="4.5"/><circle cx="91" cy="64" r="6"/><circle cx="87" cy="59" r="5"/><circle cx="102" cy="50" r="8"/><circle cx="110" cy="43" r="7.5"/><circle cx="98" cy="40" r="7"/><circle cx="106" cy="33" r="6"/></g>
+        <g stroke="#1a1a1a" stroke-width="3" stroke-linecap="round" fill="none"><path d="M-16 56 L-22 58"/><path d="M-18 46 L-25 46"/><path d="M116 56 L122 58"/><path d="M118 46 L125 46"/></g>
+      </g>
+      <g id="acc-flush"><!-- angry red flush over the face --><path d="M22 60 C22 52 32 52 50 52 C68 52 78 52 78 60 L78 70 C78 86 65 96 50 96 C35 96 22 86 22 70 Z" fill="#e8432c" opacity=".28"/></g>
+      <g id="f-gentle"><use href="#f-proud"/><use href="#acc-halo"/></g>
+      <g id="f-savage"><use href="#acc-steam"/><use href="#f-fury"/></g>
+      <!-- alarmed: no comedy, wide eyes, flat mouth (safety alerts only) -->
+      <g id="f-alarm"><use href="#head"/><path d="M29 59 Q37 55 45 60" fill="none" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/><path d="M55 60 Q63 55 71 59" fill="none" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/><circle cx="38" cy="71" r="5.5" fill="#fff" stroke="#1a1a1a" stroke-width="3"/><circle cx="62" cy="71" r="5.5" fill="#fff" stroke="#1a1a1a" stroke-width="3"/><circle cx="38" cy="71" r="2.2" fill="#1a1a1a"/><circle cx="62" cy="71" r="2.2" fill="#1a1a1a"/><ellipse cx="50" cy="89" rx="6" ry="4.5" fill="#1a1a1a"/></g>
+    </defs>
+  </svg><div class="opt"><div class="icon" id="icon-cream" style="background:#fff4e0"><svg viewBox="2 2 96 104"><use href="#f-watch"/></svg></div><p>cream</p></div><div class="opt"><div class="icon" id="icon-butter" style="background:#ffd166"><svg viewBox="2 2 96 104"><use href="#f-watch"/></svg></div><p>butter</p></div><div class="opt"><div class="icon" id="icon-tomato" style="background:#e8432c"><svg viewBox="2 2 96 104"><use href="#f-watch"/></svg></div><p>tomato</p></div><div class="opt"><div class="icon" id="icon-sky" style="background:#c9e2f6"><svg viewBox="2 2 96 104"><use href="#f-watch"/></svg></div><p>sky</p></div></body></html>
