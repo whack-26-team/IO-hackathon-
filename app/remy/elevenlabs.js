@@ -16,7 +16,7 @@ export const AGENT_ID = urlAgent && /^agent_[a-z0-9]{10,60}$/i.test(urlAgent) ? 
 export const FIRST_MESSAGES = {
   gentle: "Hey, I'm Remy. What are we making today?",
   honest: "Hey, I'm Remy. What are we cooking today?",
-  savage: "I'm Remy. What are we cooking? If it's another sad salad, I've seen more ambition in a damp tea towel.",
+  savage: "I'm Remy. What are we cooking? Please don't say sad salad. That bowl has less ambition than a damp tea towel. Show me the ingredients, chef.",
   lesson: "Hey, I'm Remy. What technique are we practising today?",
 };
 

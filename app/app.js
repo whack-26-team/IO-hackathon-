@@ -18,7 +18,8 @@ import { waitForVoice } from "./review-flow.js";
 loadAllergens();
 
 const $ = (id) => document.getElementById(id);
-const state = { recipe: null, mode: "honest", remy: null, stream: null, cooking: false, live: false, preRecipeId: null };
+const state = { recipe: null, mode: "honest", remy: null, stream: null, cooking: false, live: false, preRecipeId: null,
+  reviewSpeaking: false, reviewHeld: false };
 
 // ---------- events for extras (app/extras/, Felix) ----------
 const bus = {};
@@ -142,6 +143,7 @@ $("start-btn").addEventListener("click", async () => {
   resetStats();
   state.cooking = true;
   state.lastStatus = null;
+  state.reviewSpeaking = false; state.reviewHeld = false;
 
   $("start-screen").classList.add("hidden");
   $("cook-screen").classList.remove("hidden");
@@ -214,12 +216,23 @@ $("stop-btn").addEventListener("click", () => stopCooking());
 async function stopCooking(expectReply = false) {
   if (!state.cooking) return; // Remy's "stopped" status can call this too; only run once
   state.cooking = false;
-  clearTimeout(state.finishing); state.finishing = null;
   const remy = state.remy, wasLive = state.live;
-  // Automatic completion can fire before Remy's last sentence starts. Wait for that sentence
-  // and then for the goodbye before replacing the cook screen with the review.
-  if (wasLive && remy) await waitForVoice(remy, state.lastStatus?.status, expectReply);
   remy?.send("ending"); // stop fresh camera prompts while Remy says his final line
+  state.stream?.getVideoTracks().forEach((t) => t.stop());
+  timers.clearAll();
+  $("idle-banner").classList.add("hidden");
+  $("paused").classList.add("hidden"); state.paused = false;
+  clearTimeout(showBubble.t);
+  pendingRoast = null;
+  hideAlert();
+  quietRemy();
+  $("cook-screen").classList.add("hidden");
+  document.documentElement.dataset.mode = state.mode;
+  state.reviewSpeaking = true;
+  showGoodbye(); // review appears at the end event, while the final voice turn finishes
+  fire("stop", {});
+  // Automatic completion can fire before Remy's last sentence starts.
+  if (wasLive && remy) await waitForVoice(remy, state.lastStatus?.status, expectReply);
   const bye = goodbyeFor();
   // send() returns false if real Remy isn't connected: the phone says the line instead.
   if (wasLive && remy && remy.send("goodbye", { text: bye.text }) === true) {
@@ -230,17 +243,9 @@ async function stopCooking(expectReply = false) {
   }
   remy?.stop(); state.remy = null;
   state.stream?.getTracks().forEach((t) => t.stop());
-  timers.clearAll();
-  $("idle-banner").classList.add("hidden");
-  $("paused").classList.add("hidden"); state.paused = false;
-  clearTimeout(showBubble.t);
-  pendingRoast = null; // first, so hiding the alert doesn't show a held-back roast after Stop
-  hideAlert();
-  quietRemy();
-  $("cook-screen").classList.add("hidden");
-  document.documentElement.dataset.mode = state.mode; // the attitude's page colour behind the goodbye
-  showGoodbye();
-  fire("stop", {});
+  state.reviewSpeaking = false;
+  $("goodbye-hint").textContent = "Back to the start in a moment · tap to skip";
+  if (!state.reviewHeld) showGoodbye.t = setTimeout(backToStart, GOODBYE_MS);
 }
 
 // Remy signs off in his attitude's voice, then the start screen comes back by itself.
@@ -292,9 +297,10 @@ function showGoodbye() {
   $("goodbye").classList.remove("hidden");
   if (!calm()) starPops(summary.stars);
   clearTimeout(showGoodbye.t);
-  showGoodbye.t = setTimeout(backToStart, GOODBYE_MS);
+  $("goodbye-hint").textContent = "Remy is finishing…";
 }
 function backToStart() {
+  if (state.reviewSpeaking) return;
   clearTimeout(showGoodbye.t);
   state.stream?.getTracks().forEach((t) => t.stop());
   $("goodbye").classList.add("hidden");
@@ -380,8 +386,11 @@ function wireRemy(remy) {
     if (state.mode !== "lesson") { state.mode = "lesson"; $("mode-badge").classList.add("hidden"); remy.send("mode_changed", { mode: "lesson" }); }
   } });
   // Cooking school: Remy's technique score becomes the session score
-  remy.on("lesson_score", (d) => { if (!state.finishing) state.finishing = setTimeout(() => { state.finishing = null; stopCooking(true); }, 1200);
-    stats.lessonScore = d.score; stats.lessonComment = d.comment; showBubble({ text: `${history.starText(d.score)} ${d.comment}`, severity: "info" }); });
+  remy.on("lesson_score", (d) => {
+    stats.lessonScore = d.score; stats.lessonComment = d.comment;
+    showBubble({ text: `${history.starText(d.score)} ${d.comment}`, severity: "info" });
+    stopCooking(true);
+  });
   // "Clear the recipe": take it off the screen (timers keep running)
   remy.on("recipe_clear", () => { state.recipe = null; showRecipe(null); });
   remy.on("tip", (d) => showBubble(d));
@@ -390,13 +399,11 @@ function wireRemy(remy) {
   remy.on("step", (d) => {
     if (d.step_complete) stats.stepsDone = Math.max(stats.stepsDone, (d.current_step ?? 0) + 1);
     // Recipe finished (last step done, by Remy or by voice): end the session and show the review page.
-    // A short pause lets Remy finish his line. Lessons wait for Remy's score instead (lesson_score).
+    // Lessons wait for Remy's score instead (lesson_score).
     const steps = state.recipe?.steps?.length || 0;
-    if (d.step_complete && steps && stats.stepsDone >= steps && !state.recipe?.lesson && !state.finishing) {
-      state.finishing = setTimeout(() => { state.finishing = null; stopCooking(true); }, 1200);
-    }
     renderSteps(d.current_step, d.step_complete);
     if (d.next_instruction) showBubble({ text: d.next_instruction, severity: "info" });
+    if (d.step_complete && steps && stats.stepsDone >= steps && !state.recipe?.lesson) stopCooking(true);
   });
   remy.on("timer_start", (d) => {
     stats.timers.add(d.id);
@@ -411,8 +418,7 @@ function wireRemy(remy) {
   // +/- time, or { to } = set what's left (e.g. "make the pasta timer 8 minutes")
   remy.on("timer_adjust", (d) => timers.adjust(d.id, d.to != null ? d.to - (timers.remaining(d.id)?.left ?? 0) : d.seconds));
   remy.on("command", (d) => {
-    // The voice finishes its response and sign-off before the review replaces this screen.
-    if (d.name === "end_session") { setTimeout(() => stopCooking(true), 700); return; }
+    if (d.name === "end_session") { stopCooking(true); return; }
     if (d.name === "repeat" && d.text) showBubble({ text: d.text, severity: "info" });
     if (d.name === "time_left") {
       const r = timers.remaining(d.id);
@@ -701,7 +707,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
       `camera   ${state.cameraInfo ? `${state.cameraInfo.label} ${state.cameraInfo.width}x${state.cameraInfo.height} zoom ${state.cameraInfo.zoom} (${state.cameraInfo.tried})${state.cameraInfo.zoomed ? " zoomed to 1x" : ""}${state.cameraInfo.retried ? " RETRIED (was black)" : ""} track ${state.stream?.getVideoTracks()[0]?.readyState || "-"}` : "not started"}`,
-      `version  v137`,
+      `version  v138`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
@@ -739,7 +745,7 @@ const remyApp = {
     return sheet;
   },
   closeSheet() { $("slot-sheets").replaceChildren(); },
-  keepGoodbye() { clearTimeout(showGoodbye.t); },   // stop the goodbye screen returning to start by itself (e.g. while sharing)
+  keepGoodbye() { state.reviewHeld = true; clearTimeout(showGoodbye.t); },   // keep review open while sharing
   backToStart: () => backToStart(),
   history,
   get mode() { return state.mode; },
