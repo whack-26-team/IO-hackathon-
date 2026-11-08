@@ -50,14 +50,27 @@ Reply with JSON only, in exactly this shape:
                "detail": "what you see", "confidence": 0.0-1.0}}],
   "safety": "" or "IMMEDIATE danger you can see: flames or fire, blade edge visibly touching fingertips, fingertips clearly ahead of or under the cutting edge, a hand crossing the blade, child near the hob, raw meat touching ready-to-eat food",
   "step_done": true/false/null,          // does the photo show this step's done_when? null if unsure
-  "answer": "" or "answer to Remy's question, based only on the photo"
+  "answer": "" or "answer to Remy's question, based only on the photo",
+  "packet": null or {{"shape": "pasta shape printed on a visible packet, e.g. penne", "minutes": cooking minutes printed on it or null}}
 }}
 Smoke or steam from a pan is never a safety item: report very heavy smoke as a "too_hot" issue instead.
 For a knife, flag visible cutting-edge contact with fingertips or fingers in its path immediately;
 do not wait to see blood or an injury. In a claw grip the knife normally passes close to tucked
 guiding knuckles. Do not flag proximity alone.
 If the hand or blade path is unclear from this photo, leave safety empty and report uncertainty.
-Use confidence below 0.6 when unsure (shadows, steam vs smoke, blur). Empty lists are fine."""
+Use confidence below 0.6 when unsure (shadows, steam vs smoke, blur). Empty lists are fine.
+Only fill "packet" if a pasta packet is visible and you can actually read the shape (and the time, if printed)."""
+
+
+def _packet(p) -> dict | None:
+    """A readable pasta packet: {shape, minutes|None}, else None."""
+    if not isinstance(p, dict) or not str(p.get("shape") or "").strip():
+        return None
+    try:
+        minutes = float(p.get("minutes")) if p.get("minutes") is not None else None
+    except (TypeError, ValueError):
+        minutes = None
+    return {"shape": str(p["shape"]).strip().lower()[:40], "minutes": minutes if minutes and 1 <= minutes <= 30 else None}
 
 
 def api_key() -> str:
@@ -231,6 +244,7 @@ def _parse(r: httpx.Response, model: str, started: float) -> dict:
         "safety": str(result.get("safety", ""))[:200],
         "step_done": result.get("step_done") if result.get("step_done") in (True, False) else None,
         "answer": str(result.get("answer", ""))[:300],
+        "packet": _packet(result.get("packet")),
         "model": model,
         "ms": int((time.monotonic() - started) * 1000),
         "at": time.time(),

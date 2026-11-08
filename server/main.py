@@ -114,6 +114,11 @@ SWAP_RULE = """# MISSING AN INGREDIENT
 Suggest one sensible swap. If it changes the recipe, call create_recipe with the adapted recipe
 (same steps and timers where they still apply) so the screen shows it."""
 
+PASTA_RULE = """# PASTA
+Any dish with pasta: find out the shape before the pasta timer. First check the camera notes for a
+[PASTA PACKET SEEN]; if there is one, offer your guess ("Looks like penne, 11 minutes on the packet,
+right?"). If you can't see a packet, ask them to show it or tell you the pasta. The packet time wins."""
+
 NAME_RULE = """# YOUR NAME
 When the cook only says "Remy" or "Hey Remy", reply exactly "Yes, chef?" and wait.
 If they include a request after your name, answer the request directly. Never answer your
@@ -182,6 +187,7 @@ def build_instructions(recipe: dict | None, mode: str, lite: bool = False, profi
         core,
         f"# {'LESSON COACH' if is_lesson else 'PERSONALITY MODE: ' + mode.upper()}\n{personality}",
         NAME_RULE,
+        PASTA_RULE,
         *([lesson_rule(recipe)] if recipe and recipe.get("lesson") else []),
         SWAP_RULE,
         *([profile_line(profile)] if profile_line(profile) else []),
