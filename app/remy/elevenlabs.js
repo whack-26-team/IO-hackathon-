@@ -185,6 +185,13 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', profile =
             if (started?.seconds) speak(`[TIMER STARTED BY APP] The cook said it's in and the countdown is running. Announce it now, once, out loud: "${started.announce}" Do not call start_timer for it.`, false, true);
             lastUserAt = now();
             emit('heard', { text: message });   // the cook spoke (the app's idle hang-up listens for this)
+            // the cook named one of our dishes and nothing is loaded: the app loads it and tells Remy
+            if (!started) actions.autoRecipe(message).then((auto) => { if (auto?.note && run === generation && alive()) speak(auto.note, false, true); });
+          }
+          // Remy answered a camera mistake in words only: show it as a roast anyway (Gentle: a tip)
+          if (source === 'ai' && message) {
+            const unhandled = actions.takeUnhandledCamera?.();
+            if (unhandled) emit(mode === 'gentle' ? 'tip' : 'roast', mode === 'gentle' ? { text: message, severity: 'warning' } : { text: message, level: 1, mistake: unhandled.type });
           }
           onTranscript({ source, message });
         },

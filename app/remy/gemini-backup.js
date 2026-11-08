@@ -122,7 +122,9 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', profile = nul
     if (started?.command) notes.push(`[APP HANDLED: ${started.command}] ${started.note} Acknowledge in five words or fewer; don't repeat it.`);
     if (started?.cleared) notes.push('[RECIPE CLEARED BY APP] The cook asked to clear the recipe; it is gone from the screen. Confirm briefly and ask what they want to cook next.');
     if (started?.seconds) notes.push(`[TIMER STARTED BY APP] ${started.label}, ${started.seconds / 60} minutes. Announce it once: "${started.announce}" Do not call start_timer for it.`);
-    turn(text);
+    if (started) { turn(text); return; }
+    // the cook named one of our dishes? load it before Remy answers
+    actions.autoRecipe(text).then((auto) => { if (auto?.note) notes.push(auto.note); turn(text); });
   }
 
   // ---------- one Remy reply ----------
@@ -144,6 +146,9 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', profile = nul
       if (data.say) history.push({ role: 'remy', text: data.say });
       const results = [];
       for (const a of data.actions || []) results.push({ action: a.name, result: await actions.call(a.name, a.args || {}) });
+      // The camera caught a mistake and Remy only talked: show his words as a roast anyway (Gentle: a tip)
+      const unhandled = /\[CAMERA EVENT\]/.test(extraNote) && !results.some(x => ['roast', 'show_tip', 'safety_alert'].includes(x.action)) ? actions.takeUnhandledCamera() : null;
+      if (unhandled && data.say) emit(mode === 'gentle' ? 'tip' : 'roast', mode === 'gentle' ? { text: data.say, severity: 'warning' } : { text: data.say, level: 1, mistake: unhandled.type });
       await say(data.say);
       // Recipe lookups / refused actions: let Remy react to the result (max two follow-ups)
       const needsFollowUp = results.some(x => ['find_recipe', 'create_recipe'].includes(x.action) || x.result?.ok === false);

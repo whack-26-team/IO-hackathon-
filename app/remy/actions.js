@@ -159,6 +159,27 @@ export function createActions({ emit, request, alive, now = Date.now }) {
     emit('command', { name: 'end_session' });
     return { command: 'end session', note: 'The cook ended the session; the app is saying goodbye.' };
   }
+  // The AI often answers "cereal? lovely" without calling find_recipe, so nothing loads and the camera
+  // can't judge the steps. When no recipe is loaded and the cook's words match one of OUR recipes, the
+  // app loads it itself and returns a note telling Remy to start on it.
+  const triedDish = new Set();
+  async function autoRecipe(text) {
+    const t = String(text || '').replace(NAME, '').trim();
+    if (recipe || !t || t.split(/\s+/).length > 14 || triedDish.has(t.toLowerCase())) return null;
+    triedDish.add(t.toLowerCase());
+    try {
+      const data = await request(`/api/recipes/find?q=${encodeURIComponent(t)}`);
+      if (!alive() || recipe) return null;
+      if (data?.found && data.recipe?.steps?.length) {
+        setRecipe(data);
+        return { title: data.recipe.title, note: `[APP LOADED RECIPE: ${data.recipe.title}] The cook asked for it and it's on the screen now. Confirm it in one line, name the ingredients briefly, then give step 1. Don't call find_recipe for it.` };
+      }
+      if (data?.ask) return { note: `[APP] ${data.message}` };
+    } catch { /* offline: Remy can still call find_recipe */ }
+    return null;
+  }
+  // A camera mistake Remy hasn't reacted to with show_tip / roast / safety_alert yet
+  let cameraIssue = null;
   function hear(text) {
     heard = (heard + ' ' + text).slice(-600);
     const end = endSession(text);
@@ -208,6 +229,7 @@ export function createActions({ emit, request, alive, now = Date.now }) {
     emit('recipe', { recipe, source: data.source || 'remy', checked_by_human: !!data.checked_by_human });
   }
   async function call(name, args) {
+    if (['roast', 'show_tip', 'safety_alert'].includes(name)) cameraIssue = null;
     if (!alive()) return { ok: false, message: 'Session ended; action not applied.' };
     const schema = schemas.get(name);
     if (!schema || !validate(schema, args)) return { ok: false, message: 'Unknown action or invalid arguments. Use the supplied action schema.' };
@@ -276,7 +298,10 @@ export function createActions({ emit, request, alive, now = Date.now }) {
     } catch (error) { return { ok: false, message: error.message }; }
   }
   return {
-    call, hear,
+    call, hear, autoRecipe,
+    cameraEvent(issue) { cameraIssue = { issue, at: now() }; },
+    // The camera saw a mistake and Remy answered without a roast/tip: returns the issue once (then forgets it)
+    takeUnhandledCamera(maxAge = 20000) { const c = cameraIssue; cameraIssue = null; return c && now() - c.at < maxAge ? c.issue : null; },
     configure(brain) { schemas = new Map(brain.tools.map(t => [t.name, t.parameters])); if (brain.recipe) setRecipe({ recipe: brain.recipe, checked_by_human: brain.recipe.checked_by_human }); },
     snapshot() { return { recipe, current_step: step, timers: [...timers.values()] }; },
     currentStep() { return recipe?.steps[step] || null; },
