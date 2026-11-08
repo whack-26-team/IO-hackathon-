@@ -438,3 +438,12 @@ html[data-mode="gentle"] .score-card { background: #f4f9fe; }
   #start-screen.mode-savage .hero-face, #start-screen.mode-savage #start-btn { animation: none; }
   #start-screen.mode-savage > .embers { display: none; }
 }
+
+/* Cooking screen polish: Remy blinks and gently bobs while quiet; the collapsed recipe panel shows the current step */
+.cook-face .blinker { display: none; }
+.cook-face.blink .blinker { display: inline; }
+.speech.quiet .cook-face { animation: idle 3.5s ease-in-out infinite; }
+.current-step-text { flex: 1 1 100%; font-weight: 700; font-size: 15.5px; line-height: 1.3; color: var(--cream); }
+.recipe[open] .current-step-text { display: none; }
+.recipe:not([open]) { max-height: none; }
+.recipe:not([open]) > summary { box-shadow: none; }

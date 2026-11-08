@@ -89,17 +89,26 @@ document.querySelectorAll('input[name="mode"]').forEach((el) =>
   el.addEventListener("change", () => {
     if (!el.checked) return;
     applyMode(el.value);
-    if (el.value === "savage") $("age-dialog").classList.remove("hidden");
+    history.saveSettings({ mode: el.value });                       // remembered for next time
+    // 18+ asked once per phone: after a "yes" it doesn't ask again
+    if (el.value === "savage" && !history.settings().ageOk) $("age-dialog").classList.remove("hidden");
   })
 );
-$("age-yes").addEventListener("click", () => $("age-dialog").classList.add("hidden"));
+$("age-yes").addEventListener("click", () => { history.saveSettings({ ageOk: true }); $("age-dialog").classList.add("hidden"); });
 $("age-no").addEventListener("click", () => {
   document.querySelector('input[value="honest"]').checked = true;
   applyMode("honest");
+  history.saveSettings({ mode: "honest" });
   $("age-dialog").classList.add("hidden");
 });
 $("safety-link").addEventListener("click", () => $("safety-dialog").classList.remove("hidden"));
 $("safety-ok").addEventListener("click", () => $("safety-dialog").classList.add("hidden"));
+// Start on the attitude used last time (Savage only if the 18+ "yes" was given on this phone)
+(function restoreMode() {
+  const st = history.settings();
+  const m = MODE_NAMES[st.mode] && (st.mode !== "savage" || st.ageOk) ? st.mode : null;
+  if (m) { const input = document.querySelector(`input[name="mode"][value="${m}"]`); if (input) input.checked = true; }
+})();
 applyMode(checkedMode()); // the browser may remember the last choice after a reload
 initSetupGuide();
 
@@ -148,6 +157,7 @@ $("start-btn").addEventListener("click", async () => {
   const useMock = $("use-mock").checked;
   state.live = !useMock && !useDemo; // real Remy speaks timer reminders himself (see the timers' sound below)
   const factory = useDemo ? createDemoRemy : useMock ? createMockRemy : createLiveRemy;
+  state.voice = useMock || useDemo ? "pretend" : null;   // real Remy reports live/backup itself
   // A recipe picked before Start (extras): load it so Remy starts on it
   let preRecipe = null;
   if (preRecipeId) {
@@ -309,6 +319,7 @@ function renderRecap() {
 function wireRemy(remy) {
   for (const type of ["status", "recipe", "recipe_clear", "timer_adjust", "command", "lesson_score", "tip", "roast", "alert", "step", "timer_start", "timer_cancel"]) remy.on(type, (d) => fire(type, d));
   remy.on("status", setStatus);
+  remy.on("voice", (d) => setVoice(d.kind));   // live.js: ElevenLabs or the backup voice
   remy.on("recipe", (d) => { showRecipe(d); stats.recipe = d.recipe?.title || stats.recipe; if (d.recipe?.lesson) stats.lesson = d.recipe.id; });
   // Cooking school: Remy's technique score becomes the session score
   remy.on("lesson_score", (d) => { stats.lessonScore = d.score; stats.lessonComment = d.comment; showBubble({ text: `🎓 ${d.score}/10. ${d.comment}`, severity: "info" }); });
@@ -345,10 +356,17 @@ function wireRemy(remy) {
 
 // ---------- status pill + "Remy is speaking" ----------
 
+// Which voice is running, shown after the status: live (ElevenLabs), backup (phone + Gemini), pretend
+const VOICE_LABEL = { live: "live voice", backup: "backup voice", pretend: "pretend" };
+function setVoice(kind) { state.voice = kind; setStatus(state.lastStatus || { status: "connecting" }); }
 function setStatus({ status, message }) {
+  state.lastStatus = { status, message };
   const pill = $("status");
   pill.className = `chip status ${status}`;  // keep the chip look
-  $("status-text").textContent = status === "remy-speaking" ? "Remy is speaking" : (message || status);
+  let text = status === "remy-speaking" ? "Remy is speaking" : (message || status);
+  text = text.replace(/\s*\((backup voice|pretend Remy)\)/i, "");   // said once, below
+  const v = VOICE_LABEL[state.voice];
+  $("status-text").textContent = v && status !== "error" && status !== "stopped" ? `${text} · ${v}` : text;
   if (status === "stopped") stopCooking();
 }
 
@@ -497,7 +515,10 @@ function renderIngredients() {
     if (flagged.has(n)) li.classList.add("flagged");
     ing.appendChild(li);
   });
-  if (reasons.length) document.querySelector("#recipe-panel .ingredients")?.setAttribute("open", "");
+  if (reasons.length) {   // allergy/diet clash: open the panel so the warning is seen
+    document.querySelector("#recipe-panel .ingredients")?.setAttribute("open", "");
+    $("recipe-panel").setAttribute("open", "");
+  }
 }
 
 // "Serves 2 − +": amounts on screen change, cooking times don't. Remy gets one short note.
@@ -533,6 +554,8 @@ function renderSteps(current = 0, currentDone = false) {
     list.appendChild(li);
   });
   $("step-summary").textContent = now >= steps.length ? "All done 🎉" : `Step ${now + 1} of ${steps.length}`;
+  // collapsed panel: just the step you're on (tap the panel to see everything)
+  $("current-step-text").textContent = now < steps.length ? steps[now].instruction : "Plate it up!";
   // keep the current step visible in the scrolling list
   list.querySelector(".current")?.scrollIntoView({ block: "nearest", behavior: "smooth" });
 }
@@ -605,7 +628,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v109`,
+      `version  v110`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
@@ -675,4 +698,16 @@ document.querySelectorAll('input[name="mode"]').forEach((el) => el.addEventListe
     e.style.animationDelay = `${-Math.random() * 10}s`;
     box.append(e);
   }
+})();
+
+// Cooking screen: Remy blinks now and then while he's quiet (same as the start screen)
+(function cookBlink() {
+  setTimeout(() => {
+    const face = $("cook-face");
+    const id = face.querySelector("use").getAttribute("href");
+    if (state.cooking && !matchMedia("(prefers-reduced-motion: reduce)").matches && (id === "#f-watch" || id === "#f-sus")) {
+      face.classList.add("blink"); setTimeout(() => face.classList.remove("blink"), 140);
+    }
+    cookBlink();
+  }, 2500 + Math.random() * 2500);
 })();
