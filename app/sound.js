@@ -23,8 +23,8 @@ export function unlockSound() {
 // While Remy's voice call uses the mic, iPhones often pause or quieten Web Audio, so the alert beeps
 // went silent. An <audio> clip (made here, no file to download) still plays; it's unlocked in the Start tap.
 let alarm = null;
-function alarmClip() {
-  const rate = 22050, pattern = [[440, 0.14], [880, 0.14], [440, 0.14], [880, 0.14], [440, 0.14], [880, 0.14], [440, 0.14], [880, 0.14]];
+function alarmClip(silent = false) {
+  const rate = 22050, pattern = silent ? [[0, 0.3]] : [[440, 0.14], [880, 0.14], [440, 0.14], [880, 0.14], [440, 0.14], [880, 0.14], [440, 0.14], [880, 0.14]];
   const total = Math.round(rate * pattern.reduce((s, [, d]) => s + d + 0.02, 0));
   const data = new Int16Array(total); let i = 0;
   for (const [f, d] of pattern) {
@@ -39,15 +39,26 @@ function alarmClip() {
   w(36, "data"); v.setUint32(40, data.length * 2, true); new Int16Array(buf, 44).set(data);
   return URL.createObjectURL(new Blob([buf], { type: "audio/wav" }));
 }
-function primeAlarm() {
+// iPhones don't count a MUTED play as permission (muted playback is always allowed), so the alarm
+// was still blocked later. Instead a short SILENT clip plays with sound on inside the tap; that player
+// is then allowed to play the alarm when an alert comes.
+let alarmSrc = null, silentSrc = null;
+export const alarmStatus = { primed: "no", last: "never played" };   // shown on ?debug=1 and /check
+export function primeAlarm() {
   try {
-    if (!alarm) { alarm = new Audio(alarmClip()); alarm.preload = "auto"; alarm.setAttribute("playsinline", ""); }
-    alarm.muted = true;
-    alarm.play().then(() => { alarm.pause(); alarm.currentTime = 0; alarm.muted = false; }).catch(() => { alarm.muted = false; });
-  } catch { /* no audio on this phone */ }
+    alarmSrc ||= alarmClip(); silentSrc ||= alarmClip(true);
+    if (!alarm) { alarm = new Audio(); alarm.preload = "auto"; alarm.setAttribute("playsinline", ""); }
+    alarm.muted = false; alarm.src = silentSrc;
+    alarm.play().then(() => { alarmStatus.primed = "yes"; }).catch((e) => { alarmStatus.primed = `blocked (${e?.name || e})`; });
+  } catch (e) { alarmStatus.primed = `error (${e?.name || e})`; }
 }
-function playAlarm() {
-  try { if (alarm) { alarm.muted = false; alarm.currentTime = 0; alarm.volume = 1; alarm.play().catch(() => {}); } } catch { /* fine */ }
+export function playAlarm() {
+  try {
+    if (!alarm) { alarmStatus.last = "not primed (tap Start first)"; return; }
+    alarm.muted = false; alarm.src = alarmSrc; alarm.currentTime = 0;
+    alarm.play().then(() => { alarmStatus.last = `played ${new Date().toLocaleTimeString()}`; })
+      .catch((e) => { alarmStatus.last = `blocked (${e?.name || e})`; });
+  } catch (e) { alarmStatus.last = `error (${e?.name || e})`; }
 }
 
 // iPhones only let a page speak if the first spoken line starts inside a tap. Remy's first line
@@ -132,3 +143,5 @@ export function beep(kind) {
 
 // Goodbye card: one pop per filled star, timed with the stars popping in (higher pitch each time)
 export function starPops(n) { for (let i = 1; i <= n; i++) pop(0.15 + i * 0.12, 480 + i * 70); }
+
+export const soundState = () => (ctx ? ctx.state : "not started");

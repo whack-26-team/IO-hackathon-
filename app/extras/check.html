@@ -47,6 +47,8 @@
   <h2>On this phone (tap each)</h2>
   <div class="row wait" id="row-cam"><span class="dot"></span><div><b>Camera &amp; microphone</b><small>Tap test, then talk: the bar should move.</small>
     <button id="btn-cam">Test camera &amp; mic</button><video id="video" playsinline muted autoplay></video><div class="meter" id="meter"><i></i></div></div></div>
+  <div class="row wait" id="row-alarm"><span class="dot"></span><div><b>Safety alarm (like during cooking)</b><small>Turns the mic on like Remy does, then plays the alarm 2 seconds later. Silent switch off, volume up.</small>
+    <button id="btn-alarm">Test alarm</button></div></div>
   <div class="row wait" id="row-sound"><span class="dot"></span><div><b>Speaker</b><small>You should hear a ding, then the phone saying "Remy check". Silent switch off!</small>
     <button id="btn-sound">Play sound</button></div></div>
   <div class="row wait" id="row-hear"><span class="dot"></span><div><b>Remy can hear you (backup voice)</b><small>Tap, then say "Hello Remy". Uses the iPhone's speech recognition (needs Dictation on).</small>
@@ -145,6 +147,23 @@
       };
       tick(); set(r, "warn", `${camNote}. Say something to check the mic…`);
     } catch (e) { set(r, "bad", `Blocked (${e.name}). Allow camera + mic for this site in Settings → Safari.`); }
+  };
+
+  // manual: the safety alarm, with the mic on (like a real cooking session)
+  $("btn-alarm").onclick = async () => {
+    const r = $("row-alarm");
+    const { primeAlarm, playAlarm, alarmStatus, unlockSound } = await import("/sound.js");
+    unlockSound();   // what the Start tap does (also unlocks the alarm)
+    let mic = null;
+    try { mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); } catch { /* test without mic */ }
+    set(r, "wait", `Mic ${mic ? "on" : "off"}. Alarm in 2 seconds…`);
+    setTimeout(() => {
+      playAlarm();
+      setTimeout(() => {
+        mic?.getTracks().forEach((t) => t.stop());
+        set(r, /played/.test(alarmStatus.last) ? "ok" : "bad", `Unlock: ${alarmStatus.primed}. Alarm: ${alarmStatus.last}. Heard it? If it says "played" but was silent: silent switch, volume or Bluetooth.`);
+      }, 1500);
+    }, 2000);
   };
 
   // manual: speaker

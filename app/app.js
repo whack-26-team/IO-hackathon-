@@ -3,7 +3,7 @@
 // so pretend Remy (remy/mock.js) and real Remy (remy/live.js) are interchangeable.
 
 import { createTimers } from "./timers.js";
-import { unlockSound, beep, wakeSound, starPops } from "./sound.js";
+import { unlockSound, beep, wakeSound, starPops, alarmStatus, soundState } from "./sound.js";
 import { createMockRemy } from "./remy/mock.js";
 import { createLiveRemy, preloadLive } from "./remy/live.js";
 import { openCamera, pictureReady } from "./camera.js";
@@ -707,7 +707,8 @@ if (new URLSearchParams(location.search).has("debug")) {
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
       `camera   ${state.cameraInfo ? `${state.cameraInfo.label} ${state.cameraInfo.width}x${state.cameraInfo.height} zoom ${state.cameraInfo.zoom} (${state.cameraInfo.tried})${state.cameraInfo.zoomed ? " zoomed to 1x" : ""}${state.cameraInfo.retried ? " RETRIED (was black)" : ""} track ${state.stream?.getVideoTracks()[0]?.readyState || "-"}` : "not started"}`,
-      `version  v139`,
+      `alarm    primed ${alarmStatus.primed} · last ${alarmStatus.last} · web audio ${soundState()}`,
+      `version  v140`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
