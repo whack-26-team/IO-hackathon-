@@ -177,7 +177,7 @@ $("start-btn").addEventListener("click", async () => {
   const useDemo = new URLSearchParams(location.search).get("demo") === "1"; // scripted demo (docs/DEMO.md)
   const useMock = usePretend();   // Pretend Remy only with ?pretend=1 on the page address (testing)
   state.live = !useMock && !useDemo; // real Remy speaks timer reminders himself (see the timers' sound below)
-  const factory = useDemo ? createDemoRemy : useMock ? createMockRemy : createLiveRemy;   // live = Gemini backup voice unless ?full=1 / ?eleven=1 (saves ElevenLabs credits)
+  const factory = useDemo ? createDemoRemy : useMock ? createMockRemy : createLiveRemy;   // live = ElevenLabs (?backup=1 = Gemini backup voice)
   state.voice = useMock || useDemo ? "pretend" : null;   // real Remy reports live/backup itself
   // A recipe picked before Start (extras): load it so Remy starts on it
   let preRecipe = null;
@@ -673,7 +673,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
       `camera   ${state.cameraInfo ? `${state.cameraInfo.label} ${state.cameraInfo.width}x${state.cameraInfo.height} zoom ${state.cameraInfo.zoom} (${state.cameraInfo.tried})${state.cameraInfo.zoomed ? " zoomed to 1x" : ""}${state.cameraInfo.retried ? " RETRIED (was black)" : ""} track ${state.stream?.getVideoTracks()[0]?.readyState || "-"}` : "not started"}`,
-      `version  v129`,
+      `version  v130`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);

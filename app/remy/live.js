@@ -3,8 +3,9 @@
 // Real Remy = ElevenLabs voice. If ElevenLabs fails (can't connect, out of credits, keeps
 // dropping), this switches to the backup Remy by itself: the phone's own speech recognition and
 // voice, with Gemini writing his replies (gemini-backup.js). Timers, recipe and steps stay.
-// Saving ElevenLabs credits for the pitch: the backup (Gemini) voice is the default. ElevenLabs only
-// runs with ?full=1 (the pitch) or ?eleven=1 on the page address; ?backup=1 always forces the backup.
+// ElevenLabs is the default again (lite instructions; ?full=1 = full, for the pitch). Credits are
+// protected by the idle hang-up and by hanging up when the app is left (app.js).
+// ?backup=1 (or ?gemini=1) on the page address = Gemini backup voice, no ElevenLabs credits.
 import { createElevenLabsRemy } from './elevenlabs.js';
 import { createGeminiRemy } from './gemini-backup.js';
 
@@ -13,9 +14,8 @@ import { preloadSDK, prefetchBrain } from './elevenlabs.js';
 
 // Faster start: warm up real Remy while the start screen is open (best effort; skipped for ?backup=1)
 const params = () => new URLSearchParams(typeof location !== 'undefined' ? location.search : '');
-// true = start on the Gemini backup voice (everything except ?full=1 / ?eleven=1)
-export const useBackupVoice = () => typeof location !== 'undefined'
-  && (params().has('backup') || !(params().has('full') || params().has('eleven')));
+// true = start on the Gemini backup voice (only when asked for)
+export const useBackupVoice = () => typeof location !== 'undefined' && (params().has('backup') || params().has('gemini'));
 
 export function preloadLive({ mode, profile } = {}) {
   if (useBackupVoice()) return;   // not using ElevenLabs: don't warm it up (no credits spent)
