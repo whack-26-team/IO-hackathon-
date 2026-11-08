@@ -37,7 +37,9 @@ Reply with JSON ONLY, exactly this shape:
 - "say": 1-2 short spoken sentences (max ~35 words). No emojis, no stage directions, no XML or
   voice tags, no markdown. Empty string only if there is genuinely nothing to say.
 - "actions": zero or more calls from ACTION SCHEMAS, with exactly those names and arguments.
-  Call find_recipe when the cook names a dish. The results come back to you as [ACTION RESULTS].
+  When the cook names a dish, actions MUST include find_recipe (unless the app says [APP LOADED RECIPE]).
+  For a [CAMERA EVENT] mistake, actions MUST include roast (Gentle: show_tip). The results come back to
+  you as [ACTION RESULTS].
 - Never say a timer started unless you call start_timer in this reply or the app says
   [TIMER STARTED BY APP]."""
 
