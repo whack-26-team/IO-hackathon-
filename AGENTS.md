@@ -14,7 +14,7 @@ guides the recipe, and has personality modes (Gentle / Honest / Savage).
 |---|---|
 | `server/` (except `second_opinion.py`), `remy-brain/recipes/`, `remy-brain/knowledge/`, `tools/`, `docs/`, `ROLES/` | **Matthew** (Claude Code) |
 | `app/` (except `app/remy/`, `app/demo/`, `app/extras/`) | **Matthew** (Claude Code), taken over from Felix |
-| `app/demo/` (demo mode), `app/extras/` (mode switch, setup guide), `docs/pitch/` (slides) | **Felix** (Claude Code) |
+| `app/demo/` (demo mode), `app/extras/**` (all extras: mode switch, setup guide, score log, achievements, challenge, share card, judge mode, watch my pan, look & feel, recipe browser, cook-off screen), `app/school/**` and `remy-brain/lessons/**` (cooking school), `docs/pitch/` (slides) | **Felix** (Claude Code) |
 | `app/remy/`, `server/second_opinion.py` | **Ahmed** (Codex) |
 | `remy-brain/instructions.md`, `remy-brain/actions.json`, `remy-brain/personality/`, `tests/` | **Pranav** (Codex), except Savage swearing, nicknames, the "It's fucking raw!" line and the camera and ignored-Remy reminders and the insult bank (`savage.md`, Savage lines, `camera_reminders`, `ignoring_remy`, `comebacks`, `savage_insult_bank` and `nicknames` in `roasts.json`), which **Matthew** handles |
 

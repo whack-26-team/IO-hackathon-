@@ -16,7 +16,8 @@
   <meta name="theme-color" content="#fff4e0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=88">
+  <link rel="stylesheet" href="style.css?v=89">
+  <link rel="stylesheet" href="extras/extras.css?v=89">
 </head>
 <body>
   <!-- the start screen's colour, overhanging every edge of the screen -->
@@ -85,10 +86,12 @@
       </label>
     </fieldset>
 
+    <div id="slot-start-chip" class="slot"></div>  <!-- Felix: e.g. weekly challenge -->
     <button id="start-btn" class="go">Start cooking</button>
+    <div id="slot-start-menu" class="slot"></div>  <!-- Felix: menu row (recipes, school, your cooks, settings) -->
 
     <footer class="start-foot">
-      <span>🔒 REMY doesn't save anything · <button id="safety-link" class="link">Privacy &amp; safety ›</button></span>
+      <span>🔒 History stays on this phone · <button id="safety-link" class="link">Privacy &amp; safety ›</button></span>
       <!-- For testing until real Remy is connected -->
       <label class="pretend"><input type="checkbox" id="use-mock" checked> 🧪 Pretend Remy</label>
     </footer>
@@ -113,7 +116,7 @@
     <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="safety-title">
       <h2 id="safety-title">Privacy &amp; safety</h2>
       <ul class="safety-points">
-        <li>🔒 <b>REMY doesn't record or keep anything.</b> The camera and mic are only used while you cook.</li>
+        <li>🔒 <b>REMY never records you.</b> The camera and mic are only used while you cook. Your scores and settings are kept <b>only on this phone</b>, never uploaded, and you can clear them any time.</li>
         <li>☁️ With real Remy (Pretend Remy off), your <b>voice goes to ElevenLabs</b> (Remy's voice) and <b>a picture every few seconds goes to Google Gemini</b> (Remy's eyes) so he can respond. Their own privacy policies apply.</li>
         <li>🧠 Remy is an assistant. Use your own judgment, especially with knives and hot oil.</li>
         <li>🌡️ Remy can't see inside food. Check meat, fish and eggs with a thermometer.</li>
@@ -139,6 +142,7 @@
     </header>
 
     <div class="bottom">
+      <div id="slot-cook-tools" class="slot cook-tools"></div>  <!-- Felix: 👀 📸 buttons -->
       <!-- Remy talks from his speech bubble; his face changes with what he's saying -->
       <div id="speech" class="speech quiet">
         <svg id="cook-face" class="cook-face" viewBox="-18 -12 136 116" aria-hidden="true"><use href="#f-watch"/></svg>
@@ -180,9 +184,13 @@
     <svg id="goodbye-face" class="goodbye-face" viewBox="-18 -12 136 116" aria-hidden="true"><use href="#f-proud"/></svg>
     <div id="recap" class="recap"></div>
     <div id="recap-score" class="recap-score"></div>
+    <div id="slot-goodbye" class="slot"></div>  <!-- Felix: badges, share button -->
     <div class="goodbye-hint">Back to the start in a moment · tap to skip</div>
   </section>
 
-  <script type="module" src="app.js?v=88"></script>
+  <!-- Bottom sheets opened by extras (app.openSheet) -->
+  <div id="slot-sheets"></div>
+
+  <script type="module" src="app.js?v=89"></script>
 </body>
 </html>

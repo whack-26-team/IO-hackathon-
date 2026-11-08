@@ -313,3 +313,14 @@ html[data-mode="gentle"] .goodbye-bubble { background: #cfe4f6; }
   font-weight: 700; font-size: 14px; box-shadow: 2px 2px 0 var(--ink); }
 .recap-score { font-weight: 800; font-size: 22px; margin-top: 6px; max-width: 340px; }
 html[data-mode="savage"] .recap-score { color: var(--cream); }
+
+/* Slots that extras (app/extras/, Felix) fill. Empty = takes no space. */
+.slot:empty { display: none; }
+.cook-tools { display: flex; gap: 8px; justify-content: flex-end; }
+
+/* Bottom sheet opened with app.openSheet(el): scrolls inside, the page itself never scrolls */
+.sheet-backdrop { position: fixed; inset: 0; z-index: 30; background: rgba(26, 26, 26, .55); display: flex; align-items: flex-end; justify-content: center; }
+.sheet { width: 100%; max-width: 480px; max-height: 82%; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+  background: var(--cream); color: var(--ink); border: var(--line); border-bottom: 0; border-radius: 22px 22px 0 0;
+  padding: 18px 18px calc(18px + var(--safe-bottom)); animation: sheet-up .22s ease-out; }
+@keyframes sheet-up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
