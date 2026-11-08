@@ -4,7 +4,7 @@ import { createVision } from './vision.js';
 export const SDK_URL = 'https://esm.sh/@elevenlabs/client@1.35.0?bundle';
 // Public agent identifier, NOT an API key. Replace public access with Matthew's
 // short-lived session provider before opening the app beyond the hackathon team.
-export const AGENT_ID = 'agent_9201m6v41z1he9eshw97vkqbyyvn';
+export const AGENT_ID = 'agent_5701m6w7gjqef74bxt3pvrdwbxy7';
 
 export function createElevenLabsRemy({ recipe = null, mode = 'honest', stream, video, canvas,
   agentId = AGENT_ID, sessionProvider, loadSDK = () => import(SDK_URL),

@@ -22,8 +22,10 @@ OpenAI starter is retained in `openai.js`; it has not been retested.
 `agent-prompt.md` begins with the full merged `remy-brain/instructions.md`, followed
 by the transport instructions and `{{session_brain}}`. Core rules explicitly take
 priority over personality examples. The exact core prefix has an automated test.
-The configured ElevenLabs agent is `agent_9201m6v41z1he9eshw97vkqbyyvn` (public ID,
-not a secret), with a response-returning client tool named `remy_action` and two
+The configured ElevenLabs agent is `agent_5701m6w7gjqef74bxt3pvrdwbxy7` in
+Pranav's ElevenLabs workspace (public ID, not a secret). It is a manual copy of
+Ahmed's original `agent_9201m6v41z1he9eshw97vkqbyyvn`, so new calls use Pranav's
+workspace credits. The copy has a response-returning client tool named `remy_action` and two
 required string arguments: `action`, `arguments_json`. Tool timeout: 25 seconds.
 The published agent uses Eleven Realtime v1 Max with Eric as its primary voice.
 The previous GPT-6 Luna setting is stored for Custom mode but does not apply
@@ -34,11 +36,13 @@ selected mode is Savage after the screen's 18+ opt-in; Gentle and Honest use Eri
 This is an original chef voice, not a Gordon Ramsay impersonation. Check the
 audible voice switch on a phone before treating it as verified.
 
-The current ElevenLabs settings use patient turn eagerness, background voice
+The copied ElevenLabs settings use patient turn eagerness, background voice
 detection on, and Ignore Default Personality off. Realtime Max keeps the system
 prompt, voices, tools, and turn settings, but costs more per token than Mini.
 Check its actual response delay, kitchen-noise behaviour, and usage during the
-real phone cook-along before deciding whether to keep Max.
+real phone cook-along before deciding whether to keep Max. The agent copy and
+app connection need a real cook-along after this branch is deployed; creating
+the copy alone does not redirect the deployed site.
 
 ## Current limits and owner handoffs
 
