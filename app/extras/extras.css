@@ -99,3 +99,9 @@ body.x-slide-in #cook-screen { animation: x-slide .45s ease-out; }
 .x-plate-card b { font-size: 56px; line-height: 1; } .x-plate-card span { font-weight: 800; font-size: 18px; text-align: center; line-height: 1.2; }
 .x-plate-card em { font-style: normal; font-size: 12px; opacity: .7; margin-top: 4px; }
 html[data-mode="cooking"] .cook-tools { flex-wrap: wrap; }
+
+/* ---- setup card ---- */
+.x-setup-row { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 2px dashed #e2d8cc; }
+.x-setup-row:last-of-type { border-bottom: 0; margin-bottom: 10px; }
+.x-setup-icon { font-size: 28px; line-height: 1; flex: none; }
+.x-setup-row b { display: block; font-size: 17px; } .x-setup-row small { color: var(--muted); font-size: 14px; line-height: 1.3; }
