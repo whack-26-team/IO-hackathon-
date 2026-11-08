@@ -106,7 +106,7 @@ def temps_line(fs: dict) -> str:
 
 def relevant_food_safety(recipe: dict | None) -> dict:
     fs = _load("food-safety.json")
-    out: dict = {"_rule": fs.get("_rule", ""), "temps": temps_line(fs), "hazards": fs.get("hazards", {})}
+    out: dict = {"_rule": fs.get("_rule", ""), "temps": temps_line(fs), "hazards": HAZARDS_SHORT}
     if not recipe:
         return out
     text = " ".join([recipe.get("title", ""), " ".join(recipe.get("ingredients", []))]).lower()
@@ -128,3 +128,40 @@ def knowledge_for(recipe: dict | None) -> dict:
 
 def as_text(obj: dict) -> str:
     return json.dumps(obj, ensure_ascii=False, separators=(",", ":"))
+
+
+# ---------- compact action list for the voice's instructions ----------
+def _type(schema: dict) -> str:
+    t = schema.get("type")
+    if "enum" in schema:
+        return "|".join(str(v) for v in schema["enum"])
+    if t == "array":
+        return "[" + _type(schema.get("items", {})) + "]"
+    if t == "object":
+        req = set(schema.get("required", []))
+        parts = []
+        for name, sub in schema.get("properties", {}).items():
+            note = sub.get("description", "")
+            parts.append(f"{name}{'' if name in req else '?'}:{_type(sub)}" + (f" ({note})" if note and len(note) <= 60 else ""))
+        return "{" + ", ".join(parts) + "}"
+    return {"string": "str", "integer": "int", "number": "num", "boolean": "bool"}.get(t, "any")
+
+
+def tools_text(tools: list, recipe: dict | None = None) -> str:
+    """'name {args} — description' per action, ~half the size of the raw JSON schemas.
+    lesson_score only appears in a lesson."""
+    lines = []
+    for t in tools:
+        if t.get("name") == "lesson_score" and not (recipe and recipe.get("lesson")):
+            continue
+        lines.append(f"- {t['name']} {_type(t.get('parameters', {}))}: {t.get('description', '')}")
+    return "Call actions by exact name with exactly these arguments (? = optional).\n" + "\n".join(lines)
+
+
+# ---------- always-on hazards, as one short paragraph (same rules as food-safety.json hazards) ----------
+HAZARDS_SHORT = ("Smoke from a hot pan is NOT a safety alert or a roast: one tip, turn the heat down; only visible "
+                 "flames are. Pan fire: heat off, cover the pan, don't move it, never water; if it won't go out, get out "
+                 "and call the fire service. Raw meat never touches ready-to-eat food: separate boards or wash between, "
+                 "wash hands after, never wash raw chicken. Knife: claw grip, cut away from the body, board steady (damp "
+                 "cloth under it). Turn pan handles inwards. You can't detect allergens: if one is mentioned, tell them "
+                 "to check every label.")

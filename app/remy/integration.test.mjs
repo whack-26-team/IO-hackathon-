@@ -203,7 +203,7 @@ test('a dropped WebRTC call reconnects over WebSocket',async()=>{
   await f.remy.stop();
 });
 
-test('camera notes are only re-sent when something changes or 30 s pass',async()=>{
+test('camera notes are only re-sent when something changes or 60 s pass',async()=>{
   let res={summary:'pan',issues:[],safety:'',can_see_cooking:true};
   const f=visionFixture(async()=>res);
   f.vision.start(); await tick();
@@ -212,6 +212,8 @@ test('camera notes are only re-sent when something changes or 30 s pass',async()
   res={...res,issues:[{type:'burning',confidence:0.9,detail:'x'}]}; await f.tasks.shift()();
   assert.equal(f.context.length,2);
   f.setTime(40000); await f.tasks.shift()();
+  assert.equal(f.context.length,2);   // 40 s: nothing new, no note
+  f.setTime(70000); await f.tasks.shift()();
   assert.equal(f.context.length,3); f.vision.stop();
 });
 

@@ -38,7 +38,7 @@ from pydantic import BaseModel
 
 from server.recipe_check import check_ai_recipe
 from server.recipe_sources import IMPORT_DIR, find_recipe
-from server.knowledge import as_text, knowledge_for, relevant_cook_times, relevant_food_safety
+from server.knowledge import as_text, knowledge_for, relevant_cook_times, relevant_food_safety, tools_text
 from server import vision
 from server import chat
 from server import push
@@ -275,7 +275,8 @@ def get_brain(req: SessionRequest):
     recipe = load_recipe(req.recipe_id) if req.recipe_id else None
     return {
         "instructions": build_instructions(recipe, req.mode, req.lite, req.profile),
-        "tools": load_tools(),
+        "tools": load_tools(),   # full schemas: the app checks every call against these
+        "tools_text": tools_text(load_tools(), recipe),   # compact list the voice reads (saves ElevenLabs tokens)
         "recipe": recipe,
         "mode": req.mode,
         "max_minutes": SESSION_MINUTES,
