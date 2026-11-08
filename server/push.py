@@ -70,34 +70,38 @@ def schedule(sub: dict, timer_id: str, label: str = "", fire_at_ms: float | None
     return {"ok": True, "fire_at_ms": int(fire_at * 1000)}
 
 
-def _send(sub: dict, label: str, timer_id: str) -> None:
+def _send(sub: dict, label: str, timer_id: str, fire_at: float | None = None) -> None:
     from pywebpush import WebPushException, webpush   # imported here so the app runs without it
     payload = {"title": f"⏱ {label} is done", "body": "Back to the hob, chef. Remy's waiting.", "tag": f"timer-{timer_id}"}
     try:
+        # Urgency: high = deliver now. Without it, phones (iPhone especially) may hold the alert back
+        # to save battery, so it arrives late.
         webpush(subscription_info=sub, data=json.dumps(payload),
                 vapid_private_key=os.getenv("VAPID_PRIVATE_KEY", "").strip(),
-                vapid_claims={"sub": os.getenv("VAPID_SUBJECT", "https://remy-2wc2.onrender.com")}, ttl=600)
-        sent_log.append({"label": label, "ok": True})
+                vapid_claims={"sub": os.getenv("VAPID_SUBJECT", "https://remy-2wc2.onrender.com")},
+                ttl=600, headers={"Urgency": "high"})
+        sent_log.append({"label": label, "ok": True, "sent_late_s": round(time.time() - fire_at, 1) if fire_at else None,
+                         "at": time.strftime("%H:%M:%S")})
     except WebPushException as e:   # expired subscription, phone offline...: nothing else to do
-        sent_log.append({"label": label, "ok": False, "error": str(e)[:120]})
+        sent_log.append({"label": label, "ok": False, "error": str(e)[:120], "at": time.strftime("%H:%M:%S")})
     del sent_log[:-20]
 
 
-def due_now(now: float | None = None) -> list[tuple[dict, str, str]]:
-    """Take the timers that have ended off the list: [(sub, label, id)]."""
+def due_now(now: float | None = None) -> list[tuple[dict, str, str, float]]:
+    """Take the timers that have ended off the list: [(sub, label, id, fire_at)]."""
     now = time.time() if now is None else now
     with _lock:
         due = [(k, v) for k, v in _timers.items() if v["fire_at"] <= now]
         for k, _ in due:
             _timers.pop(k, None)
-    return [(v["sub"], v["label"], k[1]) for k, v in due]
+    return [(v["sub"], v["label"], k[1], v["fire_at"]) for k, v in due]
 
 
 def _loop() -> None:
     while True:
-        for sub, label, timer_id in due_now():
-            _send(sub, label, timer_id)
-        time.sleep(1)
+        for sub, label, timer_id, fire_at in due_now():
+            _send(sub, label, timer_id, fire_at)
+        time.sleep(0.5)
 
 
 def _ensure_thread() -> None:
