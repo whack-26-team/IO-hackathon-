@@ -22,12 +22,13 @@ async function mainCameraId() {
 export async function openCamera({ width = 1280 } = {}) {
   const id = await mainCameraId();
   const video = { facingMode: { ideal: "environment" }, width: { ideal: width }, ...(id ? { deviceId: { ideal: id } } : {}) };
+  const audio = { echoCancellation: { ideal: true }, noiseSuppression: { ideal: true } };
   let stream;
-  try { stream = await navigator.mediaDevices.getUserMedia({ video, audio: true }); }
+  try { stream = await navigator.mediaDevices.getUserMedia({ video, audio }); }
   catch (e) {
     if (!id) throw e;   // a remembered camera that no longer exists: plain back camera instead
     try { localStorage.removeItem(KEY); } catch { /* fine */ }
-    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment", width: { ideal: width } }, audio: true });
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment", width: { ideal: width } }, audio });
   }
   const track = stream.getVideoTracks()[0];
   const info = { label: track?.label || "?", tried: id ? "remembered 1x" : "default" };

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { createActions } from './actions.js';
 import { createVision } from './vision.js';
-import { createElevenLabsRemy, prefetchBrain } from './elevenlabs.js';
+import { createElevenLabsRemy, prefetchBrain, FIRST_MESSAGES } from './elevenlabs.js';
 import { isWakeCall } from './wake.js';
 const tools = JSON.parse(await readFile(new URL('../../remy-brain/actions.json', import.meta.url), 'utf8')).tools;
 const core = await readFile(new URL('../../remy-brain/instructions.md', import.meta.url), 'utf8');
@@ -120,25 +120,32 @@ test('late camera response is discarded after stop, and stale analysis does not 
   const stale=visionFixture(async()=>{stale.setTime(7000);return {safety:'old danger'};});
   stale.vision.start(); await tick(); assert.equal(stale.speech.length,0); assert.match(stale.context[0],/STALE/); stale.vision.stop();
 });
-function voiceFixture(start, stream) {
+function voiceFixture(start, stream, mode='honest') {
   let options, closed=0, clock=10000; const events=[],sent=[],context=[],tasks=[],micMuted=[];
   const page=new EventTarget(); page.hidden=false;
   const session={endSession:async()=>{closed++;},sendContextualUpdate:t=>context.push(t),sendUserMessage:t=>sent.push(t),setMicMuted:value=>micMuted.push(value)};
-  const remy=createElevenLabsRemy({page,stream,now:()=>clock, schedule:(fn,ms)=>{const t={fn,ms};tasks.push(t);return t;},cancel:t=>{if(t)t.cancelled=true;},
+  const remy=createElevenLabsRemy({page,stream,mode,now:()=>clock, schedule:(fn,ms)=>{const t={fn,ms};tasks.push(t);return t;},cancel:t=>{if(t)t.cancelled=true;},
     fetcher:async()=>({ok:true,json:async()=>brain}),loadSDK:async()=>({Conversation:{startSession:async o=>{options=o;return start?start(session,o):session;}}})});
   for(const type of ['status','timer_start','tip']) remy.on(type,data=>events.push({type,data}));
   return {remy,page,events,sent,context,tasks,micMuted,get options(){return options;},get closed(){return closed;},setTime:t=>clock=t};
 }
-test('wake call is one reply and the mic is muted while Remy speaks',async()=>{
+test('the cook can interrupt while Remy speaks',async()=>{
   const f=voiceFixture(); await f.remy.start();
   f.options.onMessage({source:'user',message:'Hey Remy?'});
   assert.match(f.context.at(-1),/Yes, chef\?/);
   f.options.onModeChange({mode:'speaking'});
   f.options.onMessage({source:'user',message:'Remy'});
-  assert.deepEqual(f.micMuted,[true]);
-  assert.equal(f.context.filter(x=>x.includes('[WAKE CALL]')).length,1);
+  assert.deepEqual(f.micMuted,[]);
+  assert.equal(f.context.filter(x=>x.includes('[WAKE CALL]')).length,2);
   f.options.onModeChange({mode:'listening'});
-  assert.deepEqual(f.micMuted,[true,false]);
+  assert.deepEqual(f.micMuted,[]);
+  await f.remy.stop();
+});
+test('Savage gets an immediate food jab without changing the other greetings',async()=>{
+  const f=voiceFixture(null,null,'savage'); await f.remy.start();
+  assert.equal(f.options.dynamicVariables.remy_opening,FIRST_MESSAGES.savage);
+  assert.match(FIRST_MESSAGES.savage,/sad salad/);
+  assert.doesNotMatch(FIRST_MESSAGES.gentle,/sad salad/);
   await f.remy.stop();
 });
 test('ending stops background prompts but lets the goodbye finish',async()=>{

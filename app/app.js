@@ -162,7 +162,8 @@ $("start-btn").addEventListener("click", async () => {
     // Still black after a few seconds? Close it and open the plain back camera once more.
     if (!(await pictureReady($("camera")))) {
       state.stream.getTracks().forEach((t) => t.stop());
-      state.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment", width: { ideal: 1280 } }, audio: true });
+      state.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment", width: { ideal: 1280 } },
+        audio: { echoCancellation: { ideal: true }, noiseSuppression: { ideal: true } } });
       const vs = state.stream.getVideoTracks()[0]?.getSettings?.() || {};
       state.cameraInfo = { ...state.cameraInfo, retried: true, label: state.stream.getVideoTracks()[0]?.label, width: vs.width, height: vs.height };
       $("camera").srcObject = state.stream;
@@ -700,7 +701,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
       `camera   ${state.cameraInfo ? `${state.cameraInfo.label} ${state.cameraInfo.width}x${state.cameraInfo.height} zoom ${state.cameraInfo.zoom} (${state.cameraInfo.tried})${state.cameraInfo.zoomed ? " zoomed to 1x" : ""}${state.cameraInfo.retried ? " RETRIED (was black)" : ""} track ${state.stream?.getVideoTracks()[0]?.readyState || "-"}` : "not started"}`,
-      `version  v136`,
+      `version  v137`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
