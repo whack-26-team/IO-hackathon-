@@ -190,6 +190,7 @@ $("start-btn").addEventListener("click", async () => {
     else preRecipe = null;
   }
   const settings = history.settings();
+  state.factory = factory;   // kept so Remy can be woken up again after the app was left (see pauseRemy)
   state.remy = factory({
     recipe: preRecipe,
     profile: { diet: settings.diet || [], allergies: settings.allergies || [] },  // ⚙️ Settings: one short line for Remy
@@ -225,6 +226,7 @@ function stopCooking() {
   }
   timers.clearAll();
   $("idle-banner").classList.add("hidden");
+  $("paused").classList.add("hidden"); state.paused = false;
   clearTimeout(showBubble.t);
   pendingRoast = null; // first, so hiding the alert doesn't show a held-back roast after Stop
   hideAlert();
@@ -671,7 +673,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
       `camera   ${state.cameraInfo ? `${state.cameraInfo.label} ${state.cameraInfo.width}x${state.cameraInfo.height} zoom ${state.cameraInfo.zoom} (${state.cameraInfo.tried})${state.cameraInfo.zoomed ? " zoomed to 1x" : ""}${state.cameraInfo.retried ? " RETRIED (was black)" : ""} track ${state.stream?.getVideoTracks()[0]?.readyState || "-"}` : "not started"}`,
-      `version  v128`,
+      `version  v129`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
@@ -826,3 +828,47 @@ setInterval(() => {
 // "I'm here!" (or any speech) keeps Remy on
 function keepRemy() { idle.lastTalk = Date.now(); idle.warned = false; $("idle-banner").classList.add("hidden"); }
 $("idle-stay").addEventListener("click", keepRemy);
+
+// ---------- leaving the app: Remy stops talking ----------
+// On iPhone the voice kept going after switching away from the app (and ElevenLabs kept billing).
+// Now: the moment the app is hidden, speech stops and Remy's voice hangs up; recipe, steps and timers
+// stay. Coming back shows "Wake Remy up" (a tap is needed anyway for the mic and sound on iPhone).
+function pauseRemy() {
+  try { speechSynthesis.cancel(); } catch { /* no voice */ }
+  pendingStop?.stop(); pendingStop = null;   // the goodbye, if he was mid-goodbye
+  if (!state.cooking || !state.remy) return;
+  const remy = state.remy; state.remy = null;
+  try { remy.stop(); } catch { /* already stopped */ }
+  state.stream?.getTracks().forEach((t) => t.stop());
+  state.paused = true;
+  hideGettingReady();
+  $("idle-banner").classList.add("hidden");
+  $("paused").classList.remove("hidden");
+}
+async function wakeRemy() {
+  if (!state.paused || !state.cooking) return;
+  unlockSound();   // first, inside the tap
+  $("paused").classList.add("hidden");
+  state.paused = false;
+  try {
+    const cam = await openCamera();
+    state.stream = cam.stream; state.cameraInfo = cam.info;
+    $("camera").srcObject = state.stream; $("camera").play?.().catch(() => {}); fitCamera();
+  } catch {
+    showBubble({ text: "I can't see anything! Allow camera and microphone access, then try again.", severity: "urgent" });
+    return;
+  }
+  const settings = history.settings();
+  showGettingReady();
+  state.remy = state.factory({
+    recipe: state.recipe, mode: state.mode, stream: state.stream, video: $("camera"), canvas: $("frame-canvas"),
+    profile: { diet: settings.diet || [], allergies: settings.allergies || [] },
+  });
+  wireRemy(state.remy);
+  keepRemy();
+  state.remy.start();
+}
+$("paused-go").addEventListener("click", wakeRemy);
+$("paused-stop").addEventListener("click", () => stopCooking());
+document.addEventListener("visibilitychange", () => { if (document.hidden) pauseRemy(); });
+addEventListener("pagehide", pauseRemy);

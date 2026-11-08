@@ -4,7 +4,11 @@ import { createVision } from './vision.js';
 export const SDK_URL = 'https://esm.sh/@elevenlabs/client@1.35.0?bundle';
 // Public agent identifier, NOT an API key. Replace public access with Matthew's
 // short-lived session provider before opening the app beyond the hackathon team.
-export const AGENT_ID = 'agent_5701m6w7gjqef74bxt3pvrdwbxy7';
+export const PITCH_AGENT_ID = 'agent_5701m6w7gjqef74bxt3pvrdwbxy7';
+// ?agent=agent_xxx on the page address uses another ElevenLabs agent, e.g. a copy of Remy set to the
+// faster, cheaper Flash voice model for testing, without touching the pitch agent.
+const urlAgent = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('agent') : null;
+export const AGENT_ID = urlAgent && /^agent_[a-z0-9]{10,60}$/i.test(urlAgent) ? urlAgent : PITCH_AGENT_ID;
 
 // ---- Faster start: load ElevenLabs' code and Remy's instructions while the start screen is open ----
 let sdkPromise = null;

@@ -1,5 +1,13 @@
 > **🤬 Savage swearing is Matthew's now:** don't change the swearing, nicknames or "It's fucking raw!" line in `savage.md` / the Savage lines of `roasts.json` (see `docs/TEAM-TODO.md`).
 
+> **⚡ Flash voice for testing (Matthew asked, needs your ElevenLabs workspace, ~3 min):** the voice model can't be set from the app, only on the agent.
+> 1. ElevenLabs → Agents → Remy (`agent_5701m6w7gjqef74bxt3pvrdwbxy7`) → **⋯ Duplicate**. Name the copy "Remy (Flash test)".
+> 2. In the copy: **Voice** tab → **TTS model** → **Flash** (the English Flash model; Turbo if Flash isn't offered). Keep the same voice. Save.
+> 3. Check the copy's **Security** settings match the original (same allowed hosts, public/auth setting) so the app can connect.
+> 4. Copy the new agent's ID (starts with `agent_`) and send it to Matthew. Test it straight away at `https://remy-2wc2.onrender.com/?eleven=1&agent=THE_NEW_ID`.
+> 5. Leave the original Remy as it is: that's the pitch agent (`?full=1`).
+> (Simpler but riskier: switch the original's TTS model to Flash and switch it back before the pitch.)
+
 > **📌 Waiting for you:** check [`docs/TEAM-TODO.md`](../docs/TEAM-TODO.md) for changes the team has decided that need doing in your files.
 
 # Pranav: insults, roasts, catchphrases & personality · accuracy testing
