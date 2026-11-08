@@ -20,15 +20,15 @@ OpenAI starter is retained in `openai.js`; it has not been retested.
    compound durations are rejected; repeat as a number of minutes or seconds.
 
 `agent-prompt.md` is our copy of the agent's published dashboard prompt: only the ElevenLabs transport
-instructions (voice tags, `remy_action`, timers, camera) followed by `{{session_brain}}`. Remy's core
+instructions (single voice, `remy_action`, timers, camera) followed by `{{session_brain}}`. Remy's core
 rules are **not** repeated there: the server sends the latest ones at the start of `session_brain`
 (`/api/brain`). The dashboard prompt fell from 10,738 to about 3,697 characters when the
 duplicate rules were removed. That is a character count, not a measured credit saving.
 The source-only HTML comment at the top of `agent-prompt.md` is not in the dashboard.
 If you edit either copy, keep the other in step.
 
-The published agent uses Realtime Mini and the Grandfather Joe primary voice,
-with the Savage secondary voice. The copied ElevenLabs settings use patient turn
+The published agent uses Realtime Mini and Oliver - Clean, British and Steady as its only voice.
+Gentle, Honest and Savage change delivery, not voice. The copied ElevenLabs settings use patient turn
 eagerness, background voice detection on, and Ignore Default Personality off.
 Check actual response delay, kitchen-noise behaviour, and usage during the
 real phone cook-along. The agent copy and
@@ -72,8 +72,8 @@ and start cooking. Test:
 3. Select a recipe, follow one step, and verify the next-step screen update.
 4. Interrupt Remy, hide/restore the page, then briefly disconnect the network.
 5. Stop and verify the camera indicator and voice both stop.
-6. Start a new call in Savage after the 18+ opt-in and confirm its voice differs
-   from Gentle. Trigger a safety alert and check that the warning stays clear.
+6. Start a new call in Savage after the 18+ opt-in and confirm the same voice
+   delivers the different attitude. Trigger a safety alert and check that the warning stays clear.
 
 Record reply latency and failures before marking the PR ready for review.
 
