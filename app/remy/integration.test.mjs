@@ -69,11 +69,12 @@ test('invalid and unknown tool calls cannot create screen events',async()=>{
 });
 function visionFixture(response, { mode = 'honest', activeRecipe = recipe } = {}) {
   let clock=1000; const tasks=[],events=[],context=[],speech=[],requests=[];
-  const vision=createVision({video:{videoWidth:1280,videoHeight:720,readyState:2},canvas:{getContext:()=>({drawImage(){}}),toDataURL:()=> 'data:image/jpeg;base64,abc'},
+  const canvas={getContext:()=>({drawImage(){}}),toDataURL:()=> 'data:image/jpeg;base64,abc'};
+  const vision=createVision({video:{videoWidth:1280,videoHeight:720,readyState:2},canvas,
     request:async(...args)=>{requests.push(args);return response(...args);},actions:{currentStep:()=>activeRecipe.steps[0],snapshot:()=>({recipe:activeRecipe})},
     context:t=>context.push(t),speak:(t,u)=>speech.push({t,u}),emit:(type,data)=>events.push({type,data}),alive:()=>true,getMode:()=>mode,
     now:()=>clock,schedule:(fn,ms)=>{fn.delay=ms;tasks.push(fn);return fn;},cancel:()=>{}});
-  return {vision,tasks,events,context,speech,requests,setTime:t=>clock=t};
+  return {vision,canvas,tasks,events,context,speech,requests,setTime:t=>clock=t};
 }
 test('camera sends the current recipe step as an object accepted by the vision API',async()=>{
   const f=visionFixture(async()=>({summary:'pan',issues:[],safety:''}));
@@ -81,8 +82,22 @@ test('camera sends the current recipe step as an object accepted by the vision A
   assert.equal(f.requests[0][0],'/api/vision/look');
   assert.deepEqual(f.requests[0][1].step,recipe.steps[0]);
   assert.equal(typeof f.requests[0][1].step,'object');
-  assert.equal(f.tasks[0].delay,2200, 'next picture follows after 2.2 seconds');
+  assert.equal(f.canvas.width,512);
+  assert.equal(f.tasks[0].delay,2300, 'next picture starts about 2.3 seconds after the previous one');
   f.vision.stop();
+});
+test('slow analysis does not add another full wait before the next picture',async()=>{
+  const f=visionFixture(async()=>{f.setTime(2600);return {summary:'pan',issues:[],safety:''};});
+  f.vision.start(); await tick();
+  assert.equal(f.tasks[0].delay,700); // 1.6 seconds spent analysing, 0.7 seconds until next start
+  f.vision.stop();
+});
+test('knife steps send a clearer frame without changing ordinary photo size',async()=>{
+  const knife=visionFixture(async()=>({summary:'board',issues:[],safety:''}),
+    {activeRecipe:{...recipe,steps:[{instruction:'Slice the carrot with a knife.'}]}});
+  knife.vision.start(); await tick();
+  assert.equal(knife.canvas.width,640);
+  knife.vision.stop();
 });
 test('camera safety is immediate, and repeated frames do not repeat ordinary warnings',async()=>{
   const f=visionFixture(async()=>({summary:'pan',issues:[{type:'burning',confidence:0.9,detail:'black edges'}],safety:''}));
