@@ -8,6 +8,14 @@ import { createElevenLabsRemy } from './elevenlabs.js';
 import { createGeminiRemy } from './gemini-backup.js';
 
 export { createElevenLabsRemy };
+import { preloadSDK, prefetchBrain } from './elevenlabs.js';
+
+// Faster start: warm up real Remy while the start screen is open (best effort; skipped for ?backup=1)
+export function preloadLive({ mode, profile } = {}) {
+  if (typeof location !== 'undefined' && new URLSearchParams(location.search).has('backup')) return;
+  preloadSDK().catch(() => {});
+  prefetchBrain({ mode, profile });
+}
 
 const EVENTS = ['status', 'recipe', 'recipe_clear', 'tip', 'roast', 'alert', 'step', 'timer_start', 'timer_cancel', 'timer_adjust', 'command', 'lesson_score'];
 

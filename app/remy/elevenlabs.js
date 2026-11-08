@@ -6,8 +6,37 @@ export const SDK_URL = 'https://esm.sh/@elevenlabs/client@1.35.0?bundle';
 // short-lived session provider before opening the app beyond the hackathon team.
 export const AGENT_ID = 'agent_5701m6w7gjqef74bxt3pvrdwbxy7';
 
+// ---- Faster start: load ElevenLabs' code and Remy's instructions while the start screen is open ----
+let sdkPromise = null;
+export function preloadSDK() {
+  if (!sdkPromise) sdkPromise = import(SDK_URL).catch((e) => { sdkPromise = null; throw e; });
+  return sdkPromise;
+}
+const isLite = () => !(typeof location !== 'undefined' && new URLSearchParams(location.search).has('full'));
+const brainKey = ({ mode, profile, lite }) => JSON.stringify([mode, lite, profile?.diet || [], profile?.allergies || []]);
+let brainCache = null;   // { key, at, promise }
+export function prefetchBrain({ mode = 'honest', profile = null, fetcher = fetch } = {}) {
+  const lite = isLite();
+  const key = brainKey({ mode, profile, lite });
+  if (brainCache?.key === key && Date.now() - brainCache.at < 600000) return brainCache.promise;
+  const promise = fetcher('/api/brain', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mode, ...(lite ? { lite: true } : {}), ...(profile ? { profile } : {}) }) })
+    .then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  brainCache = { key, at: Date.now(), promise };
+  return promise;
+}
+// Use the prefetched brain once, only if it was made for exactly this session (else fetch as normal)
+async function takePrefetchedBrain({ mode, profile, recipe }) {
+  if (!brainCache || recipe?.id) return null;
+  const { key, at, promise } = brainCache;
+  if (key !== brainKey({ mode, profile, lite: isLite() }) || Date.now() - at > 600000) return null;
+  brainCache = null;
+  const b = await promise;
+  return b?.instructions && Array.isArray(b.tools) ? b : null;
+}
+
 export function createElevenLabsRemy({ recipe = null, mode = 'honest', profile = null, stream, video, canvas,
-  agentId = AGENT_ID, sessionProvider, loadSDK = () => import(SDK_URL),
+  agentId = AGENT_ID, sessionProvider, loadSDK = preloadSDK,
   fetcher = fetch, page = document, now = Date.now,
   schedule = setTimeout, cancel = clearTimeout, onTranscript = () => {},
 } = {}) {
@@ -111,6 +140,10 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', profile =
     const run = ++generation;
     status('connecting', 'Connecting Remy’s voice…');
     try {
+      if (!brain) {   // ready from the start screen? (faster start)
+        const ready = await takePrefetchedBrain({ mode, profile, recipe });
+        if (ready) { brain = ready; actions.configure(brain); }
+      }
       if (!brain) {
         // Lite by default (Matthew, to save ElevenLabs credits): Remy's instructions leave out the big
         // roast/insult library, so every reply costs fewer tokens. ?full=1 on the page address = everything.
