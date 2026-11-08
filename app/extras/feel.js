@@ -44,5 +44,5 @@ export function initFeel(app) {
   app.on("alert", () => pulse("x-alert-edge", 7000));
   app.on("tip", (d) => { if (d?.severity === "info" && PRAISE.test(d.text || "")) confetti(30); });
   app.on("start", () => pulse("x-slide-in", 500));
-  app.on("goodbye", ({ stats }) => { document.body.classList.remove("x-speaking", "x-alert-edge"); if (stats.score >= 8) confetti(60); });
+  app.on("goodbye", ({ stats }) => { document.body.classList.remove("x-speaking", "x-alert-edge"); if (stats.stars >= 4) confetti(60); });
 }

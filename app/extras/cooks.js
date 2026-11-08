@@ -20,9 +20,9 @@ function cooksSheet(app) {
   const wrap = el("div", "x-sheet");
   wrap.append(el("h2", "x-title", "🏆 Your cooks"));
 
-  const best = cooks.reduce((m, c) => Math.max(m, c.score || 0), 0);
+  const best = cooks.reduce((m, c) => Math.max(m, app.history.starsOf(c)), 0);
   const stats = el("div", "x-stats");
-  for (const [n, label] of [[cooks.length, "cooks"], [best ? `${best}/10` : "–", "best score"], [streak(cooks), "day streak"]]) {
+  for (const [n, label] of [[cooks.length, "cooks"], [best ? `${best}★` : "–", "best"], [streak(cooks), "day streak"]]) {
     const s = el("div", "x-stat"); s.append(el("b", "", String(n)), el("small", "", label)); stats.append(s);
   }
   wrap.append(stats);
@@ -49,7 +49,7 @@ function cooksSheet(app) {
       el("small", "", `${new Date(c.at).toLocaleDateString(undefined, { day: "numeric", month: "short" })} · ${c.timers || 0} timers · ${c.roasts || 0} roasts${c.alerts ? ` · ${c.alerts} safety` : ""}`));
     const best = (c.highlights || []).find((h) => h.kind === "alert") || (c.highlights || []).find((h) => h.kind === "roast");
     if (best) left.append(el("small", "x-row-moment", `${best.kind === "alert" ? "🛟" : "🔥"} “${best.text}”`));
-    li.append(left, el("span", "x-score", `${c.score ?? "–"}/10`));
+    li.append(left, el("span", "x-score x-stars", app.history.starsOf(c) ? app.history.starText(app.history.starsOf(c)) : "–"));
     list.append(li);
   }
   wrap.append(list);

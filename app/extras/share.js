@@ -19,7 +19,7 @@ function wrapText(ctx, text, maxWidth) {
 
 export async function makeCard(app) {
   const s = app.stats(); const mode = app.mode;
-  const score = document.getElementById("recap-score")?.textContent || `${s.score}/10`;
+  const score = document.getElementById("recap-score")?.textContent || `${s.stars}/5 stars`;
   const c = document.createElement("canvas"); c.width = 1080; c.height = 1350;
   const ctx = c.getContext("2d");
   ctx.fillStyle = BG[mode] || BG.honest; ctx.fillRect(0, 0, c.width, c.height);

@@ -22,8 +22,8 @@ export async function initChallenge(app) {
   const chip = document.createElement("button");
   chip.className = "x-challenge";
   const render = () => {
-    const best = app.history.cooks().filter((c) => c.dish === recipe.title).reduce((m, c) => Math.max(m, c.score || 0), 0);
-    chip.textContent = `🎯 This week: ${recipe.title.replace(/ \(.*\)$/, "")}${best ? ` · best ${best}/10` : ""}`;
+    const best = app.history.cooks().filter((c) => c.dish === recipe.title).reduce((m, c) => Math.max(m, app.history.starsOf(c)), 0);
+    chip.textContent = `🎯 This week: ${recipe.title.replace(/ \(.*\)$/, "")}${best ? ` · best ${best}★` : ""}`;
   };
   render();
   chip.addEventListener("click", () => app.startCooking({ recipeId: id }));

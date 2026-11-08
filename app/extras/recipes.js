@@ -3,13 +3,13 @@
 import { loadAllergens, clashes } from "../allergens.js";
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
 
-// Cooking school: short technique lessons; Remy watches and scores you out of 10
+// Cooking school: short technique lessons; Remy watches and gives you 1-5 stars
 async function lessonsList(app) {
   const box = el("div");
-  box.append(el("p", "x-note", "Short technique practice. Remy watches you and scores your technique out of 10."));
+  box.append(el("p", "x-note", "Short technique practice. Remy watches you and gives you up to 5 stars."));
   let lessons = [];
   try { lessons = await (await fetch("/api/lessons")).json(); } catch { box.append(el("p", "x-empty", "Couldn't load lessons.")); return box; }
-  const best = (id) => app.history.cooks().filter((c) => c.lesson === id).reduce((m, c) => Math.max(m, c.score || 0), 0);
+  const best = (id) => app.history.cooks().filter((c) => c.lesson === id).reduce((m, c) => Math.max(m, app.history.starsOf(c)), 0);
   const list = el("ul", "x-list");
   for (const l of lessons) {
     const li = el("li", "x-row x-recipe");
@@ -18,7 +18,7 @@ async function lessonsList(app) {
     main.append(el("b", "", l.title), el("small", "", `${l.steps} steps · ${l.summary}`));
     main.addEventListener("click", () => { app.closeSheet(); app.startCooking({ recipeId: l.id }); });
     li.append(main);
-    if (b) li.append(el("span", "x-score x-lesson-best", `${b}/10`));   // best score, only once you have one
+    if (b) li.append(el("span", "x-score x-stars x-lesson-best", app.history.starText(b)));   // best score, only once you have one
     list.append(li);
   }
   box.append(list);
