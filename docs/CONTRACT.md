@@ -21,6 +21,7 @@ Events Remy sends to the screen:
 | type | data | screen shows |
 |---|---|---|
 | `recipe` | `{ recipe, source: "remy" \| "ai", checked_by_human }` (after `find_recipe` finds ours, or `create_recipe` succeeds). AI recipes have `recipe.safety` (safe temps) and timers may have `estimate: true` | shows the title, ingredients and step list |
+| `recipe_clear` | `{}`: the cook asked to clear the recipe ("clear the recipe") or Remy called `clear_recipe` | removes the recipe panel; timers keep running |
 | `status` | `{ status: "connecting" \| "live" \| "remy-speaking" \| "stopped" \| "error", message }` | status pill |
 | `tip` | `{ text, severity: "info" \| "warning" \| "urgent" }` | tip bubble |
 | `roast` | `{ text, level: 1 \| 2 \| 3 }` | big shaking roast bubble |

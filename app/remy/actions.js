@@ -50,8 +50,16 @@ export function createActions({ emit, request, alive, now = Date.now }) {
     }
     return null;
   }
+  // "Clear the recipe", "scrap the recipe", "get rid of the recipe" -> take it off the screen
+  const CLEAR = /\b(clear|remove|cancel|scrap|delete|forget|close|get rid of|ditch|stop)\b[^.?!]*\brecipe\b/i;
+  function clearRecipe() {
+    recipe = null; step = 0;
+    emit('recipe_clear', {});
+    return { ok: true, cleared: true, message: 'Recipe removed from the screen. Ask what they want to cook next.' };
+  }
   function hear(text) {
     heard = (heard + ' ' + text).slice(-600);
+    if (recipe && CLEAR.test(text)) return clearRecipe();
     const started = autoStart(text);
     if (started) return started;
     // Complex durations deliberately require the cook to repeat them as a number.
@@ -132,6 +140,7 @@ export function createActions({ emit, request, alive, now = Date.now }) {
           timers.set(id, { ...timer, done: false, step, instruction: recipe?.steps[step]?.instruction, next_instruction: recipe?.steps[step + 1]?.instruction });
           return { ok: true, ...timer, message: `Countdown started on the cooking screen. Announce it once, out loud, saying what it's for: "${announce(label, minutes)}"` };
         }
+        case 'clear_recipe': return clearRecipe();
         case 'cancel_timer': emit('timer_cancel', { id: args.id }); timers.delete(args.id); break;
         case 'update_step':
           if (!recipe || args.current_step < 0 || args.current_step >= recipe.steps.length) throw new Error('Choose a valid step from the loaded recipe.');

@@ -265,9 +265,11 @@ function renderRecap() {
 }
 
 function wireRemy(remy) {
-  for (const type of ["status", "recipe", "tip", "roast", "alert", "step", "timer_start", "timer_cancel"]) remy.on(type, (d) => fire(type, d));
+  for (const type of ["status", "recipe", "recipe_clear", "tip", "roast", "alert", "step", "timer_start", "timer_cancel"]) remy.on(type, (d) => fire(type, d));
   remy.on("status", setStatus);
   remy.on("recipe", (d) => { showRecipe(d); stats.recipe = d.recipe?.title || stats.recipe; });
+  // "Clear the recipe": take it off the screen (timers keep running)
+  remy.on("recipe_clear", () => { state.recipe = null; showRecipe(null); });
   remy.on("tip", (d) => showBubble(d));
   remy.on("roast", (d) => showRoast(d));
   remy.on("alert", (d) => showAlert(d.text));
@@ -516,7 +518,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v89`,
+      `version  v90`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);

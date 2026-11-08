@@ -9,7 +9,7 @@ import { createGeminiRemy } from './gemini-backup.js';
 
 export { createElevenLabsRemy };
 
-const EVENTS = ['status', 'recipe', 'tip', 'roast', 'alert', 'step', 'timer_start', 'timer_cancel'];
+const EVENTS = ['status', 'recipe', 'recipe_clear', 'tip', 'roast', 'alert', 'step', 'timer_start', 'timer_cancel'];
 
 export function createLiveRemy(options, { primary = createElevenLabsRemy, backup = createGeminiRemy,
   forceBackup = typeof location !== 'undefined' && new URLSearchParams(location.search).has('backup') } = {}) {

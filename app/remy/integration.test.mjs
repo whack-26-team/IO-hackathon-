@@ -77,7 +77,8 @@ test('camera sends the current recipe step as an object accepted by the vision A
 test('camera safety is immediate, and repeated frames do not repeat ordinary warnings',async()=>{
   const f=visionFixture(async()=>({summary:'pan',issues:[{type:'burning',confidence:0.9,detail:'black edges'}],safety:''}));
   f.vision.start(); await tick(); await f.tasks.shift()();
-  assert.equal(f.speech.length,1); assert.equal(f.context.length,2); f.vision.stop();
+  // an unchanged second frame is not re-sent to Remy (saves voice tokens)
+  assert.equal(f.speech.length,1); assert.equal(f.context.length,1); f.vision.stop();
   const urgent=visionFixture(async()=>({safety:'Smoke from oil',issues:[]}));
   urgent.vision.start(); await tick();
   assert.equal(urgent.events[0].type,'alert'); assert.equal(urgent.speech[0].u,true); urgent.vision.stop();
@@ -197,4 +198,28 @@ test('a dropped WebRTC call reconnects over WebSocket',async()=>{
   const retry=f.tasks.find(t=>!t.cancelled && t.ms===1500); assert.ok(retry); await retry.fn(); for(let i=0;i<5;i++) await tick();
   assert.deepEqual(types,['webrtc','websocket']);
   await f.remy.stop();
+});
+
+test('camera notes are only re-sent when something changes or 30 s pass',async()=>{
+  let res={summary:'pan',issues:[],safety:'',can_see_cooking:true};
+  const f=visionFixture(async()=>res);
+  f.vision.start(); await tick();
+  await f.tasks.shift()(); await f.tasks.shift()();
+  assert.equal(f.context.length,1);
+  res={...res,issues:[{type:'burning',confidence:0.9,detail:'x'}]}; await f.tasks.shift()();
+  assert.equal(f.context.length,2);
+  f.setTime(40000); await f.tasks.shift()();
+  assert.equal(f.context.length,3); f.vision.stop();
+});
+
+test('saying clear the recipe takes it off the screen; so does the clear_recipe action',async()=>{
+  const events=[]; const actions=createActions({emit:(type,data)=>events.push({type,data}),request:async()=>({}),alive:()=>true});
+  const r={id:'r',title:'R',steps:[{instruction:'Boil'}]};
+  actions.configure({tools:[{name:'clear_recipe',parameters:{type:'object',properties:{},required:[]}}],recipe:r});
+  assert.equal(actions.hear("I'm boiling the water"), null);
+  assert.equal(actions.hear('Remy, can you clear the recipe please').cleared, true);
+  assert.equal(actions.snapshot().recipe, null);
+  actions.configure({tools:[{name:'clear_recipe',parameters:{type:'object',properties:{},required:[]}}],recipe:r});
+  assert.equal((await actions.call('clear_recipe',{})).cleared, true);
+  assert.equal(events.filter(e=>e.type==='recipe_clear').length, 2);
 });
