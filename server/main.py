@@ -110,6 +110,20 @@ straight away, e.g. "Yes, chef?" or "I'm here.", then help with whatever they as
 your name. Only a safety alert comes first."""
 
 
+PEOPLE_ONLY = ("_owner", "_sources", "_checked")   # notes for the team, not instructions for Remy
+
+
+def for_remy(data) -> str:
+    """A knowledge table as compact JSON without the team-only notes (fewer voice tokens per reply)."""
+    def clean(node):
+        if isinstance(node, dict):
+            return {k: clean(v) for k, v in node.items() if k not in PEOPLE_ONLY}
+        if isinstance(node, list):
+            return [clean(v) for v in node]
+        return node
+    return json.dumps(clean(data), ensure_ascii=False, separators=(",", ":"))
+
+
 SAVAGE_ONLY = ("nicknames", "camera_reminders", "ignoring_remy", "comebacks", "savage_insult_bank")
 
 
@@ -147,9 +161,9 @@ def build_instructions(recipe: dict | None, mode: str, lite: bool = False, profi
     core = _read_text(BRAIN_DIR / "instructions.md")
     personality = _read_text(BRAIN_DIR / "personality" / f"{mode}.md")
     roasts = BRAIN_DIR / "personality" / "roasts.json"
-    roast_text = json.dumps(roasts_for_mode(_read_json(roasts), mode), ensure_ascii=False) if roasts.exists() else "{}"
-    cook_times = json.dumps(_read_json(BRAIN_DIR / "knowledge" / "cook-times.json"), ensure_ascii=False)
-    safety = json.dumps(_read_json(BRAIN_DIR / "knowledge" / "food-safety.json"), ensure_ascii=False)
+    roast_text = for_remy(roasts_for_mode(_read_json(roasts), mode)) if roasts.exists() else "{}"
+    cook_times = for_remy(_read_json(BRAIN_DIR / "knowledge" / "cook-times.json"))
+    safety = for_remy(_read_json(BRAIN_DIR / "knowledge" / "food-safety.json"))
 
     return "\n\n".join([
         core,

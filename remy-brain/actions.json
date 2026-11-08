@@ -4,7 +4,7 @@
     {
       "type": "function",
       "name": "find_recipe",
-      "description": "Call once when the cook names or changes the dish, before giving recipe-specific guidance. Pass the cook's own words. Use the returned hand-checked recipe if one exists; otherwise follow the result and call create_recipe. Do not call repeatedly for the same dish.",
+      "description": "Call once when the cook names or changes the dish (pass their words). Use the checked recipe it returns; otherwise call create_recipe.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -21,7 +21,7 @@
     {
       "type": "function",
       "name": "create_recipe",
-      "description": "Create and show a recipe only after find_recipe returns no hand-checked match, or when the cook asks to adapt a recipe. Keep it short and home-cook friendly. Include visible looks_right and looks_wrong cues and an objective done_when for every step. Never invent timer durations or food-safety temperatures: the server checks and replaces those values, so use its returned recipe.",
+      "description": "Only when find_recipe has no checked match or the cook asks to adapt one. Short home-cook steps with visible looks_right/looks_wrong and done_when. The server fixes timers and safe temperatures: use the recipe it returns.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -106,7 +106,7 @@
     {
       "type": "function",
       "name": "show_tip",
-      "description": "Show and say one short, immediately useful instruction. Use info for requested or timely guidance, warning for a likely non-dangerous mistake, and urgent only for time-sensitive correction that is not a safety emergency. Visible smoke from a hot pan, even heavy smoke, gets one plain heat-down tip, never a roast or safety_alert for smoke alone. Ask one concrete question instead when the view is uncertain. Do not call when everything is fine, repeat an unchanged tip, or bundle multiple tips. Use safety_alert for immediate danger such as visible flames.",
+      "description": "One short useful instruction. info = guidance, warning = likely mistake, urgent = time-sensitive (not danger). Smoke from a hot pan gets one heat-down tip, never a roast or alert. Unsure? Ask instead. Don't repeat or bundle tips.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -132,7 +132,7 @@
     {
       "type": "function",
       "name": "roast",
-      "description": "Use only after a non-safety mistake is clearly visible or the cook confirms it. Give the corrective action first, then one short line in the current mode. Target the food or technique, never the person. Smoke alone is not a roastable mistake or proof that food is burnt. Level 1 is the first incident; increase only for a separate confirmed repeat, never more frames of the same incident. Do not call when uncertain, during unresolved danger, for normal waiting, or for an unchanged mistake already roasted.",
+      "description": "Only for a clearly visible or cook-confirmed, non-dangerous mistake: correction first, then one line in the current mode, aimed at the food. Level up only on a separate repeat. Never when unsure, during danger, or for smoke alone.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -146,11 +146,11 @@
               2,
               3
             ],
-            "description": "1 = first confirmed incident, 2 = separate repeat, 3 = third separate repeat."
+            "description": "1 = first incident, 2 and 3 = separate repeats."
           },
           "mistake": {
             "type": "string",
-            "description": "Exact key from roasts.json: burning, overcooked, undercooked, raw, too_much_salt, messy_station, wrong_order, or slow."
+            "description": "Key from roasts.json: burning, overcooked, undercooked, raw, too_much_salt, messy_station, wrong_order or slow."
           }
         },
         "required": [
@@ -162,13 +162,13 @@
     {
       "type": "function",
       "name": "safety_alert",
-      "description": "Highest-priority red warning for clearly visible or cook-confirmed immediate danger such as flames or fire, fingers in a knife's path, raw-meat cross-contamination, or a child or pet beside an active hob. Smoke from a hot pan, even heavy smoke, is a show_tip to turn down heat, not a safety_alert unless flames or fire are visible. Call this before every other action, use a direct imperative, and drop all comedy. Do not pair it with roast while danger remains. Do not use for ordinary cooking mistakes or an ambiguous view; ask first if it is safe to wait for an answer.",
+      "description": "Immediate visible danger only (flames, fingers in the knife's path, raw meat touching ready food, child or pet at the hob). Call first, plain imperative, no jokes. Smoke alone is a tip, not an alert.",
       "parameters": {
         "type": "object",
         "properties": {
           "text": {
             "type": "string",
-            "description": "Short and clear, e.g. 'Flames in the pan: turn off the heat and cover it'."
+            "description": "Short and direct, e.g. 'Flames: turn off the heat and cover the pan'."
           }
         },
         "required": [
@@ -179,13 +179,13 @@
     {
       "type": "function",
       "name": "update_step",
-      "description": "Advance only when the current recipe step's done_when is visibly satisfied or the cook confirms it. Never infer completion from elapsed time alone. Set current_step to the 0-based step the cook is now on, say one short next instruction, and do not repeat the same update.",
+      "description": "Advance only when the step's done_when is visibly met or the cook confirms; never from time alone. current_step = the 0-based step they're now on; say the next instruction once.",
       "parameters": {
         "type": "object",
         "properties": {
           "current_step": {
             "type": "integer",
-            "description": "0-based index of the step the cook is now on."
+            "description": "0-based step now in progress."
           },
           "step_complete": {
             "type": "boolean"
@@ -203,7 +203,7 @@
     {
       "type": "function",
       "name": "start_timer",
-      "description": "Start exactly one countdown when you see or hear that the timed activity has begun, such as pasta entering the water. Use minutes only from the active recipe timer or cook-times table; never guess or silently choose within a range. If timing or start is unclear, ask. Do not start a duplicate. Say the label and duration once so the cook can correct it.",
+      "description": "Start one countdown when the timed activity begins (e.g. pasta in). Minutes only from the recipe timer or cook-times table; never guess, ask if unclear. No duplicates. Say the label and length once.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -220,7 +220,7 @@
           },
           "check_at_minutes": {
             "type": "number",
-            "description": "When to check/taste, e.g. 1 minute before the end."
+            "description": "When to check, e.g. 1 minute before the end."
           }
         },
         "required": [
@@ -233,7 +233,7 @@
     {
       "type": "function",
       "name": "cancel_timer",
-      "description": "Cancel only when the cook asks, confirms the timer is wrong, or the timed activity has definitely stopped and the countdown no longer applies. Use the exact active timer id, say what was cancelled, and never cancel merely because the camera view changed.",
+      "description": "Only when the cook asks or the timer is clearly wrong. Use the exact id and say what you cancelled.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -249,7 +249,7 @@
     {
       "type": "function",
       "name": "clear_recipe",
-      "description": "Remove the current recipe from the screen when the cook asks to clear, cancel or scrap it without naming a new dish. Timers keep running. Then ask what they want to cook next.",
+      "description": "When the cook asks to clear or scrap the recipe without naming a new dish. Timers keep running; then ask what's next.",
       "parameters": {
         "type": "object",
         "properties": {},
@@ -259,7 +259,7 @@
     {
       "type": "function",
       "name": "lesson_score",
-      "description": "Cooking-school lessons only: when the last step is done, give the technique a score from 1 to 10 and one short comment. Call once per lesson.",
+      "description": "Lessons only: when the last step is done, score the technique 1-10 with one short comment. Once per lesson.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -269,7 +269,7 @@
           },
           "comment": {
             "type": "string",
-            "description": "One short sentence about the technique."
+            "description": "One short sentence."
           }
         },
         "required": [
