@@ -52,7 +52,20 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', profile = nul
         u.onend = done; u.onerror = done;
         // if the phone blocks the line it never says "finished": don't wait forever, go back to listening
         const watchdog = setTimeout(done, 4000 + text.length * 90);
+        // iPhones sometimes stall the voice (the line never starts): unstick it and try the line once more
+        let started = false;
+        u.onstart = () => { started = true; };
+        try { if (synth.speaking || synth.pending) synth.cancel(); synth.resume?.(); } catch { /* fine */ }
         synth.speak(u);
+        setTimeout(() => {
+          if (started || finished) return;
+          u.onend = u.onerror = null;
+          try { synth.cancel(); synth.resume?.(); } catch { /* fine */ }
+          const again = new SpeechSynthesisUtterance(text);
+          again.lang = u.lang; again.voice = u.voice; again.rate = u.rate; again.pitch = u.pitch;
+          again.onend = done; again.onerror = done;
+          synth.speak(again);
+        }, 2500);
       } catch { speakingNow = false; resolve(); }
     });
   }

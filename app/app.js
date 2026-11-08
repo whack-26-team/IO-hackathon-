@@ -6,7 +6,7 @@ import { createTimers } from "./timers.js";
 import { unlockSound, beep, wakeSound, starPops } from "./sound.js";
 import { createMockRemy } from "./remy/mock.js";
 import { createLiveRemy, preloadLive } from "./remy/live.js";
-import { pickMainCamera } from "./camera.js";
+import { openCamera, pictureReady } from "./camera.js";
 import { createDemoRemy } from "./demo/demo-remy.js"; // ?demo=1 (Felix)
 import { initModeSwitch } from "./extras/mode-switch.js"; // tap the badge mid-cook (Felix)
 import { initSetupGuide } from "./extras/setup-guide.js"; // first-time setup card (Felix)
@@ -150,13 +150,22 @@ $("start-btn").addEventListener("click", async () => {
   setStatus({ status: "connecting", message: "connecting…" });
 
   try {
-    state.stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "environment", width: { ideal: 1280 } },
-      audio: true,
-    });
-    state.cameraInfo = await pickMainCamera(state.stream);   // the 1x back camera, not the 0.5x ultra-wide (camera.js)
+    // back camera, opened once, on the 1x lens when this phone has told us which one that is (camera.js)
+    const cam = await openCamera();
+    state.stream = cam.stream; state.cameraInfo = cam.info;
     $("camera").srcObject = state.stream;
+    $("camera").play?.().catch(() => {});   // some iPhones stay black until play() is called
     fitCamera();
+    // Still black after a few seconds? Close it and open the plain back camera once more.
+    if (!(await pictureReady($("camera")))) {
+      state.stream.getTracks().forEach((t) => t.stop());
+      state.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment", width: { ideal: 1280 } }, audio: true });
+      const vs = state.stream.getVideoTracks()[0]?.getSettings?.() || {};
+      state.cameraInfo = { ...state.cameraInfo, retried: true, label: state.stream.getVideoTracks()[0]?.label, width: vs.width, height: vs.height };
+      $("camera").srcObject = state.stream;
+      $("camera").play?.().catch(() => {});
+      fitCamera();
+    }
   } catch (e) {
     showBubble({ text: "I can't see anything! Allow camera and microphone access, then try again.", severity: "urgent" });
     setStatus({ status: "error", message: "No camera" });
@@ -658,8 +667,8 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `camera   ${state.cameraInfo ? `${state.cameraInfo.label} ${state.cameraInfo.width}x${state.cameraInfo.height} zoom ${state.cameraInfo.zoom}${state.cameraInfo.to ? ` (was ${state.cameraInfo.from})` : ""}${state.cameraInfo.zoomed ? " zoomed to 1x" : ""}` : "not started"}`,
-      `version  v125`,
+      `camera   ${state.cameraInfo ? `${state.cameraInfo.label} ${state.cameraInfo.width}x${state.cameraInfo.height} zoom ${state.cameraInfo.zoom} (${state.cameraInfo.tried})${state.cameraInfo.zoomed ? " zoomed to 1x" : ""}${state.cameraInfo.retried ? " RETRIED (was black)" : ""} track ${state.stream?.getVideoTracks()[0]?.readyState || "-"}` : "not started"}`,
+      `version  v126`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
