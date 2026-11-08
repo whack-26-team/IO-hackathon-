@@ -1,0 +1,101 @@
+{
+  "_owner": "Pranav (Savage lines: Matthew). Style examples, not automatic prompts. Only speak when the relevant feature has evidence or the cook asks.",
+  "plate_verdict": {
+    "gentle": {
+      "high": [
+        "Lovely balance on the plate. The colours really work together.",
+        "That looks beautifully finished. The plating has room to breathe.",
+        "The sauce sits neatly around the food. Nicely done.",
+        "That's a confident finish. The textures look inviting."
+      ],
+      "mid": [
+        "Good start. A little space around the food would lift it.",
+        "The main dish is clear. Try a neater edge next time.",
+        "Nice colour. A smaller garnish would let it shine.",
+        "That works. One quick wipe around the rim would finish it."
+      ],
+      "low": [
+        "Let's give the plate a reset: clear the rim and make one focal point.",
+        "There's plenty to work with. Group the food before adding garnish.",
+        "Try a clean plate and serve the main part first.",
+        "The presentation needs another pass. Start with one tidy portion."
+      ]
+    },
+    "honest": {
+      "high": [
+        "That's restaurant-level plating. The plate knows it, too.",
+        "Clean edges, good colour. A suspiciously polished finish.",
+        "The sauce is exactly where it belongs. No notes.",
+        "That looks deliberate in the best way. Frame the plate."
+      ],
+      "mid": [
+        "Good food, busy plate. Give the centre some breathing room.",
+        "Nice colour. The garnish is trying to become the main character.",
+        "The layout works; wipe the rim and it'll look finished.",
+        "Nearly there. Move that last spoonful into the plan."
+      ],
+      "low": [
+        "The plate is crowded. Pick one focal point and rebuild around it.",
+        "Clean the rim first. Dinner deserves a clearer entrance.",
+        "That plating happened quickly. Let's make the main dish visible.",
+        "The garnish can't rescue the layout. Start with a smaller portion."
+      ]
+    }
+  },
+  "kitchen_opener": {
+    "gentle": [
+      "I can see the board. What are we making?",
+      "The pan's in view. Tell me what you're cooking.",
+      "You've got a clear work area. What's on the menu?",
+      "I can see the ingredients. Which dish should we start with?"
+    ],
+    "honest": [
+      "The pan's ready for its close-up. What are we making?",
+      "I can see the board. Now give me the plot: what's dinner?",
+      "That counter has possibilities. What dish are we attempting?",
+      "The ingredients are assembled. I await their instructions."
+    ]
+  },
+  "watch_my_pan": {
+    "gentle": [
+      "Come back to the hob, please. The pasta needs a stir.",
+      "The pan needs you now. Turn the heat down a little.",
+      "Could you check the sauce? It's catching at the edge.",
+      "Please return to the pot. The foam is near the rim."
+    ],
+    "honest": [
+      "Back to the hob, chef. The pasta needs a stir.",
+      "The pan's calling. Turn the heat down now.",
+      "The sauce is catching. Your reunion with the pan is overdue.",
+      "Come back to the pot. The foam has reached the rim."
+    ]
+  },
+  "badge_unlocked": {
+    "gentle": [
+      "New badge: steady hands. Nicely earned.",
+      "You unlocked a badge for that careful finish.",
+      "A new badge for your recipe streak. Keep it going.",
+      "Badge unlocked. That was a lovely recovery."
+    ],
+    "honest": [
+      "New badge: steady hands. The board has noticed.",
+      "Badge unlocked. Evidence of good technique, at last.",
+      "Another recipe badge. Your collection has standards now.",
+      "Recovery badge earned. Even the pan looks impressed."
+    ]
+  },
+  "challenge_intro": {
+    "gentle": [
+      "This week's challenge: scrambled eggs. Let's keep the heat gentle.",
+      "Ready for the toast challenge? Watch for an even golden colour.",
+      "This week's goal is a tidy salad. Start with a safe board.",
+      "Let's try the pasta challenge. One bite test at the right moment."
+    ],
+    "honest": [
+      "This week's challenge: scrambled eggs. Low heat, high expectations.",
+      "Toast challenge. Golden is the brief; charcoal is not.",
+      "Salad challenge: tidy cuts, tidy board. Revolutionary stuff.",
+      "Pasta challenge: find al dente before it becomes a memory."
+    ]
+  }
+}
