@@ -1,0 +1,55 @@
+{
+  "id": "lesson-rolling-boil",
+  "title": "Spot a rolling boil",
+  "summary": "Learn the difference between a simmer and a proper rolling boil for pasta.",
+  "lesson": true,
+  "checked_by_human": false,
+  "ingredients": [
+    "A pan of water"
+  ],
+  "equipment": [
+    "Saucepan with a lid",
+    "Hob"
+  ],
+  "score_on": [
+    "water at a full rolling boil",
+    "lid used to speed it up",
+    "pan handle turned inwards"
+  ],
+  "notes": "Hot water: keep the pan handle turned in and never lean over the pan.",
+  "steps": [
+    {
+      "instruction": "Half fill a pan with water, put the lid on and turn the heat to high. Turn the handle inwards, away from the edge.",
+      "looks_right": [
+        "lid on",
+        "handle turned inwards"
+      ],
+      "looks_wrong": [
+        "handle sticking out over the edge"
+      ],
+      "done_when": "The pan is heating with the lid on."
+    },
+    {
+      "instruction": "Watch it change: tiny bubbles on the bottom (not yet), then small bubbles rising (a simmer), then big bubbles breaking all over the surface (a rolling boil).",
+      "looks_right": [
+        "big bubbles breaking across the whole surface",
+        "lots of steam"
+      ],
+      "looks_wrong": [
+        "only small bubbles on the bottom",
+        "gentle simmer at the edges only"
+      ],
+      "done_when": "The water is at a rolling boil that doesn't stop when you stir it."
+    },
+    {
+      "instruction": "Turn the heat down until it just simmers: small, steady bubbles. That's the difference.",
+      "looks_right": [
+        "small, steady bubbles after turning down"
+      ],
+      "looks_wrong": [
+        "still boiling hard"
+      ],
+      "done_when": "You've seen a rolling boil and a simmer."
+    }
+  ]
+}
