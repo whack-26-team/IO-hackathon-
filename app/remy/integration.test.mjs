@@ -258,3 +258,18 @@ test('faster start: a brain prefetched on the start screen is used once; a diffe
   const b=make('honest'); await b.start(); await b.stop();
   assert.deepEqual(calls.filter(c=>c[0]==='/api/brain').map(c=>c[1]),['savage','honest']);
 });
+
+test('voice timer changes: add/take off/set, with or without "Remy", never guessed', async () => {
+  const events = []; const a = createActions({ emit: (type, data) => events.push({ type, data }), request: async () => ({}), alive: () => true });
+  a.configure({ tools: [], recipe: { id: 'r', title: 'R', steps: [{ instruction: 'Boil' }, { instruction: 'Pasta in', timer: { label: 'Rigatoni', minutes: 11, check_at: 10 } }] } });
+  a.hear('Remy, next step'); a.hear("pasta's in");
+  const last = () => events.filter(e => e.type === 'timer_adjust').at(-1)?.data;
+  a.hear('add two minutes to the pasta'); assert.equal(last().seconds, 120);
+  a.hear('decrease it by a minute'); assert.equal(last().seconds, -60);
+  a.hear('two more minutes please'); assert.equal(last().seconds, 120);
+  a.hear('knock half a minute off'); assert.equal(last().seconds, -30);
+  a.hear('make the pasta timer 8 minutes'); assert.equal(last().to, 480);
+  const n = events.length;
+  a.hear('take the pasta out in a minute'); a.hear('add the pasta for 10 minutes');
+  assert.equal(events.length, n);   // not timer changes
+});
