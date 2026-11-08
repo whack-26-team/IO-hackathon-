@@ -7,6 +7,8 @@
 // the SAME id and the new time. We update that timer in place instead of adding a new one.
 // The cook can also change it by hand with the −1 / +1 buttons.
 
+const RIP_AFTER_MS = 15000; // a finished ticket stays red this long, then rips off
+
 export function createTimers(container, emit, beep = () => {}) {
   const timers = new Map();
 
@@ -92,6 +94,9 @@ export function createTimers(container, emit, beep = () => {}) {
       t.el.classList.add("done");
       beep("done");
       emit("timer_done", { id: t.id, label: t.label });
+      // after a while the finished ticket rips off the rail by itself (tap it to rip it now)
+      clearTimeout(t.ripTimer);
+      t.ripTimer = setTimeout(() => { if (timers.get(t.id) === t && t.done) cancel({ id: t.id }); }, RIP_AFTER_MS);
     }
   }
 
@@ -104,7 +109,7 @@ export function createTimers(container, emit, beep = () => {}) {
     t.endAt = Math.max(t.endAt + delta * 1000, now);
     t.total = Math.max(t.total + delta * 1000, t.endAt - now);
     if (t.checkAt && !t.checked) t.checkAt += delta * 1000;
-    if (t.endAt > now) { t.done = false; t.el.classList.remove("done"); }
+    if (t.endAt > now) { t.done = false; t.el.classList.remove("done"); clearTimeout(t.ripTimer); }
     flash(t.el, "updated");
     tick(t);
     emit("timer_changed", { id, label: t.label, end_at: t.endAt });
@@ -120,8 +125,14 @@ export function createTimers(container, emit, beep = () => {}) {
     const t = timers.get(id);
     if (!t) return;
     clearInterval(t.interval);
-    t.el.remove();
+    clearTimeout(t.ripTimer);
     timers.delete(id);
+    // the receipt rips off the rail and falls away, then it's gone
+    const el = t.el;
+    el.classList.add("rip");
+    const gone = () => el.remove();
+    el.addEventListener("animationend", (e) => { if (e.animationName === "rip") gone(); });
+    setTimeout(gone, 900);   // in case the animation doesn't run (reduced motion, hidden screen)
     emit("timer_removed", { id });
   }
 
