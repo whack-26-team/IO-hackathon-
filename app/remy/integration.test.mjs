@@ -15,8 +15,11 @@ function actionFixture(options={}, initialRecipe=recipe) {
   actions.configure({...brain,recipe:initialRecipe});
   return {actions,events};
 }
-test('full merged core is an exact prefix of the configured agent prompt', async()=> {
-  assert.ok((await readFile(new URL('./agent-prompt.md',import.meta.url),'utf8')).startsWith(core));
+test('agent prompt carries only the voice instructions; the core rules come once, from the server', async()=> {
+  const prompt=await readFile(new URL('./agent-prompt.md',import.meta.url),'utf8');
+  assert.ok(prompt.includes('{{session_brain}}')); assert.ok(prompt.includes('<Savage>')); assert.ok(prompt.includes('remy_action'));
+  // the core rules must not be repeated in the dashboard prompt (they'd be paid for twice on every reply)
+  assert.ok(!prompt.includes(core.split('\n').find(l=>l.startsWith('# ')))); assert.ok(!prompt.includes('## Order of priorities'));
 });
 test('timer tool becomes countdown; duplicate call does not reset it; end retains next step',async()=> {
   const {actions,events}=actionFixture();

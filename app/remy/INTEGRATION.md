@@ -19,22 +19,11 @@ OpenAI starter is retained in `openai.js`; it has not been retested.
    cooking. A cook can also request an explicit reminder duration. Ambiguous
    compound durations are rejected; repeat as a number of minutes or seconds.
 
-`agent-prompt.md` begins with the full merged `remy-brain/instructions.md`, followed
-by the transport instructions and `{{session_brain}}`. Core rules explicitly take
-priority over personality examples. The exact core prefix has an automated test.
-The configured ElevenLabs agent is `agent_5701m6w7gjqef74bxt3pvrdwbxy7` in
-Pranav's ElevenLabs workspace (public ID, not a secret). It is a manual copy of
-Ahmed's original `agent_9201m6v41z1he9eshw97vkqbyyvn`, so new calls use Pranav's
-workspace credits. The copy has a response-returning client tool named `remy_action` and two
-required string arguments: `action`, `arguments_json`. Tool timeout: 25 seconds.
-The published agent uses Eleven Realtime v1 Max with Eric as its primary voice.
-The previous GPT-6 Luna setting is stored for Custom mode but does not apply
-while Realtime mode is selected. ElevenLabs also has a secondary voice labeled
-`Savage` using its Marcus British male library voice.
-The published prompt requests `<Savage>...</Savage>` speech tags only when the
-selected mode is Savage after the screen's 18+ opt-in; Gentle and Honest use Eric.
-This is an original chef voice, not a Gordon Ramsay impersonation. Check the
-audible voice switch on a phone before treating it as verified.
+`agent-prompt.md` is our copy of the agent's dashboard prompt: only the ElevenLabs transport
+instructions (voice tags, `remy_action`, timers, camera) followed by `{{session_brain}}`. Remy's core
+rules are **not** repeated there: the server sends the latest ones at the start of `session_brain`
+(`/api/brain`), so they're paid for once per reply (about 7,300 fewer characters) and never go
+stale. If you edit the dashboard prompt, keep it in step with this file.
 
 The copied ElevenLabs settings use patient turn eagerness, background voice
 detection on, and Ignore Default Personality off. Realtime Max keeps the system
