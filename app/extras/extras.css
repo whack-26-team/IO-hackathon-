@@ -150,3 +150,18 @@ html[data-mode="savage"] .x-menu-btn.sticker svg { filter: drop-shadow(2px 3px 0
 .x-title, .x-tab, .x-surprise, .x-toggle, .x-row-main b, .x-stat b, .x-scoring summary, .x-clear, .x-share, .x-challenge, .x-special-badge, .x-score {
   font-family: "Baloo 2", var(--font); font-weight: 700; letter-spacing: 0; }
 .x-title { font-size: 28px; line-height: 1.1; }
+
+/* Recipes sheet: fixed height so switching tabs doesn't make it jump; panes fade in */
+.sheet:has(.x-recipes-sheet) { height: 82%; }
+.x-pane-in { animation: pane-in .25s ease-out; }
+@keyframes pane-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .x-pane-in { animation: none; } }
+/* cartoon sticker icons instead of emoji */
+.x-ico { width: 1.35em; height: 1.35em; flex: none; vertical-align: -0.3em; margin-right: 6px; transform: rotate(-6deg); }
+.x-tab, .x-surprise { display: inline-flex; align-items: center; justify-content: center; gap: 2px; }
+.x-special-badge { display: inline-flex; align-items: center; }
+.x-special-badge .x-ico { width: 1.6em; height: 1.6em; margin-right: 4px; }
+.x-fav { width: 28px; height: 28px; display: block; transition: transform .15s; }
+.x-star.on .x-fav { transform: rotate(-8deg) scale(1.08); }
+.x-star { display: flex; align-items: center; }
+.x-special-badge .x-ico { fill: #ffd166; }
