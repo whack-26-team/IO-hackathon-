@@ -148,6 +148,7 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', profile = nul
       for (const a of data.actions || []) results.push({ action: a.name, result: await actions.call(a.name, a.args || {}) });
       // The camera caught a mistake and Remy only talked: show his words as a roast anyway (Gentle: a tip)
       const unhandled = /\[CAMERA EVENT\]/.test(extraNote) && !results.some(x => ['roast', 'show_tip', 'safety_alert'].includes(x.action)) ? actions.takeUnhandledCamera() : null;
+      if (/\[HECKLE\]/.test(extraNote) && data.say && !results.some(x => x.action === 'roast')) emit('roast', { text: data.say, level: 1, heckle: true });
       if (unhandled && data.say) emit(mode === 'gentle' ? 'tip' : 'roast', mode === 'gentle' ? { text: data.say, severity: 'warning' } : { text: data.say, level: 1, mistake: unhandled.type });
       await say(data.say);
       // Recipe lookups / refused actions: let Remy react to the result (max two follow-ups)
@@ -173,6 +174,7 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', profile = nul
       if (type === 'mode_changed' && ['gentle', 'honest', 'savage'].includes(data.mode)) { mode = data.mode; return true; }
       if (type === 'goodbye' && typeof data.text === 'string') { say(data.text); return true; }
       if (type === 'say' && typeof data.text === 'string') { say(data.text); return true; }
+      if (type === 'heckle') { if (!busy) turn('', "[HECKLE] No mistake right now. Throw ONE short original Savage jab (max 15 words) at the cook's pace, technique, the dish or the kitchen; swearing and a playful nickname are fine. Don't claim a mistake, don't call roast, then carry on."); return true; }
       if (type === 'servings' && Number.isFinite(data.serves)) { notes.push(`[SERVINGS] Now cooking for ${data.serves}; amounts on screen are scaled. Cooking times stay the same.`); return true; }
       if (['timer_check', 'timer_done'].includes(type) && typeof data.id === 'string') {
         const event = actions.timerEvent(type, data);
