@@ -57,8 +57,64 @@ export function createActions({ emit, request, alive, now = Date.now }) {
     emit('recipe_clear', {});
     return { ok: true, cleared: true, message: 'Recipe removed from the screen. Ask what they want to cook next.' };
   }
+  // Hands-free commands the app handles itself (saves Remy a reply). They start with his name:
+  // "Remy, next step" / "back" / "repeat that" / "how long on the pasta?" / "cancel the garlic timer"
+  // / "add a minute to the pasta" / "take a minute off the sauce".
+  const NAME = /^\W*(?:hey\s+|ok\s+|okay\s+)?(?:remy|rémy|remi|remmy|ramy)\b[\s,.!?:-]*/i;
+  const NUM = { a: 1, an: 1, one: 1, two: 2, three: 3, four: 4, five: 5 };
+  function findTimer(text) {
+    const live = [...timers.values()].filter(t => !t.done || text.includes(t.label.toLowerCase()));
+    const t = text.toLowerCase();
+    return live.find(x => x.label.toLowerCase().split(/[^a-z]+/).some(w => w.length > 2 && t.includes(w)))
+      || (live.length === 1 ? live[0] : null);
+  }
+  function goToStep(index) {
+    step = Math.max(0, Math.min(recipe.steps.length - 1, index));
+    // same shape as Remy's update_step: "step k-1 complete" moves the screen to step k
+    emit('step', step === 0 ? { current_step: 0, step_complete: false, next_instruction: recipe.steps[0].instruction }
+      : { current_step: step - 1, step_complete: true, next_instruction: recipe.steps[step].instruction });
+  }
+  function command(text) {
+    const m = text.match(NAME);
+    if (!m) return null;
+    const rest = text.slice(m[0].length).toLowerCase().trim();
+    if (!rest) return null;
+    const done = (name, note) => ({ command: name, note });
+    if (/\btimer\b/.test(rest) && /\b(cancel|stop|kill|scrap|delete)\b/.test(rest)) {
+      const t = findTimer(rest);
+      if (!t) return null;
+      emit('timer_cancel', { id: t.id }); timers.delete(t.id);
+      return done('cancel timer', `${t.label} timer cancelled.`);
+    }
+    const more = rest.match(/\b(add|another|plus|extra|give (?:it|me))\b\D*?\b(a|an|one|two|three|four|five|\d+)?\s*(?:more\s+)?minutes?\b/);
+    const less = rest.match(/\b(take|knock|minus|less)\b\D*?\b(a|an|one|two|three|four|five|\d+)?\s*minutes?\b/);
+    if (more || less) {
+      const t = findTimer(rest);
+      if (!t) return null;
+      const n = Number(NUM[(more || less)[2]] ?? (more || less)[2] ?? 1) || 1;
+      const seconds = (less && !more ? -1 : 1) * n * 60;
+      emit('timer_adjust', { id: t.id, seconds });
+      t.seconds = Math.max(0, t.seconds + seconds);
+      return done('adjust timer', `${t.label} timer ${seconds > 0 ? '+' : '−'}${n} min.`);
+    }
+    if (/\bhow long\b|\btime left\b|\bhow much time\b/.test(rest)) {
+      const t = findTimer(rest);
+      emit('command', { name: 'time_left', id: t?.id || null, label: t?.label || null });
+      return done('time left', 'Time left shown on screen.');
+    }
+    if (!recipe) return null;
+    if (/\b(next( step)?|what'?s next|go on|done with this)\b/.test(rest)) { goToStep(step + 1); return done('next step', `Now on step ${step + 1}.`); }
+    if (/\b(back|previous( step)?|last step|go back)\b/.test(rest)) { goToStep(step - 1); return done('previous step', `Back to step ${step + 1}.`); }
+    if (/\b(repeat|say that again|again|what('?s| is) (the|this) step|what do i do)\b/.test(rest)) {
+      emit('command', { name: 'repeat', text: recipe.steps[step].instruction });
+      return done('repeat step', 'Current step shown on screen.');
+    }
+    return null;
+  }
   function hear(text) {
     heard = (heard + ' ' + text).slice(-600);
+    const cmd = command(text);
+    if (cmd) return cmd;
     if (recipe && CLEAR.test(text)) return clearRecipe();
     const started = autoStart(text);
     if (started) return started;

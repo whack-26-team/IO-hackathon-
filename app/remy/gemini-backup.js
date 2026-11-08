@@ -38,7 +38,7 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', video, canvas
   function say(text) {
     return new Promise(resolve => {
       const synth = globalThis.speechSynthesis;
-      if (!text || !synth) return resolve();
+      if (!text || !synth) { listen(); return resolve(); }   // nothing to say: keep listening
       try {
         stopListening();
         speakingNow = true;
@@ -83,6 +83,7 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', video, canvas
     text = (text || '').trim();
     if (!text || !active) return;
     const started = actions.hear(text); // "pasta's in" starts the timer straight away
+    if (started?.command) notes.push(`[APP HANDLED: ${started.command}] ${started.note} Acknowledge in five words or fewer; don't repeat it.`);
     if (started?.cleared) notes.push('[RECIPE CLEARED BY APP] The cook asked to clear the recipe; it is gone from the screen. Confirm briefly and ask what they want to cook next.');
     if (started?.seconds) notes.push(`[TIMER STARTED BY APP] ${started.label}, ${started.seconds / 60} minutes. Announce it once: "${started.announce}" Do not call start_timer for it.`);
     turn(text);
@@ -156,6 +157,7 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', video, canvas
         speak: (text, urgent) => turn('', text) });
       vision.start();
       status('live', 'Listening (backup voice)');
+      listen();
       turn('', '[APP] The cook just started. Greet them in one short line and ask what they are cooking.');
     },
     async stop() {
