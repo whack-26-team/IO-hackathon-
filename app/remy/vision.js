@@ -11,11 +11,13 @@ export function createVision({ video, canvas, request, actions, context, speak, 
         if (!recent('no-frame', 30000)) emit('tip', { text: 'Waiting for a clear camera picture.', severity: 'warning' });
         return;
       }
-      const scale = Math.min(1, 512 / Math.max(video.videoWidth, video.videoHeight));
+      const step = actions.currentStep();
+      // A knife step needs a little more detail to distinguish a tucked claw grip from a fingertip in the blade's path.
+      const knifeStep = /\b(knife|chop\w*|slic\w*|dic\w*|cut\w*|minc\w*|julienne|claw grip)\b/i.test(JSON.stringify(step || {}));
+      const scale = Math.min(1, (knifeStep ? 640 : 512) / Math.max(video.videoWidth, video.videoHeight));
       canvas.width = Math.round(video.videoWidth * scale);
       canvas.height = Math.round(video.videoHeight * scale);
       canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-      const step = actions.currentStep();
       const result = await request('/api/vision/look', { image: canvas.toDataURL('image/jpeg', 0.65), step: step || null }, 25000);
       if (!running || run !== generation || !alive()) return;
       if (now() - started > 5000) {
@@ -64,8 +66,10 @@ export function createVision({ video, canvas, request, actions, context, speak, 
       context('[CAMERA UNAVAILABLE] Do not claim to see the current pan. Ask the cook when needed.');
       if (!recent('error', 30000)) emit('tip', { text: 'Camera analysis unavailable. Voice still works; describe the pan to Remy.', severity: 'warning' });
     } finally {
+      // Count from the last photo's start, not from the response. This shortens the blind gap
+      // without overlapping requests or exceeding the server's two-second per-phone limit.
       if (running && run === generation && alive()) timer = schedule(look,
-        failures ? Math.min(30000, 3000 * 2 ** Math.min(failures, 3)) : 2200);
+        failures ? Math.min(30000, 3000 * 2 ** Math.min(failures, 3)) : Math.max(0, 2300 - (now() - started)));
     }
   }
   return { start() { if (!running) { running = true; generation++; void look(); } }, stop() { running = false; generation++; cancel(timer); } };
