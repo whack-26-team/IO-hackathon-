@@ -1,6 +1,6 @@
-> **⚡ URGENT (Matthew, today): cut ElevenLabs tokens by ~25%.** Copy-paste task below.
+> **✅ DONE (Matthew confirmed): the duplicate core rules were deleted from the ElevenLabs dashboard prompt.** Kept below for reference.
 
-## ⚡ Task: stop sending Remy's core rules twice to ElevenLabs (~25% fewer tokens per reply)
+## ✅ Done: stop sending Remy's core rules twice to ElevenLabs
 
 **Why:** the REMY agent's system prompt in the ElevenLabs dashboard starts with a full copy of Remy's
 core rules (~7,300 characters). Our server *also* sends the latest core rules at the start of
