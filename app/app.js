@@ -46,15 +46,43 @@ function applyMode(mode) {
   const m = MODES[mode];
   const screen = $("start-screen");
   screen.className = `screen mode-${mode}`;
-  $("greeting").textContent = m.greeting;
+  typeGreeting(m.greeting);
   const face = $("hero-face");
   setUse(face, m.face);
-  face.style.animation = "none"; void face.offsetWidth; face.style.animation = ""; // replay the pop
+  // Remy reacts to the attitude: Gentle's halo floats in, Honest smirks (Savage keeps the plain pop)
+  face.classList.remove("react-gentle", "react-honest", "react-savage"); void face.offsetWidth;
+  face.classList.add(`react-${mode}`);
   document.querySelector('meta[name="theme-color"]').setAttribute("content", m.page);
   // the page behind everything (seen under the home bar / during bounce) matches too: see style.css
   document.documentElement.dataset.mode = mode;
 }
 const checkedMode = () => document.querySelector('input[name="mode"]:checked').value;
+
+// ---------- start screen comes alive ----------
+const calm = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+// The greeting types itself out (instantly when the phone asks for less motion)
+function typeGreeting(text) {
+  const g = $("greeting");
+  clearInterval(typeGreeting.t);
+  if (calm()) { g.textContent = text; return; }
+  let i = 0; g.textContent = "";
+  g.classList.remove("typing"); void g.offsetWidth; g.classList.add("typing");
+  typeGreeting.t = setInterval(() => {
+    g.textContent = text.slice(0, ++i);
+    if (i >= text.length) { clearInterval(typeGreeting.t); g.classList.remove("typing"); }
+  }, 28);
+}
+// Remy blinks now and then (only faces with open eyes)
+(function blinkLoop() {
+  setTimeout(() => {
+    const face = $("hero-face");
+    const id = face.querySelector("use").getAttribute("href");
+    if (!calm() && !$("start-screen").classList.contains("hidden") && (id === "#f-sus" || id === "#f-watch")) {
+      face.classList.add("blink"); setTimeout(() => face.classList.remove("blink"), 140);
+    }
+    blinkLoop();
+  }, 2500 + Math.random() * 2500);
+})();
 
 // Savage needs an 18+ "yes" first. If they say no, go back to Honest.
 document.querySelectorAll('input[name="mode"]').forEach((el) =>
@@ -577,7 +605,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v106`,
+      `version  v107`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);

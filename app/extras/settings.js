@@ -23,7 +23,7 @@ function toggles(app, key, options) {
 }
 
 export function initSettings(app, menu, openSetup) {
-  menu.add("⚙️", "Settings", () => {
+  menu.add("#i-whisk", "Settings", () => {
     const wrap = document.createElement("div"); wrap.className = "x-sheet";
     const h = (tag, cls, text) => Object.assign(document.createElement(tag), { className: cls, textContent: text });
     wrap.append(h("h2", "x-title", "⚙️ Settings"),

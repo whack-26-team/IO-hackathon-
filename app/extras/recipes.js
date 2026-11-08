@@ -76,5 +76,5 @@ async function browserSheet(app) {
 }
 
 export function initRecipeBrowser(app, menu) {
-  menu.add("📖", "Recipes", async () => app.openSheet(await browserSheet(app)));
+  menu.add("#i-book", "Recipes", async () => app.openSheet(await browserSheet(app)));
 }
