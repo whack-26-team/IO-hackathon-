@@ -20,8 +20,8 @@
   <link rel="preconnect" href="https://esm.sh" crossorigin>
   <link rel="preconnect" href="https://api.elevenlabs.io" crossorigin>
   <link rel="preconnect" href="https://livekit.rtc.elevenlabs.io" crossorigin>
-  <link rel="stylesheet" href="style.css?v=109">
-  <link rel="stylesheet" href="extras/extras.css?v=109">
+  <link rel="stylesheet" href="style.css?v=110">
+  <link rel="stylesheet" href="extras/extras.css?v=110">
 </head>
 <body>
   <!-- the start screen's colour, overhanging every edge of the screen -->
@@ -189,7 +189,7 @@
       <div id="slot-cook-tools" class="slot cook-tools"></div>  <!-- Felix: 👀 📸 buttons -->
       <!-- Remy talks from his speech bubble; his face changes with what he's saying -->
       <div id="speech" class="speech quiet">
-        <svg id="cook-face" class="cook-face" viewBox="-18 -12 136 116" aria-hidden="true"><use href="#f-watch"/></svg>
+        <svg id="cook-face" class="cook-face" viewBox="-18 -12 136 116" aria-hidden="true"><use href="#f-watch"/><use class="blinker" href="#blink-eyes"/></svg>
         <div id="bubble" class="bubble"><span class="who">Remy</span><span id="bubble-text"></span></div>
       </div>
 
@@ -197,11 +197,12 @@
       <div id="no-recipe" class="panel no-recipe">Tell Remy what you're cooking 🎤</div>
 
       <!-- After the `recipe` event -->
-      <details id="recipe-panel" class="panel recipe hidden" open>
+      <details id="recipe-panel" class="panel recipe hidden">
         <summary>
           <span id="recipe-title" class="recipe-title"></span>
           <span id="recipe-tag" class="tag"></span>
           <span id="step-summary" class="step-summary"></span>
+          <span id="current-step-text" class="current-step-text"></span>
         </summary>
         <ul id="safety-list" class="safety"></ul>
         <p id="diet-warning" class="diet-warning hidden"></p>
@@ -242,6 +243,6 @@
   <!-- Bottom sheets opened by extras (app.openSheet) -->
   <div id="slot-sheets"></div>
 
-  <script type="module" src="app.js?v=109"></script>
+  <script type="module" src="app.js?v=110"></script>
 </body>
 </html>

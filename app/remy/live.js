@@ -17,7 +17,7 @@ export function preloadLive({ mode, profile } = {}) {
   prefetchBrain({ mode, profile });
 }
 
-const EVENTS = ['status', 'recipe', 'recipe_clear', 'tip', 'roast', 'alert', 'step', 'timer_start', 'timer_cancel', 'timer_adjust', 'command', 'lesson_score'];
+const EVENTS = ['status', 'voice', 'recipe', 'recipe_clear', 'tip', 'roast', 'alert', 'step', 'timer_start', 'timer_cancel', 'timer_adjust', 'command', 'lesson_score'];
 
 export function createLiveRemy(options, { primary = createElevenLabsRemy, backup = createGeminiRemy,
   forceBackup = typeof location !== 'undefined' && new URLSearchParams(location.search).has('backup') } = {}) {
@@ -46,6 +46,7 @@ export function createLiveRemy(options, { primary = createElevenLabsRemy, backup
     emit('tip', { text: `Remy's main voice is down${why ? ` (${why})` : ''}, so he's using his backup voice.`, severity: 'info' });
     current = backup({ ...options, mode });
     attach(current, false);
+    emit('voice', { kind: 'backup' });
     current.start();
   }
 
@@ -57,11 +58,12 @@ export function createLiveRemy(options, { primary = createElevenLabsRemy, backup
     },
     start() {
       stopped = false;
-      if (forceBackup) { onBackup = true; current = backup(options); attach(current, false); return current.start(); }
+      if (forceBackup) { onBackup = true; current = backup(options); attach(current, false); emit('voice', { kind: 'backup' }); return current.start(); }
       // ElevenLabs stops the tracks it was given when it gives up, so it gets a copy:
       // the camera keeps running for the backup.
       current = primary({ ...options, stream: options.stream?.clone?.() || options.stream });
       attach(current, true);
+      emit('voice', { kind: 'live' });
       return current.start();
     },
     stop() { stopped = true; return current?.stop(); },
