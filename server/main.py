@@ -38,6 +38,7 @@ from pydantic import BaseModel
 
 from server.recipe_check import check_ai_recipe
 from server.recipe_sources import IMPORT_DIR, find_recipe
+from server.knowledge import as_text, knowledge_for, relevant_cook_times, relevant_food_safety
 from server import vision
 from server import chat
 from server import push
@@ -94,7 +95,9 @@ boiled or poached), then call find_recipe with the answer.
    step looks_right / looks_wrong / done_when, and timers only where something is timed.
    If find_recipe gave a "reference" recipe, you may adapt it.
 3. create_recipe returns the checked recipe: use ITS timers (they may have been
-   corrected), mention any estimates, and give the attached safe temperatures."""
+   corrected), mention any estimates, and give the attached safe temperatures.
+The exact cooking times and safe temperatures for the dish come back in "knowledge" with
+find_recipe / create_recipe: use those."""
 
 
 def lesson_rule(recipe: dict) -> str:
@@ -167,8 +170,9 @@ def build_instructions(recipe: dict | None, mode: str, lite: bool = False, profi
     personality = _read_text(BRAIN_DIR / "personality" / f"{mode}.md")
     roasts = BRAIN_DIR / "personality" / "roasts.json"
     roast_text = for_remy(roasts_for_mode(_read_json(roasts), mode)) if roasts.exists() else "{}"
-    cook_times = for_remy(_read_json(BRAIN_DIR / "knowledge" / "cook-times.json"))
-    safety = for_remy(_read_json(BRAIN_DIR / "knowledge" / "food-safety.json"))
+    # only what matters for this dish (plus the essential safety rules): server/knowledge.py
+    cook_times = as_text(relevant_cook_times(recipe))
+    safety = as_text(relevant_food_safety(recipe))
 
     return "\n\n".join([
         core,
@@ -226,7 +230,11 @@ def find(q: str):
     Remy's find_recipe action calls this. See server/recipe_sources.py for the order."""
     if not q.strip():
         raise HTTPException(400, "Say what you'd like to cook")
-    return find_recipe(q[:200])
+    result = find_recipe(q[:200])
+    dish = result.get("recipe") or result.get("reference")
+    if dish:   # this dish's cooking times + safety, since Remy's instructions only had the essentials
+        result["knowledge"] = knowledge_for(dish)
+    return result
 
 
 class AIRecipe(BaseModel):
@@ -237,7 +245,10 @@ class AIRecipe(BaseModel):
 def ai_recipe(req: AIRecipe):
     """Safety-check a recipe Remy wrote (create_recipe): fixes timers from cook-times.json,
     marks the rest as estimates, attaches safe temperatures. See server/recipe_check.py."""
-    return check_ai_recipe(req.recipe)
+    result = check_ai_recipe(req.recipe)
+    if isinstance(result, dict) and isinstance(result.get("recipe"), dict):
+        result["knowledge"] = knowledge_for(result["recipe"])
+    return result
 
 
 @app.get("/api/recipes/{recipe_id}")
