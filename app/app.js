@@ -124,7 +124,10 @@ $("start-btn").addEventListener("click", async () => {
   let preRecipe = null;
   if (preRecipeId) {
     try { preRecipe = await (await fetch(`/api/recipes/${encodeURIComponent(preRecipeId)}`)).json(); } catch { preRecipe = null; }
-    if (preRecipe?.steps) showRecipe({ recipe: preRecipe, source: "remy", checked_by_human: preRecipe.checked_by_human });
+    if (preRecipe?.steps) {
+      showRecipe({ recipe: preRecipe, source: "remy", checked_by_human: preRecipe.checked_by_human });
+      stats.recipe = preRecipe.title; if (preRecipe.lesson) stats.lesson = preRecipe.id;
+    }
     else preRecipe = null;
   }
   const settings = history.settings();
@@ -201,7 +204,7 @@ function showGoodbye() {
   const summary = statsSummary();
   if (summary.dish || summary.timers || summary.roasts || summary.alerts) {
     history.addCook({ dish: summary.dish, mode: state.mode, score: summary.score, timers: summary.timers,
-      alerts: summary.alerts, roasts: summary.roasts, highlights: summary.highlights.slice(0, 10) });
+      alerts: summary.alerts, roasts: summary.roasts, highlights: summary.highlights.slice(0, 10), ...(summary.lesson ? { lesson: summary.lesson } : {}) });
   }
   fire("goodbye", { stats: summary });
   const face = $("goodbye-face");
@@ -236,7 +239,7 @@ const timers = createTimers($("timers"), (type, data) => {
 
 // ---------- session recap (shown on the goodbye screen) ----------
 let stats;
-function resetStats() { stats = { timers: new Set(), timersDone: 0, alerts: 0, roasts: 0, stepsDone: 0, recipe: null, highlights: [] }; }
+function resetStats() { stats = { timers: new Set(), timersDone: 0, alerts: 0, roasts: 0, stepsDone: 0, recipe: null, highlights: [], lesson: null, lessonScore: null, lessonComment: "" }; }
 // Best moments of the session (roasts, safety saves, timers) for the highlights reel. Text only.
 function highlight(kind, text) { if (text && stats.highlights.length < 30) stats.highlights.push({ kind, text: String(text).slice(0, 160) }); }
 resetStats();
@@ -247,6 +250,7 @@ function recapScore() {
   let score = 7 + (stats.timersDone > 0 ? 1 : 0) + (steps && stats.stepsDone >= steps / 2 ? 1 : 0)
     - Math.min(stats.roasts, 3) - Math.min(stats.alerts, 2) * 1.5;
   score = Math.max(1, Math.min(10, score));
+  if (stats.lesson && stats.lessonScore) return stats.lessonScore;   // cooking school: Remy's technique score
   return Math.max(1, Math.min(10, Math.round(score)));
 }
 const SCORE_LINES = {
@@ -256,15 +260,15 @@ const SCORE_LINES = {
 };
 function statsSummary() {
   return { dish: stats.recipe, timers: stats.timers.size, timersDone: stats.timersDone, alerts: stats.alerts,
-    roasts: stats.roasts, stepsDone: stats.stepsDone, score: recapScore(), highlights: [...stats.highlights] };
+    roasts: stats.roasts, stepsDone: stats.stepsDone, score: recapScore(), highlights: [...stats.highlights], lesson: stats.lesson };
 }
 // Score card: dish, big score, Remy's line, one small icon row
 function renderRecap() {
   const score = recapScore();
   const sentence = (SCORE_LINES[state.mode] || SCORE_LINES.honest)(score);   // "3/10. We'll call it practice."
-  $("recap-dish").textContent = stats.recipe || "Freestyle cook";
+  $("recap-dish").textContent = stats.lesson ? `🎓 ${stats.recipe || "Lesson"}` : (stats.recipe || "Freestyle cook");
   $("recap-num").textContent = `${score}/10`;
-  $("recap-line").textContent = sentence.replace(/^\d+\/10\.\s*/, "");
+  $("recap-line").textContent = stats.lesson && stats.lessonComment ? stats.lessonComment : sentence.replace(/^\d+\/10\.\s*/, "");
   $("recap-score").textContent = sentence;
   const items = [["⏱", stats.timers.size, "timers"], ["🛟", stats.alerts, "safety saves"], ["🔥", stats.roasts, "roasts"]];
   $("recap").replaceChildren(...items.map(([icon, n, label]) => {
@@ -275,9 +279,11 @@ function renderRecap() {
 }
 
 function wireRemy(remy) {
-  for (const type of ["status", "recipe", "recipe_clear", "timer_adjust", "command", "tip", "roast", "alert", "step", "timer_start", "timer_cancel"]) remy.on(type, (d) => fire(type, d));
+  for (const type of ["status", "recipe", "recipe_clear", "timer_adjust", "command", "lesson_score", "tip", "roast", "alert", "step", "timer_start", "timer_cancel"]) remy.on(type, (d) => fire(type, d));
   remy.on("status", setStatus);
-  remy.on("recipe", (d) => { showRecipe(d); stats.recipe = d.recipe?.title || stats.recipe; });
+  remy.on("recipe", (d) => { showRecipe(d); stats.recipe = d.recipe?.title || stats.recipe; if (d.recipe?.lesson) stats.lesson = d.recipe.id; });
+  // Cooking school: Remy's technique score becomes the session score
+  remy.on("lesson_score", (d) => { stats.lessonScore = d.score; stats.lessonComment = d.comment; showBubble({ text: `🎓 ${d.score}/10. ${d.comment}`, severity: "info" }); });
   // "Clear the recipe": take it off the screen (timers keep running)
   remy.on("recipe_clear", () => { state.recipe = null; showRecipe(null); });
   remy.on("tip", (d) => showBubble(d));
@@ -420,7 +426,8 @@ function showRecipe(data) {
   $("recipe-title").textContent = recipe.title;
   // Tag: hand-checked by our team, or written by Remy's AI (or ours but not yet checked)
   const tag = $("recipe-tag");
-  if (data.checked_by_human) { tag.textContent = "✓ Checked recipe"; tag.className = "tag checked"; }
+  if (recipe.lesson) { tag.textContent = "🎓 Lesson"; tag.className = "tag checked"; }
+  else if (data.checked_by_human) { tag.textContent = "✓ Checked recipe"; tag.className = "tag checked"; }
   else if (data.source === "ai") { tag.textContent = "🤖 Remy's recipe"; tag.className = "tag ai"; }
   else { tag.textContent = "Unchecked recipe"; tag.className = "tag unchecked"; }
 
@@ -570,7 +577,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v100`,
+      `version  v101`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);

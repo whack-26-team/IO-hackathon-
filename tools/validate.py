@@ -40,7 +40,8 @@ def cook_time(path: str):
     return node if isinstance(node, (int, float)) else None
 
 
-for path in sorted((BRAIN / "recipes").glob("*.json")):  # not _imported/ (raw imports)
+for path in [*sorted((BRAIN / "recipes").glob("*.json")),  # not _imported/ (raw imports)
+             *sorted((BRAIN / "lessons").glob("*.json"))]:   # cooking-school lessons, same shape
     r = load(path)
     if r is None:
         continue
