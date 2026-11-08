@@ -132,6 +132,7 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', profile = nul
       if (type === 'mode_changed' && ['gentle', 'honest', 'savage'].includes(data.mode)) { mode = data.mode; return true; }
       if (type === 'goodbye' && typeof data.text === 'string') { say(data.text); return true; }
       if (type === 'say' && typeof data.text === 'string') { say(data.text); return true; }
+      if (type === 'servings' && Number.isFinite(data.serves)) { notes.push(`[SERVINGS] Now cooking for ${data.serves}; amounts on screen are scaled. Cooking times stay the same.`); return true; }
       if (['timer_check', 'timer_done'].includes(type) && typeof data.id === 'string') {
         const event = actions.timerEvent(type, data);
         turn('', `[${type === 'timer_done' ? 'TIMER DONE' : 'TIMER CHECK'}] ${JSON.stringify(event)}`);

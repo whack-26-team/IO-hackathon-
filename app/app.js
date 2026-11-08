@@ -12,6 +12,7 @@ import { initSetupGuide } from "./extras/setup-guide.js"; // first-time setup ca
 import { initExtras } from "./extras/index.js"; // all other extras (Felix)
 import * as history from "./history.js"; // scores/settings, kept only on this phone
 import { loadAllergens, clashes } from "./allergens.js"; // diet/allergy ⚠ in the recipe panel
+import { scaleIngredients } from "./servings.js"; // "Serves 2 − +"
 loadAllergens();
 
 const $ = (id) => document.getElementById(id);
@@ -434,6 +435,20 @@ function showRecipe(data) {
     safety.appendChild(li);
   }
 
+  // Serves: start from the recipe's own number; − / + scale the amounts on screen
+  state.baseServes = Number(recipe.serves) || 0;
+  state.serves = state.baseServes;
+  $("servings").classList.toggle("hidden", !state.baseServes);
+  renderIngredients();
+  renderSteps(0, false);
+}
+
+function renderIngredients() {
+  const recipe = state.recipe;
+  if (!recipe) return;
+  $("serves-n").textContent = state.serves || "";
+  $("serves-minus").disabled = state.serves <= 1;
+  const list = state.baseServes ? scaleIngredients(recipe.ingredients || [], state.baseServes, state.serves) : (recipe.ingredients || []);
   // Diet / allergies from ⚙️ Settings: flag matching ingredients (a helper only: check labels)
   const { flagged, reasons } = clashes(recipe.ingredients || [], history.settings());
   const warn = $("diet-warning");
@@ -441,15 +456,26 @@ function showRecipe(data) {
   warn.textContent = reasons.length ? `⚠ May contain: ${reasons.join(", ")}. Remy can't detect allergens: check every label.` : "";
   const ing = $("ingredients-list");
   ing.innerHTML = "";
-  (recipe.ingredients || []).forEach((i, n) => {
+  list.forEach((i, n) => {
     const li = document.createElement("li");
     li.textContent = flagged.has(n) ? `⚠ ${i}` : i;
     if (flagged.has(n)) li.classList.add("flagged");
     ing.appendChild(li);
   });
   if (reasons.length) document.querySelector("#recipe-panel .ingredients")?.setAttribute("open", "");
-  renderSteps(0, false);
 }
+
+// "Serves 2 − +": amounts on screen change, cooking times don't. Remy gets one short note.
+function changeServes(delta) {
+  if (!state.recipe || !state.baseServes) return;
+  state.serves = Math.max(1, Math.min(12, state.serves + delta));
+  renderIngredients();
+  document.querySelector("#recipe-panel .ingredients")?.setAttribute("open", "");
+  clearTimeout(changeServes.t);
+  changeServes.t = setTimeout(() => state.remy?.send("servings", { serves: state.serves }), 1200); // once they stop tapping
+}
+$("serves-minus").addEventListener("click", (e) => { e.preventDefault(); changeServes(-1); });
+$("serves-plus").addEventListener("click", (e) => { e.preventDefault(); changeServes(1); });
 
 // "current" = the step you're on now. If Remy says the current step is complete,
 // the next one becomes the current one.
@@ -544,7 +570,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v99`,
+      `version  v100`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);

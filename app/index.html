@@ -16,8 +16,8 @@
   <meta name="theme-color" content="#fff4e0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=99">
-  <link rel="stylesheet" href="extras/extras.css?v=99">
+  <link rel="stylesheet" href="style.css?v=100">
+  <link rel="stylesheet" href="extras/extras.css?v=100">
 </head>
 <body>
   <!-- the start screen's colour, overhanging every edge of the screen -->
@@ -161,6 +161,7 @@
         </summary>
         <ul id="safety-list" class="safety"></ul>
         <p id="diet-warning" class="diet-warning hidden"></p>
+        <div id="servings" class="servings hidden">Serves <button id="serves-minus" aria-label="Fewer people">−</button><b id="serves-n">2</b><button id="serves-plus" aria-label="More people">+</button><small>amounts change, times don't</small></div>
         <details class="ingredients">
           <summary>Ingredients</summary>
           <ul id="ingredients-list"></ul>
@@ -197,6 +198,6 @@
   <!-- Bottom sheets opened by extras (app.openSheet) -->
   <div id="slot-sheets"></div>
 
-  <script type="module" src="app.js?v=99"></script>
+  <script type="module" src="app.js?v=100"></script>
 </body>
 </html>

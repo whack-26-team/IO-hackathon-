@@ -336,3 +336,11 @@ html[data-mode="gentle"] .score-card { background: #f4f9fe; }
 /* Diet / allergy flags in the recipe panel (⚙️ Settings) */
 .diet-warning { background: #ffb4a3; color: var(--ink); border-radius: 10px; padding: 6px 10px; margin: 6px 0; font-weight: 700; font-size: 14px; }
 #ingredients-list li.flagged { color: #ff9b85; font-weight: 800; }
+
+/* "Serves 2 − +" in the recipe panel */
+.servings { display: flex; align-items: center; gap: 8px; margin: 6px 0; font-weight: 700; font-size: 15px; }
+.servings button { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--cream); background: transparent; color: var(--cream);
+  font-size: 18px; font-weight: 800; line-height: 1; padding: 0; }
+.servings button:disabled { opacity: .35; }
+.servings b { min-width: 18px; text-align: center; font-size: 18px; }
+.servings small { opacity: .7; font-weight: 500; font-size: 12px; }

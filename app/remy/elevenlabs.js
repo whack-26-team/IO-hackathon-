@@ -209,6 +209,10 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', profile =
       await connect();
     },
     send(type, data = {}) {
+      if (type === 'servings' && Number.isFinite(data.serves)) {
+        context(`[SERVINGS] Now cooking for ${data.serves}; amounts on screen are scaled. Cooking times stay the same.`);
+        return true;
+      }
       // The screen wants Remy to say one exact line (e.g. the Rate my plate verdict)
       if (type === 'say' && typeof data.text === 'string') {
         return speak(`[SAY THIS] Say this line once, out loud, exactly as written, then stop: "${data.text.slice(0, 220)}" No actions.`, false, true);
