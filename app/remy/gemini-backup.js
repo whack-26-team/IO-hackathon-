@@ -208,7 +208,7 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', profile = nul
       status('live', 'Listening (backup voice)');
       listen();
       turn('', mode === 'savage'
-        ? '[APP] The cook just started. Sound unmistakably Savage: greet them with one short, rude food jab, then ask what they are cooking. Do not claim you saw a mistake. Keep the whole reply under 25 words.'
+        ? '[APP] The cook just started. Sound unmistakably Savage: greet them with one blunt food insult, then ask what they are cooking. Mild or strong swearing about food is allowed in this 18+ mode. Do not claim you saw a mistake. Keep it under 25 words.'
         : '[APP] The cook just started. Greet them in one short line and ask what they are cooking.');
     },
     async stop() {
