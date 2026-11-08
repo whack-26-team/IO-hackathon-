@@ -208,6 +208,10 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', stream, v
       await connect();
     },
     send(type, data = {}) {
+      // The screen wants Remy to say one exact line (e.g. the Rate my plate verdict)
+      if (type === 'say' && typeof data.text === 'string') {
+        return speak(`[SAY THIS] Say this line once, out loud, exactly as written, then stop: "${data.text.slice(0, 220)}" No actions.`, false, true);
+      }
       // The cook tapped Stop: Remy says goodbye in his attitude before the screen disconnects him
       if (type === 'goodbye' && typeof data.text === 'string') {
         return speak(`[GOODBYE] The cook tapped Stop. Say goodbye now, once, out loud, in your current ${mode} attitude, like: "${data.text.slice(0, 200)}" Keep it to one short sentence. No actions.`, true, true);
