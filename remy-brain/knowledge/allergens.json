@@ -11,7 +11,9 @@
     "fish": "fish",
     "shellfish": "shellfish",
     "sesame": "sesame",
-    "soy": "soy"
+    "soy": "soy",
+    "pescatarian": "meat (not pescatarian)",
+    "halal": "pork or alcohol (not halal)"
   },
   "words": {
     "vegetarian": [
@@ -180,6 +182,47 @@
       "edamame",
       "miso",
       "tempeh"
+    ],
+    "pescatarian": [
+      "beef",
+      "steak",
+      "pork",
+      "bacon",
+      "ham",
+      "sausage",
+      "chicken",
+      "turkey",
+      "lamb",
+      "mince",
+      "chorizo",
+      "salami",
+      "pancetta",
+      "prosciutto",
+      "duck",
+      "gelatine",
+      "lard",
+      "venison"
+    ],
+    "halal": [
+      "pork",
+      "bacon",
+      "ham",
+      "lard",
+      "gelatine",
+      "chorizo",
+      "salami",
+      "pancetta",
+      "prosciutto",
+      "pepperoni",
+      "wine",
+      "beer",
+      "cider",
+      "rum",
+      "brandy",
+      "vodka",
+      "whisky",
+      "sherry",
+      "mirin"
     ]
   }
 }

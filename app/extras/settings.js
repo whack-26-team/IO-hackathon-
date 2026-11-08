@@ -1,7 +1,7 @@
 // ⚙️ Settings (#4): diet and allergies, saved only on this phone. Remy gets one short line about
 // them, and matching ingredients are flagged ⚠ in the recipe panel and the recipe browser.
 import { pushToggle } from "./push.js";
-const DIETS = [["vegetarian", "🥕 Vegetarian"], ["vegan", "🌱 Vegan"]];
+const DIETS = [["vegetarian", "🥕 Vegetarian"], ["vegan", "🌱 Vegan"], ["pescatarian", "🐠 Pescatarian"], ["halal", "🌙 Halal"]];
 const ALLERGIES = [["nuts", "🌰 Nuts"], ["peanuts", "🥜 Peanuts"], ["gluten", "🌾 Gluten"], ["dairy", "🥛 Dairy"],
   ["egg", "🥚 Egg"], ["fish", "🐟 Fish"], ["shellfish", "🦐 Shellfish"], ["sesame", "⚪ Sesame"], ["soy", "🫘 Soy"]];
 

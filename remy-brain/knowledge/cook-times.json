@@ -78,7 +78,11 @@
     "onions_soften_medium_heat": 8,
     "onions_caramelise_low_heat": 30,
     "garlic_sliced_gentle_heat": 1.5,
-    "mushrooms_sliced_hot_pan": 5
+    "mushrooms_sliced_hot_pan": 5,
+    "aubergine_chunks_brown_per_side": 5,
+    "courgette_slices_fry": 5,
+    "peppers_chunks_fry": 5,
+    "ratatouille_final_simmer": 5
   },
   "quick_and_simple": {
     "instant_noodles_soak": 3,

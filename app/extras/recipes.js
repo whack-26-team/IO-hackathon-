@@ -52,10 +52,12 @@ async function browserSheet(app) {
   const render = () => {
     const f = favs();
     list.replaceChildren();
-    const sorted = [...recipes].sort((a, b) => (f.includes(b.id) - f.includes(a.id)) || a.title.localeCompare(b.title));
+    // Remy's special always first, then favourites, then A–Z
+    const sorted = [...recipes].sort((a, b) => (!!b.special - !!a.special) || (f.includes(b.id) - f.includes(a.id)) || a.title.localeCompare(b.title));
     for (const r of sorted) {
-      const li = el("li", "x-row x-recipe");
+      const li = el("li", "x-row x-recipe" + (r.special ? " x-special" : ""));
       const main = el("button", "x-row-main x-recipe-open");
+      if (r.special) main.append(el("span", "x-special-badge", "⭐ Remy's special"));
       const warn = clashes(r.ingredients || [], settings).reasons;
       main.append(el("b", "", r.title), el("small", "", `${r.checked_by_human ? "✓ Checked · " : ""}${r.steps} steps${r.summary ? ` · ${r.summary}` : ""}`));
       if (warn.length) main.append(el("small", "x-warn", `⚠ May contain: ${warn.join(", ")}`));

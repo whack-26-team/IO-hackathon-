@@ -1,0 +1,136 @@
+{
+  "id": "ratatouille",
+  "title": "Remy's ratatouille",
+  "special": true,
+  "summary": "Remy's signature dish: a rustic French stew of aubergine, courgette, peppers and tomato. Each veg is browned on its own, then everything comes together with garlic and basil.",
+  "aliases": [
+    "ratatouille",
+    "ratatouile",
+    "rattatouille",
+    "remy special",
+    "remy's special",
+    "remys special",
+    "remy's ratatouille",
+    "vegetable stew",
+    "french vegetable stew"
+  ],
+  "source": "Based on TheMealDB #52908 (from BBC Good Food), rewritten step by step for REMY with timers from cook-times.json. Waiting for Matthew's review.",
+  "checked_by_human": false,
+  "serves": 4,
+  "total_minutes": 60,
+  "equipment": [
+    "Large sauté pan or deep frying pan",
+    "Chopping board",
+    "Sharp knife",
+    "Heatproof bowl",
+    "Wooden spoon"
+  ],
+  "notes": "Brown each vegetable separately: crowding the pan makes them steam instead of colour. Knife work: claw grip, board on a damp cloth.",
+  "ingredients": [
+    "2 large aubergines",
+    "4 courgettes",
+    "2 yellow peppers",
+    "4 large tomatoes",
+    "5 tbsp olive oil",
+    "1 bunch of basil",
+    "1 medium onion, finely chopped",
+    "3 garlic cloves, finely chopped",
+    "1 tsp red wine vinegar",
+    "1 tsp sugar",
+    "Salt and black pepper"
+  ],
+  "steps": [
+    {
+      "instruction": "Cut the aubergines in half lengthways, then into 1.5cm chunks. Slice the courgettes into 1.5cm rounds. Cut the peppers around the stalk, remove the seeds and chop into bite-size pieces.",
+      "looks_right": [
+        "even, bite-size chunks",
+        "claw grip, board steady on a damp cloth"
+      ],
+      "looks_wrong": [
+        "fingertips flat in front of the blade",
+        "big uneven pieces (they cook unevenly)"
+      ],
+      "done_when": "All the veg is chopped into even chunks."
+    },
+    {
+      "instruction": "Score a small cross on the base of each tomato, cover with boiling water for about 20 seconds, then drain and cover with cold water. Peel off the skins, quarter them, scoop out the seeds and chop the flesh.",
+      "looks_right": [
+        "skins slipping off easily",
+        "chopped tomato flesh, no seeds"
+      ],
+      "looks_wrong": [
+        "boiling water splashing (pour slowly, away from you)",
+        "tomatoes left too long in hot water (mushy)"
+      ],
+      "done_when": "The tomatoes are peeled, seeded and chopped."
+    },
+    {
+      "instruction": "Heat 2 tbsp olive oil in the pan over medium heat. Brown the aubergine chunks for about 5 minutes on each side until golden and soft, then lift them out.",
+      "looks_right": [
+        "golden-brown edges",
+        "aubergine softening"
+      ],
+      "looks_wrong": [
+        "pan crowded (cook in two batches)",
+        "black, burnt edges (heat down)"
+      ],
+      "done_when": "The aubergine is golden and soft, set aside.",
+      "timer": {
+        "label": "Aubergine (each side)",
+        "minutes": 5,
+        "from": "veg_minutes/aubergine_chunks_brown_per_side"
+      }
+    },
+    {
+      "instruction": "Add another tbsp of oil and fry the courgettes for about 5 minutes until golden on both sides, then lift them out. Do the same with the peppers.",
+      "looks_right": [
+        "courgettes golden on both sides",
+        "peppers softening with a little colour"
+      ],
+      "looks_wrong": [
+        "veg going mushy (it cooks more later)",
+        "oil smoking hard (heat down)"
+      ],
+      "done_when": "Courgettes and peppers are golden and set aside.",
+      "timer": {
+        "label": "Courgettes",
+        "minutes": 5,
+        "from": "veg_minutes/courgette_slices_fry"
+      }
+    },
+    {
+      "instruction": "Cook the onion in the pan until soft, then add the garlic for about a minute. Stir in the vinegar and sugar, tip in the tomatoes and half the torn basil.",
+      "looks_right": [
+        "onion soft and see-through",
+        "garlic smelling sweet, pale golden"
+      ],
+      "looks_wrong": [
+        "garlic going brown (it turns bitter)",
+        "onion catching on the bottom"
+      ],
+      "done_when": "A soft onion, garlic and tomato base.",
+      "timer": {
+        "label": "Onion",
+        "minutes": 8,
+        "from": "veg_minutes/onions_soften_medium_heat"
+      }
+    },
+    {
+      "instruction": "Put all the vegetables back in, season with salt and pepper, and let it bubble gently for about 5 minutes. Scatter over the rest of the basil and serve.",
+      "looks_right": [
+        "gentle bubbling",
+        "veg coated in a glossy tomato sauce"
+      ],
+      "looks_wrong": [
+        "sauce catching and sticking (stir, heat down)",
+        "everything collapsing to mush (it's done)"
+      ],
+      "done_when": "Everything is hot, glossy and tender. Serve with basil on top.",
+      "timer": {
+        "label": "Ratatouille",
+        "minutes": 5,
+        "from": "veg_minutes/ratatouille_final_simmer"
+      }
+    }
+  ]
+}
