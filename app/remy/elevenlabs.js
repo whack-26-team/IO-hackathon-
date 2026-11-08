@@ -200,7 +200,8 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', profile =
             lastUserAt = now();
             emit('heard', { text: message });   // the cook spoke (the app's idle hang-up listens for this)
             // the cook named one of our dishes and nothing is loaded: the app loads it and tells Remy
-            if (!started) actions.autoRecipe(message).then((auto) => { if (auto?.note && run === generation && alive()) speak(auto.note, false, true); });
+            // silent note (Remy is already answering the cook): speaking it made him introduce the dish twice
+            if (!started) actions.autoRecipe(message).then((auto) => { if (auto?.note && run === generation && alive()) context(auto.note); });
           }
           // Remy answered a camera mistake in words only: show it as a roast anyway (Gentle: a tip)
           if (source === 'ai' && message && heckleAt && now() - heckleAt < 15000) { heckleAt = 0; emit('roast', { text: message, level: 1, heckle: true }); }

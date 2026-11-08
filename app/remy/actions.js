@@ -173,7 +173,7 @@ export function createActions({ emit, request, alive, now = Date.now }) {
       if (data?.found && data.recipe?.steps?.length) {
         setRecipe(data);
         const pasta = /pasta|penne|rigatoni|fusilli|spaghetti|macaroni|linguine|farfalle|tagliatelle/i.test(JSON.stringify(data.recipe.steps) + data.recipe.title);
-        return { title: data.recipe.title, note: `[APP LOADED RECIPE: ${data.recipe.title}] The cook asked for it and it's on the screen now. Confirm it in one line, name the ingredients briefly, then give step 1. Don't call find_recipe for it.${pasta ? ' Pasta dish: look for the pasta packet on camera and guess the shape and time from it; if you can\'t see one, ask which pasta they have.' : ''}` };
+        return { title: data.recipe.title, note: `[APP LOADED RECIPE: ${data.recipe.title}] The cook asked for it and it's on the screen now. If you haven't already, confirm it in one line, name the ingredients briefly, then give step 1. Say this once only; don't call find_recipe for it.${pasta ? ' Pasta dish: look for the pasta packet on camera and guess the shape and time from it; if you can\'t see one, ask which pasta they have.' : ''}` };
       }
       if (data?.ask) return { note: `[APP] ${data.message}` };
     } catch { /* offline: Remy can still call find_recipe */ }
@@ -240,6 +240,11 @@ export function createActions({ emit, request, alive, now = Date.now }) {
         case 'find_recipe': {
           const data = await request(`/api/recipes/find?q=${encodeURIComponent(args.dish)}`);
           if (!alive()) return { ok: false, message: 'Session ended.' };
+          // already on screen (e.g. the app loaded it when the cook named it): don't reload or re-introduce
+          if (data.found && recipe && data.recipe?.id === recipe.id) {
+            return { ok: true, found: true, already_loaded: true, title: recipe.title, current_step: step,
+              message: 'This recipe is already on the screen. Do NOT introduce it again or repeat the ingredients; just continue from the current step.' };
+          }
           if (data.found) setRecipe(data);
           return { ...data, ok: true };
         }

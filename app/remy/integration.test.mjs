@@ -387,3 +387,14 @@ test('lessons: two camera frames showing the step done move on without the cook 
   assert.ok(speech.some((t) => t.startsWith('[STEP DONE ON CAMERA]')));
   vision.stop();
 });
+
+test('find_recipe for the recipe already on screen does not reload or re-introduce it', async () => {
+  const tools = JSON.parse(await readFile(new URL('../../remy-brain/actions.json', import.meta.url), 'utf8')).tools;
+  const events = []; const r = { id: 'penne', title: 'Penne', steps: [{ instruction: 'Prep' }, { instruction: 'Boil' }] };
+  const a = createActions({ emit: (type, d) => events.push({ type, d }), request: async () => ({ found: true, recipe: r }), alive: () => true });
+  a.configure({ tools, recipe: r });
+  const before = events.filter(e => e.type === 'recipe').length;
+  const res = await a.call('find_recipe', { dish: 'penne with spinach' });
+  assert.equal(res.already_loaded, true);
+  assert.equal(events.filter(e => e.type === 'recipe').length, before);   // no second load
+});
