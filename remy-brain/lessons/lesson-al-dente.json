@@ -1,30 +1,58 @@
 {
   "id": "lesson-al-dente",
-  "title": "Find al dente",
-  "summary": "Learn when pasta is tender with a little bite.",
+  "title": "Test pasta for al dente",
+  "summary": "Bite-test one piece of pasta and learn what 'cooked with a little bite' looks like.",
   "lesson": true,
   "checked_by_human": false,
-  "ingredients": ["A small sample of cooking pasta"],
-  "equipment": ["Spoon", "Plate or small bowl"],
-  "score_on": ["sample cooled before tasting", "tender with slight bite", "no chalky core", "timely drain"],
+  "ingredients": [
+    "A small sample of cooking pasta"
+  ],
+  "equipment": [
+    "Spoon",
+    "Plate or small bowl"
+  ],
+  "score_on": [
+    "sample cooled before tasting",
+    "tender with slight bite",
+    "no chalky core",
+    "timely drain"
+  ],
   "notes": "Use the packet or active recipe timer; never invent a cooking duration. No rinsing is needed for the bite test.",
   "steps": [
     {
       "instruction": "Near the packet or recipe check time, lift out one piece of pasta with a spoon and let it cool briefly.",
-      "looks_right": ["one pasta piece on a spoon or plate", "steam settling before tasting"],
-      "looks_wrong": ["tasting directly from boiling water", "assuming the timer proves doneness"],
+      "looks_right": [
+        "one pasta piece on a spoon or plate",
+        "steam settling before tasting"
+      ],
+      "looks_wrong": [
+        "tasting directly from boiling water",
+        "assuming the timer proves doneness"
+      ],
       "done_when": "One piece is cool enough to taste."
     },
     {
       "instruction": "Bite the piece. Look for a tiny white dot at most, with no broad chalky core.",
-      "looks_right": ["pasta holds its shape", "centre has no broad white chalky core"],
-      "looks_wrong": ["broad chalky centre", "piece splitting or falling apart"],
+      "looks_right": [
+        "pasta holds its shape",
+        "centre has no broad white chalky core"
+      ],
+      "looks_wrong": [
+        "broad chalky centre",
+        "piece splitting or falling apart"
+      ],
       "done_when": "The cook reports tender pasta with a slight bite; a thin white dot is acceptable."
     },
     {
       "instruction": "If the centre is chalky, keep cooking and taste another piece. When it has a slight bite, drain it; no rinse needed.",
-      "looks_right": ["pasta drained after a successful bite test", "tubes or strands hold their shape"],
-      "looks_wrong": ["draining while the centre is still chalky", "waiting until pasta falls apart"],
+      "looks_right": [
+        "pasta drained after a successful bite test",
+        "tubes or strands hold their shape"
+      ],
+      "looks_wrong": [
+        "draining while the centre is still chalky",
+        "waiting until pasta falls apart"
+      ],
       "done_when": "The cook confirms a slight bite and the pasta is drained."
     }
   ]

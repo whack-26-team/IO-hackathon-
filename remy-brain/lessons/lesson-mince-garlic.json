@@ -1,0 +1,46 @@
+{
+  "id": "lesson-mince-garlic",
+  "title": "Mince garlic",
+  "summary": "Peel and finely chop a garlic clove without losing a fingertip.",
+  "lesson": true,
+  "checked_by_human": false,
+  "ingredients": [
+    "1 garlic clove"
+  ],
+  "equipment": [
+    "Chopping board",
+    "Sharp knife"
+  ],
+  "score_on": [
+    "clove peeled cleanly",
+    "fingertips tucked",
+    "fine, even pieces"
+  ],
+  "notes": "Knife lesson: safety first, no roasts while the knife is moving.",
+  "steps": [
+    {
+      "instruction": "Lay the flat of the knife on the clove and press down firmly with your palm to crack the skin, then peel it off.",
+      "looks_right": [
+        "skin cracked and peeled",
+        "knife flat, edge facing away"
+      ],
+      "looks_wrong": [
+        "edge of the blade facing your hand",
+        "smashing with fingers near the edge"
+      ],
+      "done_when": "A peeled clove."
+    },
+    {
+      "instruction": "Slice the clove thinly, then gather the slices and rock the knife back and forth over them, keeping the tip on the board.",
+      "looks_right": [
+        "knife tip stays on the board",
+        "fingers on top of the blade spine, away from the edge"
+      ],
+      "looks_wrong": [
+        "chopping wildly",
+        "fingers under the blade"
+      ],
+      "done_when": "The garlic is in tiny, even pieces."
+    }
+  ]
+}

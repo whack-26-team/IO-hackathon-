@@ -1,0 +1,62 @@
+{
+  "id": "lesson-dice-onion",
+  "title": "Dice an onion",
+  "summary": "Halve, slice and dice an onion into even little cubes, safely.",
+  "lesson": true,
+  "checked_by_human": false,
+  "ingredients": [
+    "1 onion"
+  ],
+  "equipment": [
+    "Chopping board",
+    "Damp cloth",
+    "Sharp knife"
+  ],
+  "score_on": [
+    "board stable",
+    "claw grip",
+    "even dice",
+    "root left on while cutting"
+  ],
+  "notes": "Knife lesson: safety alerts come first and no roasts while the knife is moving.",
+  "steps": [
+    {
+      "instruction": "Cut the onion in half through the root, then peel off the papery skin. Leave the root end on: it holds the layers together.",
+      "looks_right": [
+        "onion halved through the root",
+        "skin peeled off",
+        "root still attached"
+      ],
+      "looks_wrong": [
+        "root cut off (it falls apart)",
+        "board sliding"
+      ],
+      "done_when": "Two peeled halves, root still on, lying flat side down."
+    },
+    {
+      "instruction": "Flat side down, slice towards the root in thin strips, stopping just before the root. Fingertips tucked in a claw.",
+      "looks_right": [
+        "even strips",
+        "fingertips tucked",
+        "knife stops short of the root"
+      ],
+      "looks_wrong": [
+        "fingers flat in front of the blade",
+        "cutting through the root"
+      ],
+      "done_when": "One half is sliced into strips still joined at the root."
+    },
+    {
+      "instruction": "Turn it and slice across the strips to make little cubes. Finish the second half the same way.",
+      "looks_right": [
+        "small, even cubes",
+        "slow, controlled cuts"
+      ],
+      "looks_wrong": [
+        "big uneven chunks",
+        "rushing"
+      ],
+      "done_when": "A neat pile of evenly diced onion."
+    }
+  ]
+}

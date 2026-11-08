@@ -1,30 +1,60 @@
 {
   "id": "lesson-claw-grip",
-  "title": "Claw grip: safe slicing",
-  "summary": "Practise slow, controlled slices of a banana or cucumber.",
+  "title": "Knife skills: the claw grip",
+  "summary": "Practise slow, safe slices of a banana or cucumber with your fingertips tucked.",
   "lesson": true,
   "checked_by_human": false,
-  "ingredients": ["1 banana or cucumber"],
-  "equipment": ["Chopping board", "Damp cloth", "Suitable kitchen knife"],
-  "score_on": ["board stable", "fingertips tucked", "knife moving away from fingertips", "controlled slices"],
+  "ingredients": [
+    "1 banana or cucumber"
+  ],
+  "equipment": [
+    "Chopping board",
+    "Damp cloth",
+    "Suitable kitchen knife"
+  ],
+  "score_on": [
+    "board stable",
+    "fingertips tucked",
+    "knife moving away from fingertips",
+    "controlled slices"
+  ],
   "notes": "Safety first. Never roast or rush someone while they handle a knife. Stop and give a clear safety alert if fingers enter the blade path.",
   "steps": [
     {
       "instruction": "Put the board on a damp cloth so it cannot slide. Place the banana or cucumber on the board.",
-      "looks_right": ["board lies flat", "food rests securely on board"],
-      "looks_wrong": ["board sliding", "food rolling away"],
+      "looks_right": [
+        "board lies flat",
+        "food rests securely on board"
+      ],
+      "looks_wrong": [
+        "board sliding",
+        "food rolling away"
+      ],
       "done_when": "The board and food are stable before the knife is used."
     },
     {
       "instruction": "Curl your guiding fingertips behind your knuckles. Keep the blade away from your fingertips.",
-      "looks_right": ["fingertips tucked behind knuckles", "blade clear of fingertips"],
-      "looks_wrong": ["fingertips extended into the blade path", "hand reaching across the knife"],
+      "looks_right": [
+        "fingertips tucked behind knuckles",
+        "blade clear of fingertips"
+      ],
+      "looks_wrong": [
+        "fingertips extended into the blade path",
+        "hand reaching across the knife"
+      ],
       "done_when": "The guiding hand is in a safe claw position before slicing."
     },
     {
       "instruction": "Slice slowly, moving the knife away from your tucked fingertips. Stop if your grip slips.",
-      "looks_right": ["controlled slices", "fingertips remain tucked", "board remains stable"],
-      "looks_wrong": ["fingertips moving ahead of the knuckles", "rushing or unstable board"],
+      "looks_right": [
+        "controlled slices",
+        "fingertips remain tucked",
+        "board remains stable"
+      ],
+      "looks_wrong": [
+        "fingertips moving ahead of the knuckles",
+        "rushing or unstable board"
+      ],
       "done_when": "Several controlled slices are complete with the board stable and fingertips tucked."
     }
   ]

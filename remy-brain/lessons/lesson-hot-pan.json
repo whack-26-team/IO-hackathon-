@@ -1,0 +1,56 @@
+{
+  "id": "lesson-hot-pan",
+  "title": "Is the pan hot enough?",
+  "summary": "Learn when a pan and oil are ready for frying, without overheating them.",
+  "lesson": true,
+  "checked_by_human": false,
+  "ingredients": [
+    "1 tbsp oil",
+    "A small piece of bread (optional test)"
+  ],
+  "equipment": [
+    "Frying pan",
+    "Hob"
+  ],
+  "score_on": [
+    "oil shimmering, not smoking hard",
+    "test sizzle",
+    "heat turned down when needed"
+  ],
+  "notes": "Hot oil: keep water away and never leave it unattended. Heavy smoke means heat down.",
+  "steps": [
+    {
+      "instruction": "Put the pan on medium-high heat for a minute, then add the oil and tilt it to coat the pan.",
+      "looks_right": [
+        "oil spread thinly across the pan"
+      ],
+      "looks_wrong": [
+        "oil added to a cold pan and left",
+        "pan on the highest heat with nothing in it for ages"
+      ],
+      "done_when": "Oil coating the pan."
+    },
+    {
+      "instruction": "Watch the oil: when it ripples and shimmers like a heat haze, it's ready. Drop in a crumb of bread: it should sizzle straight away.",
+      "looks_right": [
+        "oil shimmering",
+        "instant sizzle around the bread"
+      ],
+      "looks_wrong": [
+        "no sizzle (not hot enough)",
+        "heavy smoke (too hot: heat down)"
+      ],
+      "done_when": "The oil shimmers and the test crumb sizzles."
+    },
+    {
+      "instruction": "Turn the heat down a notch and take the pan off the heat. You've found 'hot enough'.",
+      "looks_right": [
+        "heat turned down"
+      ],
+      "looks_wrong": [
+        "pan left on high"
+      ],
+      "done_when": "The pan is off the heat, and you know what ready looks like."
+    }
+  ]
+}

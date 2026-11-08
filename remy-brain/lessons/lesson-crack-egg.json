@@ -1,30 +1,55 @@
 {
   "id": "lesson-crack-egg",
-  "title": "Crack an egg cleanly",
-  "summary": "Open an egg into a bowl while keeping shell pieces out.",
+  "title": "Crack an egg without shell",
+  "summary": "Open an egg into a bowl and keep every bit of shell out.",
   "lesson": true,
   "checked_by_human": false,
-  "ingredients": ["1 egg"],
-  "equipment": ["Small bowl"],
-  "score_on": ["tap on flat surface", "shell opened over bowl", "no shell left in egg"],
+  "ingredients": [
+    "1 egg"
+  ],
+  "equipment": [
+    "Small bowl"
+  ],
+  "score_on": [
+    "tap on flat surface",
+    "shell opened over bowl",
+    "no shell left in egg"
+  ],
   "notes": "Wash hands and surfaces after handling raw egg. Do not judge the egg safe to eat from appearance.",
   "steps": [
     {
       "instruction": "Set a bowl on a stable surface. Tap the egg once on a flat countertop.",
-      "looks_right": ["bowl stable", "one visible crack in the shell"],
-      "looks_wrong": ["bowl wobbling", "shell crushed into many small pieces"],
+      "looks_right": [
+        "bowl stable",
+        "one visible crack in the shell"
+      ],
+      "looks_wrong": [
+        "bowl wobbling",
+        "shell crushed into many small pieces"
+      ],
       "done_when": "The egg has one crack and is held over the bowl."
     },
     {
       "instruction": "Put both thumbs into the crack and gently pull the shell halves apart over the bowl.",
-      "looks_right": ["egg drops into bowl", "shell halves stay in hands"],
-      "looks_wrong": ["shell pieces falling into the bowl", "egg spilling outside the bowl"],
+      "looks_right": [
+        "egg drops into bowl",
+        "shell halves stay in hands"
+      ],
+      "looks_wrong": [
+        "shell pieces falling into the bowl",
+        "egg spilling outside the bowl"
+      ],
       "done_when": "The egg is in the bowl and the main shell halves are out."
     },
     {
       "instruction": "Check for shell. If you see a piece, lift it out with a larger piece of shell, then wash your hands.",
-      "looks_right": ["no visible shell in bowl", "shell disposed of"],
-      "looks_wrong": ["shell fragment still in the egg"],
+      "looks_right": [
+        "no visible shell in bowl",
+        "shell disposed of"
+      ],
+      "looks_wrong": [
+        "shell fragment still in the egg"
+      ],
       "done_when": "No shell is visible in the bowl and hands have been washed."
     }
   ]
