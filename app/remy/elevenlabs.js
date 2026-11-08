@@ -172,7 +172,7 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', profile =
         } catch { return JSON.stringify({ ok: false, message: 'arguments_json must be a valid JSON object using the supplied action schema.' }); }
       };
       const options = { ...credentials, connectionType: transport,
-        dynamicVariables: { session_brain: brain.instructions + '\n\n# ACTION SCHEMAS\n' + JSON.stringify(brain.tools) },
+        dynamicVariables: { session_brain: brain.instructions + '\n\n# ACTION SCHEMAS\n' + (brain.tools_text || JSON.stringify(brain.tools)) },
         clientTools,
         onMessage: ({ source, message }) => {
           if (run !== generation || !alive()) return;

@@ -210,6 +210,7 @@ $("stop-btn").addEventListener("click", stopCooking);
 function stopCooking() {
   if (!state.cooking) return; // Remy's "stopped" status can call this too; only run once
   state.cooking = false;
+  clearTimeout(state.finishing); state.finishing = null;
   const remy = state.remy, wasLive = state.live;
   state.remy = null;
   // Remy says goodbye out loud in his attitude. Real Remy speaks it himself, so his voice
@@ -363,7 +364,8 @@ function wireRemy(remy) {
   remy.on("heard", () => keepRemy());   // the cook spoke
   remy.on("recipe", (d) => { showRecipe(d); stats.recipe = d.recipe?.title || stats.recipe; if (d.recipe?.lesson) stats.lesson = d.recipe.id; });
   // Cooking school: Remy's technique score becomes the session score
-  remy.on("lesson_score", (d) => { stats.lessonScore = d.score; stats.lessonComment = d.comment; showBubble({ text: `${history.starText(Math.max(1, Math.min(5, Math.round(d.score / 2))))} ${d.comment}`, severity: "info" }); });
+  remy.on("lesson_score", (d) => { if (!state.finishing) state.finishing = setTimeout(() => { state.finishing = null; stopCooking(); }, 4500);   // lesson marked: review page
+    stats.lessonScore = d.score; stats.lessonComment = d.comment; showBubble({ text: `${history.starText(Math.max(1, Math.min(5, Math.round(d.score / 2))))} ${d.comment}`, severity: "info" }); });
   // "Clear the recipe": take it off the screen (timers keep running)
   remy.on("recipe_clear", () => { state.recipe = null; showRecipe(null); });
   remy.on("tip", (d) => showBubble(d));
@@ -371,6 +373,12 @@ function wireRemy(remy) {
   remy.on("alert", (d) => showAlert(d.text));
   remy.on("step", (d) => {
     if (d.step_complete) stats.stepsDone = Math.max(stats.stepsDone, (d.current_step ?? 0) + 1);
+    // Recipe finished (last step done, by Remy or by voice): end the session and show the review page.
+    // A short pause lets Remy finish his line. Lessons wait for Remy's score instead (lesson_score).
+    const steps = state.recipe?.steps?.length || 0;
+    if (d.step_complete && steps && stats.stepsDone >= steps && !state.recipe?.lesson && !state.finishing) {
+      state.finishing = setTimeout(() => { state.finishing = null; stopCooking(); }, 2500);
+    }
     renderSteps(d.current_step, d.step_complete);
     if (d.next_instruction) showBubble({ text: d.next_instruction, severity: "info" });
   });
@@ -387,6 +395,8 @@ function wireRemy(remy) {
   // +/- time, or { to } = set what's left (e.g. "make the pasta timer 8 minutes")
   remy.on("timer_adjust", (d) => timers.adjust(d.id, d.to != null ? d.to - (timers.remaining(d.id)?.left ?? 0) : d.seconds));
   remy.on("command", (d) => {
+    // "end the session" / "I've finished the recipe" / "done" on the last step: straight to the review page
+    if (d.name === "end_session") { setTimeout(() => stopCooking(), d.finished ? 900 : 300); return; }
     if (d.name === "repeat" && d.text) showBubble({ text: d.text, severity: "info" });
     if (d.name === "time_left") {
       const r = timers.remaining(d.id);
@@ -673,7 +683,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
       `camera   ${state.cameraInfo ? `${state.cameraInfo.label} ${state.cameraInfo.width}x${state.cameraInfo.height} zoom ${state.cameraInfo.zoom} (${state.cameraInfo.tried})${state.cameraInfo.zoomed ? " zoomed to 1x" : ""}${state.cameraInfo.retried ? " RETRIED (was black)" : ""} track ${state.stream?.getVideoTracks()[0]?.readyState || "-"}` : "not started"}`,
-      `version  v130`,
+      `version  v131`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);

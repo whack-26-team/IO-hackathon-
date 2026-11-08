@@ -101,7 +101,8 @@ export function createActions({ emit, request, alive, now = Date.now }) {
     const question = /^(is|are|has|have|how|when|what'?s? (?:about|if)|do|does|should|can|will)\b/.test(rest) || /\?\s*$/.test(rest);
     if (/\b(next( step)?|what'?s next|go on)\b/.test(rest) || (!question && /^(?:i'?m |we'?re |all |that'?s )?(done|finished|plated)\b|\bdone with this\b/.test(rest))) {
       goToStep(step + 1);
-      return step >= recipe.steps.length ? done('recipe finished', 'All steps done: the recipe is finished. Congratulate them in one line.') : done('next step', `Now on step ${step + 1}.`);
+      if (step >= recipe.steps.length) { emit('command', { name: 'end_session', finished: true }); return done('recipe finished', 'All steps done: the recipe is finished.'); }
+      return done('next step', `Now on step ${step + 1}.`);
     }
     if (/\b(back|previous( step)?|last step|go back)\b/.test(rest)) { goToStep(step - 1); return done('previous step', `Back to step ${step + 1}.`); }
     if (/\b(repeat|say that again|again|what('?s| is) (the|this) step|what do i do)\b/.test(rest)) {
@@ -148,8 +149,20 @@ export function createActions({ emit, request, alive, now = Date.now }) {
     t.seconds = Math.max(0, t.seconds + seconds);
     return { command: 'adjust timer', note: `${t.label} timer ${seconds > 0 ? '+' : '−'}${say(seconds)}.` };
   }
+  // "end the session", "I've finished the recipe", "stop cooking", "bye Remy": the app ends the session
+  // and goes to the review (goodbye) page. With or without "Remy" first. Questions don't count.
+  const END = /\b(?:end|finish|stop|close|wrap up)\s+(?:the\s+|this\s+|my\s+)?(?:session|cooking|cook)\b|\b(?:i|we)(?:'ve| have)?\s+finished\s+(?:the\s+)?(?:recipe|cooking|dish|meal)\b|\b(?:recipe|dish|meal|food)(?:'s| is)\s+(?:all\s+)?(?:done|finished|ready)\b|\b(?:i'?m|we'?re)\s+(?:all\s+)?(?:done|finished)\s+cooking\b|\b(?:bye|goodbye|see you|cheers),?\s+remy\b|\bthat'?s\s+(?:it|all)\s+for\s+(?:today|now|tonight)\b/;
+  function endSession(text) {
+    const t = text.toLowerCase();
+    if (/^\W*(?:is|are|has|have|how|when|should|can|will|do|does)\b/.test(t.replace(NAME, '')) || /\?\s*$/.test(t)) return null;
+    if (!END.test(t)) return null;
+    emit('command', { name: 'end_session' });
+    return { command: 'end session', note: 'The cook ended the session; the app is saying goodbye.' };
+  }
   function hear(text) {
     heard = (heard + ' ' + text).slice(-600);
+    const end = endSession(text);
+    if (end) return end;
     const adj = adjustTimer(text);
     if (adj) return adj;
     const cmd = command(text);
