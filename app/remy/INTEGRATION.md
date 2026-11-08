@@ -7,7 +7,7 @@ OpenAI starter is retained in `openai.js`; it has not been retested.
 
 1. The screen provides its camera, canvas and microphone stream.
 2. `/api/brain` supplies the complete merged instructions, selected personality,
-   knowledge and eight action schemas. These are sent as `session_brain`.
+   knowledge and the current action schemas. These are sent as `session_brain`.
 3. ElevenLabs handles spoken conversation. Its `remy_action` client tool dispatches
    schema-checked actions to the existing screen events. Recipe actions use the
    server's checked recipe endpoints.
