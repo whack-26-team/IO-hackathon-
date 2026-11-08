@@ -1,0 +1,40 @@
+<!-- Draft icons for the start screen (Remy's sticker style: thick ink outline, flat fills). Owner: Matthew. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute">
+  <defs>
+    <!-- A: trophy wearing a little chef's hat -->
+    <g id="i-trophy" stroke="#1a1a1a" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M30 34 H70 V48 C70 62 61 70 50 70 C39 70 30 62 30 48 Z" fill="#ffd166"/>
+      <path d="M30 40 C18 40 18 58 32 58" fill="none"/><path d="M70 40 C82 40 82 58 68 58" fill="none"/>
+      <path d="M44 70 V78 H56 V70" fill="#ffd166"/><path d="M36 78 H64 V88 H36 Z" fill="#e8432c"/>
+      <path d="M38 34 C32 34 30 27 35 24 C34 17 43 13 48 18 C51 11 62 13 62 20 C68 19 71 27 66 31 L64 34 Z" fill="#fff"/>
+      <path d="M45 48 L50 44 L55 48" fill="none" stroke-width="4"/>
+    </g>
+    <!-- A: settings = whisk crossed with a wooden spoon -->
+    <g id="i-whisk" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M30 78 L62 30" /><ellipse cx="68" cy="22" rx="10" ry="14" transform="rotate(34 68 22)" fill="#e8b27a"/>
+      <path d="M30 78 L62 30" stroke="#e8b27a" stroke-width="2"/>
+      <path d="M70 80 L42 38" /><path d="M42 38 C30 22 34 10 42 12 C50 14 52 26 42 38 Z" fill="#fff"/>
+      <path d="M42 38 C38 26 40 16 42 12" fill="none" stroke-width="3"/><path d="M42 38 C46 26 46 16 42 12" fill="none" stroke-width="3"/>
+      <path d="M64 70 L76 90" stroke-width="9"/><path d="M64 70 L76 90" stroke="#e8432c" stroke-width="4"/>
+    </g>
+    <!-- A + C: cookbook with a ribbon bookmark -->
+    <g id="i-book" stroke="#1a1a1a" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M22 26 C34 20 44 22 50 28 C56 22 66 20 78 26 V80 C66 74 56 76 50 82 C44 76 34 74 22 80 Z" fill="#fff"/>
+      <path d="M50 28 V82" fill="none"/>
+      <path d="M30 38 H42 M30 48 H42 M58 38 H70 M58 48 H68" stroke-width="3.5"/>
+      <path d="M62 24 V44 L66 40 L70 44 V22" fill="#e8432c" stroke-width="4"/>
+    </g>
+    <!-- C: oven knob (settings) -->
+    <g id="i-knob" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round">
+      <circle cx="50" cy="52" r="30" fill="#fff"/><circle cx="50" cy="52" r="18" fill="#e8432c"/>
+      <path d="M50 38 V52" stroke="#fff" stroke-width="6"/><path d="M50 38 V52" stroke-width="2"/>
+      <path d="M50 14 V18 M76 26 L73 29 M86 52 H82 M24 26 L27 29 M14 52 H18" stroke-width="4"/>
+    </g>
+    <!-- C: gold medal on a ribbon (your cooks) -->
+    <g id="i-medal" stroke="#1a1a1a" stroke-width="5" stroke-linejoin="round">
+      <path d="M32 14 L44 46 H56 L68 14 H56 L50 30 L44 14 Z" fill="#e8432c"/>
+      <circle cx="50" cy="64" r="22" fill="#ffd166"/><circle cx="50" cy="64" r="13" fill="none" stroke-width="3.5"/>
+      <path d="M50 56 L53 62 L60 63 L55 67 L56 74 L50 70 L44 74 L45 67 L40 63 L47 62 Z" fill="#fff" stroke-width="2.5"/>
+    </g>
+  </defs>
+</svg>
