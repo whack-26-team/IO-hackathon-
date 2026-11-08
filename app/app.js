@@ -367,7 +367,8 @@ function wireRemy(remy) {
   });
   remy.on("timer_cancel", (d) => timers.cancel(d));
   // Hands-free commands (actions.js): "add a minute to the pasta", "how long left?", "repeat that"
-  remy.on("timer_adjust", (d) => timers.adjust(d.id, d.seconds));
+  // +/- time, or { to } = set what's left (e.g. "make the pasta timer 8 minutes")
+  remy.on("timer_adjust", (d) => timers.adjust(d.id, d.to != null ? d.to - (timers.remaining(d.id)?.left ?? 0) : d.seconds));
   remy.on("command", (d) => {
     if (d.name === "repeat" && d.text) showBubble({ text: d.text, severity: "info" });
     if (d.name === "time_left") {

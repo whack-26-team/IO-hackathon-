@@ -248,6 +248,28 @@
     },
     {
       "type": "function",
+      "name": "adjust_timer",
+      "description": "When the cook asks to add or take time off a running timer, or change it to a new length. Exact id; then say the new time.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "add_seconds": {
+            "type": "integer"
+          },
+          "set_minutes": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "type": "function",
       "name": "clear_recipe",
       "description": "When the cook asks to clear or scrap the recipe without naming a new dish. Timers keep running; then ask what's next.",
       "parameters": {

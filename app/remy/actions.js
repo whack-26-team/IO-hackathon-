@@ -86,17 +86,6 @@ export function createActions({ emit, request, alive, now = Date.now }) {
       emit('timer_cancel', { id: t.id }); timers.delete(t.id);
       return done('cancel timer', `${t.label} timer cancelled.`);
     }
-    const more = rest.match(/\b(add|another|plus|extra|give (?:it|me))\b\D*?\b(a|an|one|two|three|four|five|\d+)?\s*(?:more\s+)?minutes?\b/);
-    const less = rest.match(/\b(take|knock|minus|less)\b\D*?\b(a|an|one|two|three|four|five|\d+)?\s*minutes?\b/);
-    if (more || less) {
-      const t = findTimer(rest);
-      if (!t) return null;
-      const n = Number(NUM[(more || less)[2]] ?? (more || less)[2] ?? 1) || 1;
-      const seconds = (less && !more ? -1 : 1) * n * 60;
-      emit('timer_adjust', { id: t.id, seconds });
-      t.seconds = Math.max(0, t.seconds + seconds);
-      return done('adjust timer', `${t.label} timer ${seconds > 0 ? '+' : '−'}${n} min.`);
-    }
     if (/\bhow long\b|\btime left\b|\bhow much time\b/.test(rest)) {
       const t = findTimer(rest);
       emit('command', { name: 'time_left', id: t?.id || null, label: t?.label || null });
@@ -111,8 +100,48 @@ export function createActions({ emit, request, alive, now = Date.now }) {
     }
     return null;
   }
+  // Change a running timer by voice, with or without "Remy" first:
+  // "add two minutes to the pasta", "take 30 seconds off", "two more minutes", "decrease it by a minute",
+  // "make the pasta timer 8 minutes". Only when it's clear which timer (named, or the only one running).
+  const DUR = String.raw`(a|an|one|two|three|four|five|six|seven|eight|nine|ten|fifteen|twenty|thirty|\d+(?:\.\d+)?)\s*(?:more\s+|extra\s+)?(minutes?|mins?|seconds?|secs?)\b`;
+  const NUMW = { ...NUM, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, fifteen: 15, twenty: 20, thirty: 30 };
+  const toSeconds = (n, unit) => (Number(NUMW[n] ?? n) || 1) * (/^s/.test(unit) ? 1 : 60);
+  const say = (s) => { const a = Math.abs(s); return a % 60 ? `${a} sec` : `${a / 60} min`; };
+  function adjustTimer(text) {
+    if (!timers.size) return null;
+    const t0 = text.replace(NAME, '').toLowerCase().replace(/half a minute/g, '30 seconds');
+    const set = !/\ba (new |second |another )?timer\b/.test(t0) &&
+      (t0.match(new RegExp(String.raw`\b(?:make|set|change|put|reset)\b[^.]*?\bto\s+${DUR}`)) || t0.match(new RegExp(String.raw`\bmake (?:it|that|the \w+(?: timer)?)\s+${DUR}`)));
+    // the amount must come soon after the verb ("add two minutes", "reduce the pasta timer by 2 minutes"),
+    // and not "add the pasta FOR 10 minutes" (a new timer) or "take it out IN a minute"
+    const near = String.raw`\s+(?:\w+\s+){0,4}?`;
+    const clean = (m) => (m && !/\b(for|in|into|out|after)\b/.test(m[0]) ? m : null);
+    const amount = t0.match(new RegExp(String.raw`\b${DUR}`));
+    const more = clean(t0.match(new RegExp(String.raw`\b(?:add|another|plus|extra|give (?:it|me)|increase|extend)${near}${DUR}`)))
+      || t0.match(new RegExp(String.raw`\b${DUR}\s*(?:more|extra|longer)\b`))
+      || (amount && /\b(more|extra)\b/.test(amount[0]) ? amount : null)            // "two more minutes"
+      || t0.match(/\b(?:another|one more)\s+(minute|min)\b/);
+    let less = clean(t0.match(new RegExp(String.raw`\b(?:take|knock|minus|decrease|reduce|remove|subtract|shorten|cut)${near}${DUR}`)))
+      || t0.match(new RegExp(String.raw`\b${DUR}\s*(?:less|shorter)\b`));
+    if (less && /\b(take|knock)\b/.test(less[0]) && !/\boff\b/.test(t0)) less = null;   // "take ... off" only
+    if (!set && !more && !less) return null;
+    const t = findTimer(t0);
+    if (!t) return null;   // not clear which timer: Remy asks (or uses adjust_timer)
+    if (set) {
+      const to = toSeconds(set[1], set[2]);
+      emit('timer_adjust', { id: t.id, to });
+      return { command: 'adjust timer', note: `${t.label} timer changed to ${say(to)}.` };
+    }
+    const m = (less && !more ? less : more);
+    const seconds = (less && !more ? -1 : 1) * (m.length > 2 ? toSeconds(m[1], m[2]) : 60);
+    emit('timer_adjust', { id: t.id, seconds });
+    t.seconds = Math.max(0, t.seconds + seconds);
+    return { command: 'adjust timer', note: `${t.label} timer ${seconds > 0 ? '+' : '−'}${say(seconds)}.` };
+  }
   function hear(text) {
     heard = (heard + ' ' + text).slice(-600);
+    const adj = adjustTimer(text);
+    if (adj) return adj;
     const cmd = command(text);
     if (cmd) return cmd;
     if (recipe && CLEAR.test(text)) return clearRecipe();
@@ -203,6 +232,15 @@ export function createActions({ emit, request, alive, now = Date.now }) {
           return { ok: true, message: `Lesson score ${score}/10 shown on screen. Say it once.` };
         }
         case 'cancel_timer': emit('timer_cancel', { id: args.id }); timers.delete(args.id); break;
+        case 'adjust_timer': {
+          const t = timers.get(args.id);
+          if (!t) throw new Error('No running timer with that id.');
+          if (typeof args.set_minutes === 'number' && args.set_minutes > 0) { emit('timer_adjust', { id: t.id, to: Math.round(args.set_minutes * 60) }); return { ok: true, message: `${t.label} timer now ${args.set_minutes} min. Say it in a few words.` }; }
+          const s = Math.round(Number(args.add_seconds) || 0);
+          if (!s) throw new Error('Give add_seconds (negative to take time off) or set_minutes.');
+          emit('timer_adjust', { id: t.id, seconds: s }); t.seconds = Math.max(0, t.seconds + s);
+          return { ok: true, message: `${t.label} timer ${s > 0 ? '+' : '−'}${say(s)}. Say it in a few words.` };
+        }
         case 'update_step':
           if (!recipe || args.current_step < 0 || args.current_step >= recipe.steps.length) throw new Error('Choose a valid step from the loaded recipe.');
           step = args.current_step + (args.step_complete ? 1 : 0);
