@@ -126,9 +126,9 @@
   $("btn-cam").onclick = async () => {
     const r = $("row-cam");
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment", width: { ideal: 1280 } }, audio: true });
-      const { pickMainCamera } = await import("/camera.js");
-      const cam = await pickMainCamera(stream);   // same 1x-camera choice as the app
+      const { openCamera } = await import("/camera.js");
+      const opened = await openCamera();   // same camera choice as the app
+      const stream = opened.stream, cam = opened.info;
       const camNote = cam ? `${cam.label} · ${cam.width}×${cam.height}` : "camera";
       const wideOnly = cam && /ultra|dual wide/i.test(cam.label) && !cam.zoomed;
       $("video").srcObject = stream; $("video").style.display = "block"; $("meter").style.display = "block";
