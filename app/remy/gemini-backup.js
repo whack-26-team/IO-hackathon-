@@ -47,7 +47,7 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', profile = nul
         u.lang = 'en-GB'; u.voice = pickVoice();
         u.rate = mode === 'savage' ? 1.12 : mode === 'gentle' ? 0.95 : 1.02;
         u.pitch = mode === 'savage' ? 0.9 : 1;
-        const done = () => { speakingNow = false; if (active) { status('live', 'Listening (backup voice)'); listen(); } resolve(); };
+        const done = () => { speakingNow = false; if (active) { status('live', blockedTries > 0 ? 'Can’t hear you: turn on Dictation' : 'Listening (backup voice)'); listen(); } resolve(); };
         u.onend = done; u.onerror = done;
         synth.speak(u);
       } catch { speakingNow = false; resolve(); }
@@ -55,6 +55,7 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', profile = nul
   }
 
   // ---------- listening (phone speech recognition) ----------
+  let lastHearError = null, blockedTries = 0, toldBlocked = false, toldOther = false;
   function listen() {
     if (!active || speakingNow || recognizer) return;
     const SR = globalThis.SpeechRecognition || globalThis.webkitSpeechRecognition;
@@ -64,11 +65,29 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', profile = nul
       r.lang = 'en-GB'; r.continuous = true; r.interimResults = false;
       r.onresult = e => {
         for (let i = e.resultIndex; i < e.results.length; i++) {
-          if (e.results[i].isFinal) heard(e.results[i][0].transcript);
+          if (e.results[i].isFinal) { blockedTries = 0; heard(e.results[i][0].transcript); }
         }
       };
-      r.onend = () => { recognizer = null; if (active && !speakingNow) restartTimer = schedule(listen, 300); };
-      r.onerror = () => {};
+      // keep listening; if the phone keeps refusing, retry slowly instead of 3 times a second
+      r.onend = () => { recognizer = null; if (active && !speakingNow) restartTimer = schedule(listen, blockedTries > 2 ? 5000 : 300); };
+      // The phone's speech recognition failed. Most often on iPhone: Dictation is off, or Safari isn't
+      // allowed Speech Recognition. Say so (once) instead of silently never hearing the cook.
+      r.onerror = (e) => {
+        const code = e?.error || 'unknown';
+        lastHearError = code;
+        if (code === 'no-speech' || code === 'aborted') return;   // normal: quiet room, or we stopped it
+        if (code === 'not-allowed' || code === 'service-not-allowed') {
+          blockedTries++;
+          if (!toldBlocked) {
+            toldBlocked = true;
+            emit('tip', { text: "I can't hear you! On iPhone: Settings › General › Keyboard › turn on Enable Dictation, and allow Speech Recognition for Safari. Then tap Stop and Start again.", severity: 'urgent' });
+            status('live', 'Can’t hear you: turn on Dictation');
+          }
+        } else if (!toldOther) {
+          toldOther = true;
+          emit('tip', { text: `Trouble hearing you (${code}). Tap Stop and Start again.`, severity: 'warning' });
+        }
+      };
       recognizer = r;
       r.start();
     } catch { recognizer = null; }

@@ -176,8 +176,32 @@ def match_mealdb(query: str) -> dict | None:
 
 # ---------- the one function the server calls ----------
 
+# Just a food, not a dish ("eggs", "chicken"): Remy asks how they'd like it instead of guessing
+VAGUE_FOODS = {
+    "egg": "scrambled, fried, boiled or poached", "chicken": "fried, roasted, grilled or in a curry",
+    "potato": "mashed, roasted, chips or a jacket potato", "potatoe": "mashed, roasted, chips or a jacket potato",
+    "fish": "pan-fried, baked or battered", "salmon": "pan-fried, baked or in a pasta",
+    "beef": "a steak, a stir-fry, a stew or burgers", "mince": "bolognese, chilli or burgers",
+    "veg": "roasted, stir-fried or steamed", "vegetable": "roasted, stir-fried or steamed",
+    "noodle": "a stir-fry or a noodle soup", "tofu": "crispy, in a stir-fry or scrambled",
+}
+
+
+def vague_food(query: str) -> str | None:
+    """'I want eggs' -> 'egg'; 'scrambled eggs' / 'eggs on toast' -> None (that's a dish)."""
+    w = words(query)
+    return w[0] if len(w) == 1 and w[0] in VAGUE_FOODS else None
+
+
 def find_recipe(query: str) -> dict:
     """-> {found, source: 'remy'|'themealdb'|None, checked_by_human, recipe? | reference?, message}"""
+    food = vague_food(query)
+    if food:
+        name = {"potatoe": "potatoes", "egg": "eggs", "veg": "veg"}.get(food, food)
+        return {"found": False, "source": None, "checked_by_human": False, "ask": True,
+                "message": (f"'{query}' is just a food, not a dish. Don't pick a recipe yet: ask the cook how "
+                            f"they'd like their {name} ({VAGUE_FOODS[food]}?), then call find_recipe again "
+                            f"with their answer.")}
     r = match_local(query)
     if r:
         msg = f"Found our recipe: {r['title']}."

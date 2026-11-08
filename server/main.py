@@ -85,6 +85,8 @@ def load_recipe(recipe_id: str) -> dict:
 NO_RECIPE_YET = """# TODAY'S RECIPE
 Not chosen yet. The cook just pressed Start cooking. After your greeting and camera
 check, ask what they'd like to cook (they can also tell you what ingredients they have).
+Vague food ("eggs", "chicken", "potatoes")? Ask how they'd like it first (e.g. scrambled, fried,
+boiled or poached), then call find_recipe with the answer.
 1. Call find_recipe with their words. If it returns one of OUR recipes (found: true),
    briefly confirm it, name the ingredients, and guide from step 1.
 2. Otherwise (or if they want changes, e.g. spicier, vegetarian, for 6 people, only

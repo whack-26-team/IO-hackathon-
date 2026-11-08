@@ -49,6 +49,8 @@
     <button id="btn-cam">Test camera &amp; mic</button><video id="video" playsinline muted autoplay></video><div class="meter" id="meter"><i></i></div></div></div>
   <div class="row wait" id="row-sound"><span class="dot"></span><div><b>Speaker</b><small>You should hear a ding, then the phone saying "Remy check". Silent switch off!</small>
     <button id="btn-sound">Play sound</button></div></div>
+  <div class="row wait" id="row-hear"><span class="dot"></span><div><b>Remy can hear you (backup voice)</b><small>Tap, then say "Hello Remy". Uses the iPhone's speech recognition (needs Dictation on).</small>
+    <button id="btn-hear">Test hearing</button></div></div>
   <div class="row wait" id="row-voice"><span class="dot"></span><div><b>ElevenLabs voice connects</b><small>Connects to Remy's real voice and hangs up straight away (uses a tiny bit of credit).</small>
     <button id="btn-voice">Test real voice</button></div></div>
 
@@ -154,6 +156,23 @@
     }
     try { const u = new SpeechSynthesisUtterance("Remy check"); u.lang = "en-GB"; setTimeout(() => speechSynthesis.speak(u), 500); } catch {}
     set($("row-sound"), "ok", "Played. Did you hear both? If not: silent switch off, volume up.");
+  };
+
+  // manual: phone speech recognition (what the backup voice listens with)
+  $("btn-hear").onclick = () => {
+    const r = $("row-hear");
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { set(r, "bad", "This browser can't listen for speech. Use Safari (iPhone) or Chrome."); return; }
+    const rec = new SR(); rec.lang = "en-GB"; rec.interimResults = false;
+    let got = false;
+    rec.onresult = (e) => { got = true; set(r, "ok", `Heard: “${e.results[0][0].transcript}”`); };
+    rec.onerror = (e) => {
+      const fix = e.error === "not-allowed" || e.error === "service-not-allowed"
+        ? " Turn on Settings › General › Keyboard › Enable Dictation, and allow Speech Recognition for Safari (Settings › Apps › Safari / Privacy › Speech Recognition)." : "";
+      set(r, "bad", `Couldn't listen (${e.error}).${fix}`);
+    };
+    rec.onend = () => { if (!got && r.classList.contains("wait")) set(r, "warn", "Heard nothing. Tap again and speak up."); };
+    set(r, "wait", "Listening… say “Hello Remy”"); rec.start();
   };
 
   // manual: ElevenLabs connects (then hangs up)

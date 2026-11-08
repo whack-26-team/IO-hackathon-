@@ -2,7 +2,7 @@
   "id": "scrambled-eggs",
   "title": "Creamy scrambled eggs on toast",
   "summary": "Five minutes, three eggs, and very easy to overcook: perfect for a demo.",
-  "aliases": ["scrambled eggs", "scrambled egg", "eggs", "egg", "eggs on toast", "breakfast eggs"],
+  "aliases": ["scrambled eggs", "scrambled egg", "scrambled eggs on toast", "eggs on toast", "breakfast eggs"],
   "source": "Written for REMY by Claude. No timer: scrambled eggs are judged by eye (3–5 min on low, see cook-times.json). Checked by Matthew on 2026-11-07.",
   "checked_by_human": true,
   "serves": 1,
