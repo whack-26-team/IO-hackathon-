@@ -605,7 +605,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v108`,
+      `version  v109`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
@@ -661,3 +661,18 @@ function warmUpRemy() {
 setTimeout(warmUpRemy, 1200);
 $("use-mock").addEventListener("change", warmUpRemy);
 document.querySelectorAll('input[name="mode"]').forEach((el) => el.addEventListener("change", () => setTimeout(warmUpRemy, 300)));
+
+// Savage start screen: little embers drifting up behind everything (CSS animates them)
+(function makeEmbers() {
+  const box = $("embers");
+  if (!box) return;
+  for (let i = 0; i < 16; i++) {
+    const e = document.createElement("i");
+    e.style.left = `${Math.random() * 100}%`;
+    e.style.setProperty("--size", `${3 + Math.random() * 4}px`);
+    e.style.setProperty("--drift", `${(Math.random() - 0.5) * 60}px`);
+    e.style.animationDuration = `${5 + Math.random() * 5}s`;
+    e.style.animationDelay = `${-Math.random() * 10}s`;
+    box.append(e);
+  }
+})();
