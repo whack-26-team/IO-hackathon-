@@ -501,3 +501,31 @@ html[data-mode="savage"] .recap-num .star:not(.on) { color: rgba(255, 255, 255, 
 
 /* Remy's faces may glow/steam a little past their box (no hard edge on the halo glow) */
 .hero-face, .mode-bar .face, .goodbye-face, .gr-face, .dialog-face, .cook-face { overflow: visible; }
+
+/* Start screen fits every phone: fitStart() (app.js) sets --squeeze when the fonts make it too tall,
+   and Remy's picture shrinks to make room (the hero keeps the same height in every attitude) */
+#start-screen .hero { height: calc(clamp(170px, 28.5vh, 290px) - var(--squeeze, 0px)) !important; }
+@media (max-height: 620px) { #start-screen .hero { height: calc(clamp(128px, 25vh, 290px) - var(--squeeze, 0px)) !important; } }
+.hero-face { flex: 0 1 auto; min-height: 0; }
+
+/* Smooth switch between attitudes: colours fade instead of jumping (fine when tapping back and forth) */
+html, #backdrop { transition: background-color .5s ease; }
+#start-screen { transition: color .45s ease; }
+.wordmark small, .start-foot, .link, .modes legend { transition: color .45s ease; }
+.greeting { transition: background-color .45s ease, color .45s ease, transform .45s ease; }
+.mode-bar { transition: transform .1s, box-shadow .1s, background-color .45s ease, color .45s ease; }
+.mode-bar small, .mode-bar .tick, .age { transition: color .45s ease, background-color .45s ease, box-shadow .45s ease; }
+.go { transition: transform .1s, box-shadow .1s, background-color .45s ease, color .45s ease; }
+/* the utensil pattern cross-fades between its dark and light versions */
+html[data-mode="savage"] #backdrop::before { background-image: var(--utensils); }
+#backdrop::before { transition: opacity .5s ease; }
+#backdrop::after { content: ""; position: absolute; inset: 0; background: var(--utensils-light) repeat;
+  background-position: 200px calc(200px + var(--safe-top)); opacity: 0; transition: opacity .5s ease;
+  -webkit-mask: linear-gradient(#000 calc(100% - 200px - var(--safe-bottom) - 160px), transparent calc(100% - 200px - var(--safe-bottom)));
+          mask: linear-gradient(#000 calc(100% - 200px - var(--safe-bottom) - 160px), transparent calc(100% - 200px - var(--safe-bottom))); }
+html[data-mode="savage"] #backdrop::before { opacity: 0; }
+html[data-mode="savage"] #backdrop::after { opacity: 1; }
+/* embers fade in and out rather than popping */
+#start-screen > .embers { display: block; opacity: 0; transition: opacity .6s ease; }
+#start-screen.mode-savage > .embers { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { #start-screen > .embers, #start-screen.mode-savage > .embers { display: none; } }

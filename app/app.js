@@ -49,14 +49,15 @@ function applyMode(mode) {
   typeGreeting(m.greeting);
   const face = $("hero-face");
   setUse(face, m.face);
-  // Savage's steam blows out past his ears: give it room
-  face.setAttribute("viewBox", mode === "savage" ? "-32 -14 164 120" : "-18 -12 136 116");
+  // same frame in every attitude, so Remy is the same size (Savage's steam spills past it: overflow visible)
+  face.setAttribute("viewBox", "-18 -12 136 116");
   // Remy reacts to the attitude: Gentle's halo floats in, Honest smirks (Savage keeps the plain pop)
   face.classList.remove("react-gentle", "react-honest", "react-savage"); void face.offsetWidth;
   face.classList.add(`react-${mode}`);
   document.querySelector('meta[name="theme-color"]').setAttribute("content", m.page);
   // the page behind everything (seen under the home bar / during bounce) matches too: see style.css
   document.documentElement.dataset.mode = mode;
+  fitStart();
 }
 const checkedMode = () => document.querySelector('input[name="mode"]:checked').value;
 
@@ -163,7 +164,7 @@ $("start-btn").addEventListener("click", async () => {
   const useDemo = new URLSearchParams(location.search).get("demo") === "1"; // scripted demo (docs/DEMO.md)
   const useMock = $("use-mock").checked;
   state.live = !useMock && !useDemo; // real Remy speaks timer reminders himself (see the timers' sound below)
-  const factory = useDemo ? createDemoRemy : useMock ? createMockRemy : createLiveRemy;
+  const factory = useDemo ? createDemoRemy : useMock ? createMockRemy : createLiveRemy;   // live = Gemini backup voice unless ?full=1 / ?eleven=1 (saves ElevenLabs credits)
   state.voice = useMock || useDemo ? "pretend" : null;   // real Remy reports live/backup itself
   // A recipe picked before Start (extras): load it so Remy starts on it
   let preRecipe = null;
@@ -272,6 +273,7 @@ function backToStart() {
   $("start-screen").classList.remove("hidden");
   // back to the top-left at 100%, in case the iPhone shifted the view while the camera was up
   window.scrollTo(0, 0); $("start-screen").scrollTop = 0;
+  fitStart();
 }
 $("goodbye").addEventListener("click", backToStart);
 
@@ -648,7 +650,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v117`,
+      `version  v118`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
@@ -756,3 +758,19 @@ function hideGettingReady() {
   box.classList.add("leaving");
   setTimeout(() => box.classList.add("hidden"), 350);
 }
+
+// The start screen never scrolls, so if a phone's fonts make it a little too tall, Remy's picture
+// shrinks (in 6px steps) until the footer fits. Same in every attitude: nothing shifts when you switch.
+function fitStart() {
+  const s = document.getElementById("start-screen");
+  if (!s || s.classList.contains("hidden")) return;
+  let q = 0;
+  s.style.setProperty("--squeeze", "0px");
+  while (s.scrollHeight > s.clientHeight + 1 && q < 48) { q += 6; s.style.setProperty("--squeeze", `${q}px`); }
+  s.scrollTop = 0;
+}
+// Tapping an attitude focuses it, and the browser would nudge the screen up to show it: keep it still
+$("start-screen").addEventListener("scroll", (e) => { if (e.target.scrollTop) e.target.scrollTop = 0; });
+addEventListener("resize", fitStart);
+document.fonts?.ready.then(fitStart);
+setTimeout(fitStart, 600);
