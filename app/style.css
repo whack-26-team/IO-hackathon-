@@ -347,13 +347,32 @@ html[data-mode="gentle"] .score-card { background: #f4f9fe; }
 .servings b { min-width: 18px; text-align: center; font-size: 18px; }
 .servings small { opacity: .7; font-weight: 500; font-size: 12px; }
 
-/* A ticket that's finished (or cancelled) rips off the rail and falls away */
-.timer.rip { pointer-events: none; transform-origin: 15% 0; animation: rip .75s cubic-bezier(.45, 0, .8, .2) forwards; }
+/* A ticket that's finished (or cancelled) rips off the rail, cartoon style: squash, tug, tug, RIIIP,
+   then it flutters down like paper. Extras (strip, word, scraps) come from ripEffects() in timers.js. */
+.timer.rip { pointer-events: none; transform-origin: 20% 0; animation: rip 1.45s cubic-bezier(.4, 0, .6, 1) forwards; }
 @keyframes rip {
   0%   { transform: rotate(var(--tilt, 1deg)); }
-  14%  { transform: translateY(4px) rotate(-7deg); }          /* yank */
-  26%  { transform: translateY(2px) rotate(5deg); }           /* tear */
-  36%  { transform: translateY(6px) rotate(-3deg); clip-path: inset(3px 0 0 0); }  /* top strip left on the rail */
-  100% { transform: translateY(115vh) rotate(32deg); opacity: .85; clip-path: inset(3px 0 0 0); }
+  7%   { transform: translateY(3px) scale(1.06, .9) rotate(0deg); }               /* squash: wind-up */
+  14%  { transform: translate(-6px, 8px) scale(.96, 1.1) rotate(-12deg); }        /* tug left, stretch */
+  21%  { transform: translate(6px, 6px) scale(1.04, .96) rotate(11deg); }         /* tug right */
+  28%  { transform: translate(-3px, 14px) scale(.97, 1.12) rotate(-8deg); clip-path: inset(0 0 0 0); }
+  33%  { transform: translate(0, 22px) scale(1.08, .92) rotate(4deg); clip-path: inset(6px 0 0 0); }   /* SNAP */
+  48%  { transform: translate(-22px, 24vh) rotate(-20deg); clip-path: inset(6px 0 0 0); }             /* flutter... */
+  63%  { transform: translate(24px, 48vh) rotate(18deg); clip-path: inset(6px 0 0 0); }
+  78%  { transform: translate(-18px, 74vh) rotate(-16deg); clip-path: inset(6px 0 0 0); opacity: 1; }
+  100% { transform: translate(14px, 115vh) rotate(26deg); clip-path: inset(6px 0 0 0); opacity: .9; }
 }
+.rip-strip { position: fixed; z-index: 6; height: 8px; background: var(--paper); border-left: 2.5px solid var(--ink); border-right: 2.5px solid var(--ink);
+  pointer-events: none; animation: rip-strip 1.3s ease-in forwards;
+  -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom/9px 5px repeat-x, linear-gradient(#000 0 0) top/100% 3px no-repeat;
+          mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom/9px 5px repeat-x, linear-gradient(#000 0 0) top/100% 3px no-repeat; }
+@keyframes rip-strip { 0%, 30% { opacity: 0; } 34% { opacity: 1; } 75% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-4px); } }
+.rip-word { position: fixed; z-index: 7; pointer-events: none; font-family: var(--font); font-weight: 800; font-size: 26px; letter-spacing: 1px;
+  color: var(--butter); -webkit-text-stroke: 2px var(--ink); paint-order: stroke fill; text-shadow: 3px 3px 0 var(--ink);
+  transform: translate(-50%, 0) rotate(-12deg) scale(0); animation: rip-word 1.1s cubic-bezier(.2, 1.6, .4, 1) .38s forwards; }
+@keyframes rip-word { 0% { transform: translate(-50%, 0) rotate(-12deg) scale(0); opacity: 1; } 25% { transform: translate(-50%, -8px) rotate(-8deg) scale(1.35); }
+  45% { transform: translate(-50%, -10px) rotate(-12deg) scale(1); } 80% { opacity: 1; } 100% { transform: translate(-50%, -24px) rotate(-14deg) scale(1); opacity: 0; } }
+.rip-bit { position: fixed; z-index: 6; width: 7px; height: 5px; background: var(--paper); border: 1.5px solid var(--ink); pointer-events: none; opacity: 0;
+  animation: rip-bit 1s ease-out .45s forwards; }
+@keyframes rip-bit { 0% { opacity: 1; transform: translate(0, 0) rotate(0); } 100% { opacity: 0; transform: translate(var(--dx), calc(var(--dy) + 90px)) rotate(var(--spin)); } }
 @media (prefers-reduced-motion: reduce) { .timer.rip { animation: none; opacity: 0; } }
