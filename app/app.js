@@ -6,6 +6,7 @@ import { createTimers } from "./timers.js";
 import { unlockSound, beep, wakeSound, starPops } from "./sound.js";
 import { createMockRemy } from "./remy/mock.js";
 import { createLiveRemy, preloadLive } from "./remy/live.js";
+import { pickMainCamera } from "./camera.js";
 import { createDemoRemy } from "./demo/demo-remy.js"; // ?demo=1 (Felix)
 import { initModeSwitch } from "./extras/mode-switch.js"; // tap the badge mid-cook (Felix)
 import { initSetupGuide } from "./extras/setup-guide.js"; // first-time setup card (Felix)
@@ -153,6 +154,7 @@ $("start-btn").addEventListener("click", async () => {
       video: { facingMode: "environment", width: { ideal: 1280 } },
       audio: true,
     });
+    state.cameraInfo = await pickMainCamera(state.stream);   // the 1x back camera, not the 0.5x ultra-wide (camera.js)
     $("camera").srcObject = state.stream;
     fitCamera();
   } catch (e) {
@@ -652,7 +654,8 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v120`,
+      `camera   ${state.cameraInfo ? `${state.cameraInfo.label} ${state.cameraInfo.width}x${state.cameraInfo.height} zoom ${state.cameraInfo.zoom}${state.cameraInfo.to ? ` (was ${state.cameraInfo.from})` : ""}${state.cameraInfo.zoomed ? " zoomed to 1x" : ""}` : "not started"}`,
+      `version  v121`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);

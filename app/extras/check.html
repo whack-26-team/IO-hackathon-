@@ -124,7 +124,11 @@
   $("btn-cam").onclick = async () => {
     const r = $("row-cam");
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment", width: { ideal: 1280 } }, audio: true });
+      const { pickMainCamera } = await import("/camera.js");
+      const cam = await pickMainCamera(stream);   // same 1x-camera choice as the app
+      const camNote = cam ? `${cam.label} · ${cam.width}×${cam.height}` : "camera";
+      const wideOnly = cam && /ultra|dual wide/i.test(cam.label) && !cam.zoomed;
       $("video").srcObject = stream; $("video").style.display = "block"; $("meter").style.display = "block";
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
       const an = ctx.createAnalyser(); an.fftSize = 512; ctx.createMediaStreamSource(stream).connect(an);
@@ -133,10 +137,10 @@
         an.getByteTimeDomainData(data);
         const level = Math.max(...data.map((v) => Math.abs(v - 128))) / 128;
         $("meter").firstElementChild.style.width = `${Math.min(100, level * 160)}%`;
-        if (level > 0.12 && !heard) { heard = true; set(r, "ok", "Camera on and the mic hears you."); }
+        if (level > 0.12 && !heard) { heard = true; set(r, wideOnly ? "warn" : "ok", `${camNote}. Mic hears you.${wideOnly ? " Still on the ultra-wide lens: tell Matthew." : ""}`); }
         requestAnimationFrame(tick);
       };
-      tick(); set(r, "warn", "Camera on. Say something to check the mic…");
+      tick(); set(r, "warn", `${camNote}. Say something to check the mic…`);
     } catch (e) { set(r, "bad", `Blocked (${e.name}). Allow camera + mic for this site in Settings → Safari.`); }
   };
 
