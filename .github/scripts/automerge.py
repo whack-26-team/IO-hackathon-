@@ -22,13 +22,13 @@ import sys
 REPO = os.environ["GITHUB_REPOSITORY"]
 PR = os.environ["PR_NUMBER"]
 
-# Who may change what without a review. Matthew (team lead) and Claude (works for
-# Matthew) may change anything, so their PRs only need passing checks + no secrets.
+# Who may change what without a review. Matthew (team lead), Claude (works for Matthew) and
+# Pranav (took over from Matthew on the final stretch) may change anything, so their PRs only
+# need passing checks + no secrets.
 OWNERS = {
     "felix": ["app/", "docs/pitch/"],
     "ahmed": ["app/remy/", "server/second_opinion.py"],
-    "pranav": ["remy-brain/instructions.md", "remy-brain/actions.json",
-               "remy-brain/personality/", "remy-brain/lessons/", "tests/"],
+    "pranav": [""],   # full access (Matthew's handover)
     "matthew": [""],
     "claude": [""],
 }

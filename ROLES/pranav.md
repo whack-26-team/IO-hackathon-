@@ -1,3 +1,24 @@
+> **🔑 HANDOVER FROM MATTHEW: you can now edit ALL of REMY.** Every folder (server, app, recipes,
+> knowledge, Savage swearing), and your `pranav/c5-...` PRs auto-merge like Matthew's once checks pass.
+>
+> **Where things are (v133, live at https://remy-2wc2.onrender.com):**
+> - **Voice:** ElevenLabs is the default (lite instructions); `?full=1` = full (pitch), `?backup=1` = Gemini
+>   voice (no credits), `?agent=agent_xxx` = test another agent, `?pretend=1` = no AI, `?debug=1` = camera/screen info.
+> - **Credit savers:** brain trimmed (`server/knowledge.py` sends only the dish's times + safety, compact
+>   action list), 4-min idle hang-up with countdown (`?idle=N` to test), hangs up when the app is hidden.
+> - **Reliability nets (because the AI often skips actions):** the app loads a named recipe itself
+>   (`actions.autoRecipe`), camera mistakes always become a roast, timers start/adjust by voice,
+>   "end the session" / finishing the recipe goes to the review page.
+> - **Savage:** heckles every 60-100 s with no mistake needed (`?heckle=N` to test), not counted as roasts.
+> - **Stars:** 1 + first half + second half, then (finished only) roasts ≤ 2 and no alerts.
+> - **Pitch checklist:** `/check`. Judges' QR: `/judge`.
+>
+> **Still to do / test:** test on real phones (Matthew's last test: cereal + milk-first); paste
+> `adjust_timer` into the dashboard prompt's action list (repo copy `app/remy/agent-prompt.md` has it);
+> optional Flash-voice copy of the agent (steps below); approve the new egg recipes
+> (`remy-brain/recipes/*-eggs.json`, `checked_by_human: false`). Run tests with
+> `node app/remy/integration.test.mjs` (and the other `*.test.mjs`) before opening a PR.
+
 > **🤬 Savage swearing is Matthew's now:** don't change the swearing, nicknames or "It's fucking raw!" line in `savage.md` / the Savage lines of `roasts.json` (see `docs/TEAM-TODO.md`).
 
 > **⚡ Flash voice for testing (Matthew asked, needs your ElevenLabs workspace, ~3 min):** the voice model can't be set from the app, only on the agent.

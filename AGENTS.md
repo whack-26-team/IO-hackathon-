@@ -10,6 +10,8 @@ to an AI model (voice route chosen by Ahmed, see docs/PLAN.md "Voice options"). 
 guides the recipe, and has personality modes (Gentle / Honest / Savage).
 
 ## Who owns what: ONLY edit your own folder
+> **Handover:** Pranav now has full permission to edit all of REMY (every folder, including Matthew's and the Savage swearing), with the same auto-merge rights as Matthew. Everyone else: the table below still applies.
+
 | Folder / file | Owner |
 |---|---|
 | `server/` (except `second_opinion.py`), `remy-brain/recipes/`, `remy-brain/knowledge/`, `tools/`, `docs/`, `ROLES/` | **Matthew** (Claude Code) |
