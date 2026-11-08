@@ -45,7 +45,7 @@ export function initShare(app) {
     const slot = document.getElementById("slot-goodbye");
     slot.querySelector(".x-share")?.remove();
     const btn = document.createElement("button");
-    btn.className = "x-share"; btn.textContent = "📤 Share my score";
+    btn.className = "x-share"; btn.textContent = "📤 Share";
     btn.addEventListener("click", async (e) => {
       e.stopPropagation();              // the goodbye screen goes back to start on tap
       app.keepGoodbye();                // and stays put while sharing
