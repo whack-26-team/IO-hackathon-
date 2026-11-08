@@ -180,6 +180,7 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', profile =
             if (started?.cleared) context('[RECIPE CLEARED BY APP] The cook asked to clear the recipe; it is gone from the screen. Confirm briefly and ask what they want to cook next.');
             if (started?.seconds) speak(`[TIMER STARTED BY APP] The cook said it's in and the countdown is running. Announce it now, once, out loud: "${started.announce}" Do not call start_timer for it.`, false, true);
             lastUserAt = now();
+            emit('heard', { text: message });   // the cook spoke (the app's idle hang-up listens for this)
           }
           onTranscript({ source, message });
         },

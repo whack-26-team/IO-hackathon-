@@ -23,7 +23,7 @@ export function preloadLive({ mode, profile } = {}) {
   prefetchBrain({ mode, profile });
 }
 
-const EVENTS = ['status', 'voice', 'recipe', 'recipe_clear', 'tip', 'roast', 'alert', 'step', 'timer_start', 'timer_cancel', 'timer_adjust', 'command', 'lesson_score'];
+const EVENTS = ['status', 'voice', 'heard', 'recipe', 'recipe_clear', 'tip', 'roast', 'alert', 'step', 'timer_start', 'timer_cancel', 'timer_adjust', 'command', 'lesson_score'];
 
 export function createLiveRemy(options, { primary = createElevenLabsRemy, backup = createGeminiRemy,
   forceBackup = useBackupVoice() } = {}) {

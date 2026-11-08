@@ -24,8 +24,8 @@
   <link rel="preconnect" href="https://esm.sh" crossorigin>
   <link rel="preconnect" href="https://api.elevenlabs.io" crossorigin>
   <link rel="preconnect" href="https://livekit.rtc.elevenlabs.io" crossorigin>
-  <link rel="stylesheet" href="style.css?v=126">
-  <link rel="stylesheet" href="extras/extras.css?v=126">
+  <link rel="stylesheet" href="style.css?v=128">
+  <link rel="stylesheet" href="extras/extras.css?v=128">
 </head>
 <body>
   <!-- the start screen's colour, overhanging every edge of the screen -->
@@ -236,6 +236,11 @@
 
   <!-- COOKING SCREEN -->
   <section id="cook-screen" class="screen hidden">
+    <!-- idle hang-up warning: countdown + "I'm here" (app.js, idle) -->
+    <div id="idle-banner" class="idle-banner hidden" role="alert">
+      <span>No one's talked for a while. <b>Remy hangs up in <span id="idle-left">30</span>s</b></span>
+      <button id="idle-stay" class="idle-stay">I'm here!</button>
+    </div>
     <!-- shown while Remy's voice connects: he bounces in, a line per attitude -->
     <div id="getting-ready" class="getting-ready hidden" aria-live="polite">
       <svg id="gr-face" class="gr-face" viewBox="-18 -12 136 116" aria-hidden="true"><use href="#f-sus"/></svg>
@@ -313,6 +318,6 @@
   <!-- Bottom sheets opened by extras (app.openSheet) -->
   <div id="slot-sheets"></div>
 
-  <script type="module" src="app.js?v=126"></script>
+  <script type="module" src="app.js?v=128"></script>
 </body>
 </html>

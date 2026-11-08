@@ -199,6 +199,7 @@ $("start-btn").addEventListener("click", async () => {
     canvas: $("frame-canvas"),
   });
   wireRemy(state.remy);
+  idle.lastTalk = Date.now(); idle.warned = false;
   state.remy.start();
   fire("start", { mode: state.mode, recipe: preRecipe });
 });
@@ -223,6 +224,7 @@ function stopCooking() {
     sayLocally(bye.text);
   }
   timers.clearAll();
+  $("idle-banner").classList.add("hidden");
   clearTimeout(showBubble.t);
   pendingRoast = null; // first, so hiding the alert doesn't show a held-back roast after Stop
   hideAlert();
@@ -356,6 +358,7 @@ function wireRemy(remy) {
   for (const type of ["status", "recipe", "recipe_clear", "timer_adjust", "command", "lesson_score", "tip", "roast", "alert", "step", "timer_start", "timer_cancel"]) remy.on(type, (d) => fire(type, d));
   remy.on("status", setStatus);
   remy.on("voice", (d) => setVoice(d.kind));   // live.js: ElevenLabs or the backup voice
+  remy.on("heard", () => keepRemy());   // the cook spoke
   remy.on("recipe", (d) => { showRecipe(d); stats.recipe = d.recipe?.title || stats.recipe; if (d.recipe?.lesson) stats.lesson = d.recipe.id; });
   // Cooking school: Remy's technique score becomes the session score
   remy.on("lesson_score", (d) => { stats.lessonScore = d.score; stats.lessonComment = d.comment; showBubble({ text: `${history.starText(Math.max(1, Math.min(5, Math.round(d.score / 2))))} ${d.comment}`, severity: "info" }); });
@@ -668,7 +671,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
       `camera   ${state.cameraInfo ? `${state.cameraInfo.label} ${state.cameraInfo.width}x${state.cameraInfo.height} zoom ${state.cameraInfo.zoom} (${state.cameraInfo.tried})${state.cameraInfo.zoomed ? " zoomed to 1x" : ""}${state.cameraInfo.retried ? " RETRIED (was black)" : ""} track ${state.stream?.getVideoTracks()[0]?.readyState || "-"}` : "not started"}`,
-      `version  v126`,
+      `version  v128`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
@@ -791,3 +794,35 @@ $("start-screen").addEventListener("scroll", (e) => { if (e.target.scrollTop) e.
 addEventListener("resize", fitStart);
 document.fonts?.ready.then(fitStart);
 setTimeout(fitStart, 600);
+
+// ---------- hang up when nobody's there (saves ElevenLabs minutes) ----------
+// ElevenLabs charges for every minute the call is open, even in an empty kitchen. With the live voice:
+// no one has spoken for 4 minutes and no timer is running -> Remy asks "still there?"; still nothing
+// 30 seconds later -> he says goodbye and the cook goes to the goodbye screen. Any speech resets it.
+// ?idle=20 on the address = 20 seconds instead (for testing; then it also works with the other voices).
+const idle = { lastTalk: Date.now(), warned: false };
+const IDLE_TEST = Number(new URLSearchParams(location.search).get("idle")) || 0;
+const IDLE_MS = IDLE_TEST ? IDLE_TEST * 1000 : 4 * 60 * 1000;
+const IDLE_GRACE_MS = IDLE_TEST ? Math.max(5000, IDLE_TEST * 500) : 30 * 1000;
+const IDLE_ASK = {
+  gentle: "Still with me, chef? I'll pop off in a moment to save my voice. Just say something to keep me.",
+  honest: "Hello? Anyone? I'll hang up in thirty seconds unless you say something.",
+  savage: "Did you bloody leave me? Say something in the next thirty seconds or I'm off.",
+};
+setInterval(() => {
+  if (!state.cooking || !state.remy || (state.voice !== "live" && !IDLE_TEST)) return;
+  if (timers.remaining()?.left > 0) { keepRemy(); return; }   // waiting on a timer is fine
+  const quiet = Date.now() - idle.lastTalk;
+  if (quiet >= IDLE_MS + IDLE_GRACE_MS) { keepRemy(); stopCooking(); return; }
+  if (quiet >= IDLE_MS) $("idle-left").textContent = Math.max(0, Math.ceil((IDLE_MS + IDLE_GRACE_MS - quiet) / 1000));
+  if (quiet >= IDLE_MS && !idle.warned) {
+    $("idle-banner").classList.remove("hidden");
+    idle.warned = true;
+    const text = IDLE_ASK[state.mode] || IDLE_ASK.honest;
+    showBubble({ text, severity: "warning" });
+    if (state.live) state.remy.send("say", { text }); else sayLocally(text);
+  }
+}, 1000);
+// "I'm here!" (or any speech) keeps Remy on
+function keepRemy() { idle.lastTalk = Date.now(); idle.warned = false; $("idle-banner").classList.add("hidden"); }
+$("idle-stay").addEventListener("click", keepRemy);
