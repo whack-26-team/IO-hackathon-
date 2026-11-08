@@ -15,7 +15,7 @@ export function clashes(ingredients = [], settings = {}, t = table) {
   const keys = activeKeys(settings); const flagged = new Set(); const reasons = new Set();
   if (!t || !keys.length) return { flagged, reasons: [] };
   ingredients.forEach((ing, i) => {
-    const text = ` ${String(ing).toLowerCase()} `;
+    const text = ` ${String(ing).toLowerCase().replace(/wine vinegar/g, "vinegar")} `;   // vinegar isn't wine
     for (const k of keys) {
       if ((t.words[k] || []).some((w) => new RegExp(`\\b${w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(e?s)?\\b`).test(text))) {
         flagged.add(i); reasons.add(t.labels[k] || k);

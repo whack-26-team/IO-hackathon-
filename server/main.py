@@ -212,8 +212,9 @@ def list_recipes():
             "checked_by_human": r.get("checked_by_human", False),
             "steps": len(r.get("steps", [])),
             "ingredients": r.get("ingredients", []),   # so the browser can flag diet/allergy clashes
+            "special": bool(r.get("special")),         # Remy's special: pinned to the top
         })
-    return out
+    return sorted(out, key=lambda r: not r["special"])
 
 
 @app.get("/api/recipes/find")

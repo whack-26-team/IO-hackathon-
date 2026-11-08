@@ -132,3 +132,8 @@ html[data-mode="savage"] .x-menu-btn.sticker svg { filter: drop-shadow(2px 3px 0
   box-shadow: 3px 3px 0 var(--ink); transform: rotate(-1deg); font-family: var(--mono) !important; font-size: 12px !important; letter-spacing: .5px; text-transform: uppercase;
   -webkit-mask: radial-gradient(circle 7px at 0 50%, #0000 98%, #000) left/51% 100% no-repeat, radial-gradient(circle 7px at 100% 50%, #0000 98%, #000) right/51% 100% no-repeat;
           mask: radial-gradient(circle 7px at 0 50%, #0000 98%, #000) left/51% 100% no-repeat, radial-gradient(circle 7px at 100% 50%, #0000 98%, #000) right/51% 100% no-repeat; }
+
+/* ---- Remy's special (pinned top of the recipe list) ---- */
+.x-special { background: var(--butter); box-shadow: 3px 3px 0 var(--ink); border-width: 2.5px; }
+.x-special-badge { display: inline-block; font-family: var(--mono); font-size: 11px; letter-spacing: .5px; text-transform: uppercase;
+  background: var(--ink); color: var(--butter); border-radius: 6px; padding: 1px 7px; margin-bottom: 3px; }
