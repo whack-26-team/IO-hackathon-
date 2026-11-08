@@ -521,6 +521,11 @@ function showAlert(text) {
   // hide whatever Remy was saying (e.g. a joke) so nothing competes with the alert
   quietRemy();
   beep("alert");
+  // ...and said out loud on the voice that already works on this phone (the alarm can be blocked on iPhone)
+  try {
+    if (state.live && state.remy) state.remy.send("say", { text: `Stop! ${text}` });
+    else { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(`Stop! ${text}`); u.lang = "en-GB"; u.rate = 1.05; speechSynthesis.speak(u); }
+  } catch { /* no voice */ }
   if (navigator.vibrate) navigator.vibrate([300, 100, 300]); // Android only; iPhones ignore this
   clearTimeout(showAlert.t);
   showAlert.t = setTimeout(hideAlert, ALERT_MS);
@@ -708,7 +713,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
       `camera   ${state.cameraInfo ? `${state.cameraInfo.label} ${state.cameraInfo.width}x${state.cameraInfo.height} zoom ${state.cameraInfo.zoom} (${state.cameraInfo.tried})${state.cameraInfo.zoomed ? " zoomed to 1x" : ""}${state.cameraInfo.retried ? " RETRIED (was black)" : ""} track ${state.stream?.getVideoTracks()[0]?.readyState || "-"}` : "not started"}`,
       `alarm    primed ${alarmStatus.primed} · last ${alarmStatus.last} · web audio ${soundState()}`,
-      `version  v140`,
+      `version  v141`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);

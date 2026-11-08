@@ -48,14 +48,19 @@ export function primeAlarm() {
   try {
     alarmSrc ||= alarmClip(); silentSrc ||= alarmClip(true);
     if (!alarm) { alarm = new Audio(); alarm.preload = "auto"; alarm.setAttribute("playsinline", ""); }
-    alarm.muted = false; alarm.src = silentSrc;
+    // keep it PLAYING (silent loop) for the whole session: iPhones let a player that's already
+    // playing switch to the alarm far more readily than starting a new sound out of nowhere
+    alarm.muted = false; alarm.loop = true; alarm.src = silentSrc;
+    alarm.onended = null;
     alarm.play().then(() => { alarmStatus.primed = "yes"; }).catch((e) => { alarmStatus.primed = `blocked (${e?.name || e})`; });
   } catch (e) { alarmStatus.primed = `error (${e?.name || e})`; }
 }
 export function playAlarm() {
   try {
     if (!alarm) { alarmStatus.last = "not primed (tap Start first)"; return; }
-    alarm.muted = false; alarm.src = alarmSrc; alarm.currentTime = 0;
+    alarm.muted = false; alarm.loop = false; alarm.src = alarmSrc; alarm.currentTime = 0;
+    // back to the silent loop afterwards, so the next alarm can play too
+    alarm.onended = () => { alarm.onended = null; alarm.loop = true; alarm.src = silentSrc; alarm.play().catch(() => {}); };
     alarm.play().then(() => { alarmStatus.last = `played ${new Date().toLocaleTimeString()}`; })
       .catch((e) => { alarmStatus.last = `blocked (${e?.name || e})`; });
   } catch (e) { alarmStatus.last = `error (${e?.name || e})`; }
