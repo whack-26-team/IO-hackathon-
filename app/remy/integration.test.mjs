@@ -360,3 +360,12 @@ test('voice timer changes: add/take off/set, with or without "Remy", never guess
   a.hear('take the pasta out in a minute'); a.hear('add the pasta for 10 minutes');
   assert.equal(events.length, n);   // not timer changes
 });
+
+test('a pasta packet the camera read can supply the timer length (packet wins)', async () => {
+  const tools = JSON.parse(await readFile(new URL('../../remy-brain/actions.json', import.meta.url), 'utf8')).tools;
+  const a = createActions({ emit: () => {}, request: async () => ({}), alive: () => true });
+  a.configure({ tools, recipe: { id: 'r', title: 'Penne', steps: [{ instruction: 'Pasta in', timer: { label: 'Penne', minutes: 11 } }] } });
+  assert.equal((await a.call('start_timer', { id: 'p', label: 'Penne', minutes: 10 })).ok, false);   // not in the recipe, nobody said it
+  a.notePacket({ shape: 'penne', minutes: 10 });
+  assert.equal((await a.call('start_timer', { id: 'p', label: 'Penne', minutes: 10 })).ok, true);    // printed on the packet
+});

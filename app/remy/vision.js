@@ -30,6 +30,11 @@ export function createVision({ video, canvas, request, actions, context, speak, 
         return;
       }
       failures = 0;
+      // A pasta packet on camera: tell Remy once per packet (shape + printed time) and let its time start a timer
+      if (result.packet?.shape && !recent(`packet:${result.packet.shape}:${result.packet.minutes}`, 120000)) {
+        actions.notePacket?.(result.packet);
+        context('[PASTA PACKET SEEN — data] ' + JSON.stringify(result.packet) + ' Use it for your pasta guess ("Looks like ' + result.packet.shape + (result.packet.minutes ? `, ${result.packet.minutes} minutes on the packet` : '') + ', right?"); the packet time wins.');
+      }
       // Saves voice tokens: every note stays in Remy's conversation, so only send one when something
       // that matters changed (what he can see, a likely issue, safety, step done), or every 60 s.
       const keyIssues = (result.issues || []).filter(i => i.confidence >= 0.6).map(i => i.type).sort().join(',');

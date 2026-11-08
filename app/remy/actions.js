@@ -172,7 +172,8 @@ export function createActions({ emit, request, alive, now = Date.now }) {
       if (!alive() || recipe) return null;
       if (data?.found && data.recipe?.steps?.length) {
         setRecipe(data);
-        return { title: data.recipe.title, note: `[APP LOADED RECIPE: ${data.recipe.title}] The cook asked for it and it's on the screen now. Confirm it in one line, name the ingredients briefly, then give step 1. Don't call find_recipe for it.` };
+        const pasta = /pasta|penne|rigatoni|fusilli|spaghetti|macaroni|linguine|farfalle|tagliatelle/i.test(JSON.stringify(data.recipe.steps) + data.recipe.title);
+        return { title: data.recipe.title, note: `[APP LOADED RECIPE: ${data.recipe.title}] The cook asked for it and it's on the screen now. Confirm it in one line, name the ingredients briefly, then give step 1. Don't call find_recipe for it.${pasta ? ' Pasta dish: look for the pasta packet on camera and guess the shape and time from it; if you can\'t see one, ask which pasta they have.' : ''}` };
       }
       if (data?.ask) return { note: `[APP] ${data.message}` };
     } catch { /* offline: Remy can still call find_recipe */ }
@@ -180,6 +181,7 @@ export function createActions({ emit, request, alive, now = Date.now }) {
   }
   // A camera mistake Remy hasn't reacted to with show_tip / roast / safety_alert yet
   let cameraIssue = null;
+  let packet = null;   // { shape, minutes, at } from the camera
   function hear(text) {
     heard = (heard + ' ' + text).slice(-600);
     const end = endSession(text);
@@ -250,7 +252,9 @@ export function createActions({ emit, request, alive, now = Date.now }) {
         case 'start_timer': {
           const { id, label, minutes, check_at_minutes: check } = args;
           if (!id.trim() || !label.trim() || minutes <= 0 || minutes > 240 || (check !== undefined && (check <= 0 || check >= minutes))) throw new Error('Timer duration must be positive and at most 240 minutes; check time must be before the end.');
-          const explicit = suppliedTiming && now() - suppliedTiming.at < 90000 && Math.abs(suppliedTiming.minutes - minutes) < 0.00001;
+          // a time the cook said, or the cooking time printed on a pasta packet the camera read (packet wins)
+          const explicit = (suppliedTiming && now() - suppliedTiming.at < 90000 && Math.abs(suppliedTiming.minutes - minutes) < 0.00001)
+            || (packet?.minutes && now() - packet.at < 15 * 60000 && Math.abs(packet.minutes - minutes) < 0.00001);
           // The timer can come from ANY step of the loaded recipe, not only the current one: the cook
           // often says "pasta's in" before Remy has moved the step on. Shape-dependent steps
           // (timer_by_shape, e.g. boiled pasta) count too. If it matches, that step becomes current.
@@ -304,6 +308,7 @@ export function createActions({ emit, request, alive, now = Date.now }) {
   return {
     call, hear, autoRecipe,
     cameraEvent(issue) { cameraIssue = { issue, at: now() }; },
+    notePacket(p) { if (p?.shape) packet = { shape: p.shape, minutes: p.minutes || null, at: now() }; },
     // The camera saw a mistake and Remy answered without a roast/tip: returns the issue once (then forgets it)
     takeUnhandledCamera(maxAge = 20000) { const c = cameraIssue; cameraIssue = null; return c && now() - c.at < maxAge ? c.issue : null; },
     configure(brain) { schemas = new Map(brain.tools.map(t => [t.name, t.parameters])); if (brain.recipe) setRecipe({ recipe: brain.recipe, checked_by_human: brain.recipe.checked_by_human }); },
