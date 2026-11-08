@@ -4,7 +4,7 @@ const STEPS = [
   ["📱", "Prop your phone up", "Lean it against something so the camera sees your hob or chopping board."],
   ["💡", "Good light", "Remy judges by what he sees. A bright kitchen means better advice."],
   ["🔊", "Volume up", "Silent switch off, so you can hear Remy (and the timers)."],
-  ["🗣", "Just talk", "Untick 🧪 Pretend Remy, tap Start, then say \"Remy, I'm making…\"."],
+  ["🗣", "Just talk", "Tap Start, then say \"Remy, I'm making…\"."],
 ];
 
 // app.js calls this before the extras start; the real work is in initSetupCard below.

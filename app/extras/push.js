@@ -1,4 +1,5 @@
 // Lock-screen timer alerts (#9): a toggle in ⚙️ Settings. When on, every timer's end time is sent to
+import { sticker } from "./sticker.js";
 // the server, which pushes "⏱ Rigatoni is done" even with the phone locked. iPhone: only from the
 // home-screen app (iOS 16.4+), after allowing notifications.
 const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
@@ -33,7 +34,8 @@ export function pushToggle(app) {
   row.append(btn, note);
   const render = (msg) => {
     const on = app.history.get("push", {}).on;
-    btn.textContent = on ? "🔔 Lock-screen timer alerts: on" : "🔕 Lock-screen timer alerts: off";
+    btn.replaceChildren(sticker("i-bell"), document.createTextNode(on ? "Lock-screen timer alerts: on" : "Lock-screen timer alerts: off"));
+    btn.classList.toggle("off", !on);
     btn.classList.toggle("on", !!on);
     note.textContent = msg || (on ? "You'll get \u201c⏱ … is done\u201d even with the phone locked." : "Get a notification when a timer ends, even with the phone locked.");
   };

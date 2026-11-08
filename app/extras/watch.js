@@ -1,4 +1,5 @@
 // Watch my pan (#118): step away and the phone calls you back. While it's on, a safety alert,
+import { sticker } from "./sticker.js";
 // a warning tip or a finished timer starts a loud repeating alarm and a flashing screen until
 // you tap it.
 import { beep } from "../sound.js";
@@ -7,12 +8,12 @@ export function initWatchMyPan(app) {
   let on = false, alarm = null, overlay = null;
 
   const btn = document.createElement("button");
-  btn.className = "x-tool"; btn.textContent = "👀"; btn.title = "Watch my pan"; btn.setAttribute("aria-label", "Watch my pan");
+  btn.className = "x-tool"; btn.replaceChildren(sticker("i-eyes")); btn.title = "Watch my pan"; btn.setAttribute("aria-label", "Watch my pan");
   btn.setAttribute("aria-pressed", "false");
   btn.addEventListener("click", () => {
     on = !on;
     btn.classList.toggle("on", on); btn.setAttribute("aria-pressed", String(on));
-    btn.textContent = on ? "👀 Watching" : "👀";
+    btn.replaceChildren(sticker("i-eyes"), ...(on ? [document.createTextNode("Watching")] : []));
     if (on) app.say("Go on then. I'll shout if anything happens.");
     else stopAlarm();
   });
@@ -38,5 +39,5 @@ export function initWatchMyPan(app) {
   app.on("alert", (d) => startAlarm(d?.text || "Safety alert"));
   app.on("tip", (d) => { if (d?.severity === "warning" || d?.severity === "urgent") startAlarm(d.text); });
   app.on("timer_done", (d) => startAlarm(`${d?.label || "Timer"} is done`));
-  app.on("stop", () => { on = false; btn.classList.remove("on"); btn.textContent = "👀"; stopAlarm(); });
+  app.on("stop", () => { on = false; btn.classList.remove("on"); btn.replaceChildren(sticker("i-eyes")); stopAlarm(); });
 }

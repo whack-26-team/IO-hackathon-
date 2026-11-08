@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <title>REMY pitch check</title>
+  <link rel="icon" href="/icon-v2-192.png">
+  <link rel="stylesheet" href="/fonts/fonts.css?v=1">
+  <style>
+    /* Pitch checklist: open /check on the pitch phone before going on stage. Not linked from the app. */
+    :root { --ink: #1a1a1a; --cream: #fff4e0; --tomato: #e8432c; --butter: #ffd166; --mint: #3fb68b; --muted: #6b625a; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: var(--cream); color: var(--ink); font-family: "Bricolage Grotesque", system-ui, sans-serif;
+      padding: max(18px, env(safe-area-inset-top)) 16px 40px; }
+    main { max-width: 520px; margin: 0 auto; }
+    h1 { font-family: "Leckerli One", system-ui; font-weight: 400; font-size: 40px; margin: 0; line-height: 1; }
+    .sub { font-family: "Baloo 2", system-ui; font-weight: 700; color: var(--muted); margin: 4px 0 16px; }
+    .row { display: flex; gap: 12px; align-items: flex-start; background: #fff; border: 2.5px solid var(--ink); border-radius: 14px;
+      box-shadow: 3px 3px 0 var(--ink); padding: 10px 12px; margin-bottom: 10px; }
+    .dot { flex: none; width: 30px; height: 30px; border-radius: 50%; border: 2.5px solid var(--ink); display: grid; place-items: center;
+      font-weight: 800; background: #eee; }
+    .ok .dot { background: var(--mint); color: #fff; } .ok .dot::after { content: "✓"; }
+    .bad .dot { background: var(--tomato); color: #fff; } .bad .dot::after { content: "✕"; }
+    .warn .dot { background: var(--butter); } .warn .dot::after { content: "!"; }
+    .wait .dot::after { content: "…"; }
+    .row b { font-family: "Baloo 2", system-ui; font-weight: 700; font-size: 17px; display: block; line-height: 1.2; }
+    .row small { color: var(--muted); font-size: 13.5px; display: block; margin-top: 2px; }
+    button { font-family: "Baloo 2", system-ui; font-weight: 700; font-size: 17px; border: 2.5px solid var(--ink); border-radius: 12px;
+      background: var(--butter); box-shadow: 3px 3px 0 var(--ink); padding: 9px 14px; margin: 6px 6px 0 0; color: var(--ink); }
+    button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+    h2 { font-family: "Baloo 2", system-ui; font-size: 15px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin: 22px 0 8px; }
+    video { width: 100%; border-radius: 12px; border: 2.5px solid var(--ink); margin-top: 8px; display: none; background: #000; }
+    .meter { height: 10px; border: 2px solid var(--ink); border-radius: 6px; margin-top: 8px; overflow: hidden; display: none; background: #fff; }
+    .meter i { display: block; height: 100%; width: 0; background: var(--mint); transition: width .1s; }
+    .links a { display: block; font-family: "IBM Plex Mono", monospace; font-size: 14px; color: var(--ink); margin: 6px 0; word-break: break-all; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>REMY</h1>
+  <div class="sub">Pitch check: green ticks everywhere and you're good to go</div>
+
+  <h2>Automatic</h2>
+  <div id="auto"></div>
+
+  <h2>On this phone (tap each)</h2>
+  <div class="row wait" id="row-cam"><span class="dot"></span><div><b>Camera &amp; microphone</b><small>Tap test, then talk: the bar should move.</small>
+    <button id="btn-cam">Test camera &amp; mic</button><video id="video" playsinline muted autoplay></video><div class="meter" id="meter"><i></i></div></div></div>
+  <div class="row wait" id="row-sound"><span class="dot"></span><div><b>Speaker</b><small>You should hear a ding, then the phone saying "Remy check". Silent switch off!</small>
+    <button id="btn-sound">Play sound</button></div></div>
+  <div class="row wait" id="row-voice"><span class="dot"></span><div><b>ElevenLabs voice connects</b><small>Connects to Remy's real voice and hangs up straight away (uses a tiny bit of credit).</small>
+    <button id="btn-voice">Test real voice</button></div></div>
+
+  <h2>Links</h2>
+  <div class="links">
+    <a id="pitch-link" href="/?full=1">Pitch: /?full=1 (ElevenLabs, full mode)</a>
+    <a href="/">Testing: / (Gemini backup voice, saves credits)</a>
+    <a href="/?pretend=1">Pretend Remy: /?pretend=1 (no AI at all)</a>
+    <a href="/judge">Judges' QR page: /judge</a>
+  </div>
+</main>
+<script type="module">
+  const $ = (id) => document.getElementById(id);
+  function row(id, title) {
+    const r = document.createElement("div"); r.className = "row wait"; r.id = id;
+    r.innerHTML = `<span class="dot"></span><div><b></b><small>Checking…</small></div>`;
+    r.querySelector("b").textContent = title; $("auto").append(r); return r;
+  }
+  function set(r, state, note) { r.className = `row ${state}`; r.querySelector("small").textContent = note; }
+  const getJSON = async (url, body) => {
+    const res = await fetch(url, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : {});
+    if (!res.ok) throw new Error(`${res.status}`);
+    return res.json();
+  };
+
+  // 1. server awake + keys
+  const rServer = row("r-server", "Server is awake"), rKeys = row("r-keys", "Keys on the server");
+  const t0 = performance.now();
+  try {
+    const h = await getJSON("/api/health");
+    const ms = Math.round(performance.now() - t0);
+    set(rServer, ms > 4000 ? "warn" : "ok", ms > 4000 ? `Took ${(ms / 1000).toFixed(1)}s: it was asleep. Reload once more, it'll be fast now.` : `Answered in ${ms} ms.`);
+    const missing = [!h.vision_key_set && "Gemini key (Remy's eyes + backup voice)"].filter(Boolean);   // the ElevenLabs agent id is built into the app
+    set(rKeys, missing.length ? "bad" : "ok", missing.length ? `Missing: ${missing.join(", ")}. Add it on Render.` : `Gemini key set${h.elevenlabs_key_set ? ", ElevenLabs key set" : ""}.`);
+  } catch (e) { set(rServer, "bad", `Server didn't answer (${e.message}). Open the site and wait ~50 s for Render to wake up.`); set(rKeys, "bad", "Couldn't check."); }
+
+  // 2. Remy's brain (full mode, Savage) + recipes
+  const rBrain = row("r-brain", "Remy's instructions load (full Savage)"), rRecipes = row("r-recipes", "Recipes load");
+  try {
+    const b = await getJSON("/api/brain", { mode: "savage" });
+    const chars = (b.instructions || "").length;
+    set(rBrain, chars > 1000 ? "ok" : "bad", `${chars.toLocaleString()} characters, ${b.tools?.length || 0} actions.`);
+  } catch (e) { set(rBrain, "bad", `Failed (${e.message}).`); }
+  try {
+    const list = await getJSON("/api/recipes");
+    const special = list.find((r) => r.special);
+    set(rRecipes, list.length ? "ok" : "bad", `${list.length} recipes${special ? `, special: ${special.title}${special.checked_by_human ? " ✓" : ""}` : ""}.`);
+  } catch (e) { set(rRecipes, "bad", `Failed (${e.message}).`); }
+
+  // 3. ElevenLabs credits
+  const rCredits = row("r-credits", "ElevenLabs credits left");
+  try {
+    const c = await getJSON("/api/check/credits");
+    if (!c.ok) set(rCredits, "warn", `${c.reason} Check the ElevenLabs dashboard (Pranav's workspace).`);
+    else {
+      const pct = c.limit ? Math.round((c.left / c.limit) * 100) : 0;
+      const resets = c.resets_at ? `, resets ${new Date(c.resets_at * 1000).toLocaleDateString()}` : "";
+      set(rCredits, c.left < 20000 ? "bad" : c.left < 60000 ? "warn" : "ok",
+        `${c.left.toLocaleString()} of ${c.limit.toLocaleString()} left (${pct}%)${resets}. A full-mode pitch uses roughly 30–60k. This is the account of the key on Render.`);
+    }
+  } catch (e) { set(rCredits, "warn", `Couldn't read (${e.message}).`); }
+
+  // 4. Gemini backup voice answers
+  const rGemini = row("r-gemini", "Backup voice (Gemini) answers");
+  try {
+    const t1 = performance.now();
+    const r = await getJSON("/api/chat", { mode: "honest", history: [], note: "Pitch check: reply with a one-line hello." });
+    const said = r.say || r.text || r.reply || "";
+    set(rGemini, "ok", `Replied in ${((performance.now() - t1) / 1000).toFixed(1)}s${said ? `: “${String(said).slice(0, 80)}”` : "."}`);
+  } catch (e) { set(rGemini, "bad", `Failed (${e.message}). The backup voice won't work if ElevenLabs drops.`); }
+
+  // manual: camera + mic
+  $("btn-cam").onclick = async () => {
+    const r = $("row-cam");
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: true });
+      $("video").srcObject = stream; $("video").style.display = "block"; $("meter").style.display = "block";
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const an = ctx.createAnalyser(); an.fftSize = 512; ctx.createMediaStreamSource(stream).connect(an);
+      const data = new Uint8Array(an.fftSize); let heard = false;
+      const tick = () => {
+        an.getByteTimeDomainData(data);
+        const level = Math.max(...data.map((v) => Math.abs(v - 128))) / 128;
+        $("meter").firstElementChild.style.width = `${Math.min(100, level * 160)}%`;
+        if (level > 0.12 && !heard) { heard = true; set(r, "ok", "Camera on and the mic hears you."); }
+        requestAnimationFrame(tick);
+      };
+      tick(); set(r, "warn", "Camera on. Say something to check the mic…");
+    } catch (e) { set(r, "bad", `Blocked (${e.name}). Allow camera + mic for this site in Settings → Safari.`); }
+  };
+
+  // manual: speaker
+  $("btn-sound").onclick = () => {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    for (const [f, t] of [[660, 0], [990, 0.15]]) {
+      const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.value = f;
+      g.gain.setValueAtTime(0.3, ctx.currentTime + t); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.25);
+      o.connect(g).connect(ctx.destination); o.start(ctx.currentTime + t); o.stop(ctx.currentTime + t + 0.3);
+    }
+    try { const u = new SpeechSynthesisUtterance("Remy check"); u.lang = "en-GB"; setTimeout(() => speechSynthesis.speak(u), 500); } catch {}
+    set($("row-sound"), "ok", "Played. Did you hear both? If not: silent switch off, volume up.");
+  };
+
+  // manual: ElevenLabs connects (then hangs up)
+  $("btn-voice").onclick = async () => {
+    const r = $("row-voice"); set(r, "wait", "Connecting…");
+    try {
+      const { preloadSDK, AGENT_ID } = await import("/remy/elevenlabs.js");
+      const { Conversation } = await preloadSDK();
+      const t1 = performance.now(); let conv = null;
+      const done = (state, note) => { set(r, state, note); try { conv?.endSession(); } catch {} };
+      const timer = setTimeout(() => done("bad", "No connection after 15 s. Check credits and the agent in the ElevenLabs dashboard."), 15000);
+      conv = await Conversation.startSession({
+        agentId: AGENT_ID, connectionType: "webrtc",
+        dynamicVariables: { session_brain: "Connection test only. Say nothing." },
+        onConnect: () => { clearTimeout(timer); done("ok", `Connected in ${((performance.now() - t1) / 1000).toFixed(1)}s, then hung up.`); },
+        onError: (m) => { clearTimeout(timer); done("bad", `Error: ${String(m?.message || m).slice(0, 120)}`); },
+      });
+    } catch (e) { set(r, "bad", `Couldn't connect: ${String(e?.message || e).slice(0, 140)}`); }
+  };
+</script>
+</body>
+</html>

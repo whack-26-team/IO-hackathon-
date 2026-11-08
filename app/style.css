@@ -529,3 +529,25 @@ html[data-mode="savage"] #backdrop::after { opacity: 1; }
 #start-screen > .embers { display: block; opacity: 0; transition: opacity .6s ease; }
 #start-screen.mode-savage > .embers { opacity: 1; }
 @media (prefers-reduced-motion: reduce) { #start-screen > .embers, #start-screen.mode-savage > .embers { display: none; } }
+
+/* footer stickers */
+.foot-ico { width: 1.5em; height: 1.5em; vertical-align: -0.45em; margin-right: 3px; }
+
+/* ---------- cooking screen polish ---------- */
+/* Remy's bubble bounces in; while he's talking its tail wiggles */
+.speech:not(.quiet):not(.roast) .bubble { animation: bubble-in .42s cubic-bezier(.3, 1.6, .5, 1); transform-origin: 96px 0; }
+@keyframes bubble-in { 0% { transform: scale(.6) translateY(10px); opacity: 0; } 100% { transform: none; opacity: 1; } }
+body.x-speaking .speech:not(.quiet) .bubble::before { animation: tail-wiggle .5s ease-in-out infinite; }
+@keyframes tail-wiggle { 0%, 100% { transform: skewX(-25deg) rotate(20deg); } 50% { transform: skewX(-18deg) rotate(8deg) translateY(-2px); } }
+body.x-speaking .speech:not(.quiet):not(.roast) .cook-face { animation: talk-bob .5s ease-in-out infinite; }
+@keyframes talk-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px) rotate(-2deg); } }
+/* safety alert in the cartoon style: hazard-stripe frame, card slams in and shakes, no jokes */
+.alert-card { position: relative; border-width: 4px; box-shadow: none; animation: alert-slam .4s cubic-bezier(.3, 1.7, .5, 1), alert-shake .5s .4s 2; }
+.alert-card::before { content: ""; position: absolute; inset: -14px; z-index: -1; border-radius: 30px; border: 3px solid var(--ink);
+  background: repeating-linear-gradient(-45deg, var(--butter) 0 14px, var(--ink) 14px 28px); box-shadow: 8px 8px 0 var(--ink); }
+.alert-text { font-family: "Baloo 2", var(--font); font-weight: 700; letter-spacing: .3px; }
+@keyframes alert-slam { 0% { transform: scale(1.6) rotate(-6deg); opacity: 0; } 100% { transform: none; opacity: 1; } }
+@keyframes alert-shake { 0%, 100% { transform: none; } 25% { transform: translateX(-6px) rotate(-1deg); } 75% { transform: translateX(6px) rotate(1deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .speech:not(.quiet) .bubble, body.x-speaking .speech .bubble::before, body.x-speaking .speech .cook-face, .alert-card { animation: none !important; }
+}

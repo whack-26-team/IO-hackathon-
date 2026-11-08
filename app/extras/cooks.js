@@ -1,5 +1,6 @@
 // Score log (#113), achievements (#114) and the start-screen menu. Everything is stored only on
 // this phone (app.history).
+import { sticker, withSticker } from "./sticker.js";
 import { ACHIEVEMENTS, earned, checkNewBadges } from "./achievements.js";
 
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
@@ -13,12 +14,12 @@ export function streak(cooks) {
   return n;
 }
 
-const MODE_ICON = { gentle: "😇", honest: "😏", savage: "🤬" };
+const MODE_ICON = { gentle: "f-gentle", honest: "f-sus", savage: "f-savage" };   // little Remy faces
 
 function cooksSheet(app) {
   const cooks = app.history.cooks();
   const wrap = el("div", "x-sheet");
-  wrap.append(el("h2", "x-title", "🏆 Your cooks"));
+  wrap.append(el("h2", "x-title", "Your cooks"));
 
   const best = cooks.reduce((m, c) => Math.max(m, app.history.starsOf(c)), 0);
   const stats = el("div", "x-stats");
@@ -33,7 +34,11 @@ function cooksSheet(app) {
   const grid = el("div", "x-badges");
   for (const a of ACHIEVEMENTS) {
     const b = el("div", "x-badge" + (got[a.id] ? " got" : ""));
-    b.append(el("span", "x-badge-icon", got[a.id] ? a.icon : "🔒"), el("b", "", a.name), el("small", "", a.how));
+    // earned: a tilted sticker (it slaps on if you got it in the last few minutes); locked: grey outline
+    const fresh = got[a.id] && Date.now() - got[a.id] < 5 * 60 * 1000;
+    if (fresh) b.classList.add("x-slap");
+    b.style.setProperty("--tilt", `${((a.id.length * 7) % 9) - 4}deg`);
+    b.append(sticker(a.icon, { cls: "x-badge-icon", fill: a.icon === "i-star" ? "#ffd166" : undefined }), el("b", "", a.name), el("small", "", a.how));
     grid.append(b);
   }
   wrap.append(grid);
@@ -45,10 +50,10 @@ function cooksSheet(app) {
   for (const c of cooks.slice(0, 50)) {
     const li = el("li", "x-row");
     const left = el("div", "x-row-main");
-    left.append(el("b", "", `${MODE_ICON[c.mode] || ""} ${c.dish || "Freestyle cook"}`),
+    left.append(withSticker("b", "x-row-title", MODE_ICON[c.mode] || "f-sus", c.dish || "Freestyle cook"),
       el("small", "", `${new Date(c.at).toLocaleDateString(undefined, { day: "numeric", month: "short" })} · ${c.timers || 0} timers · ${c.roasts || 0} roasts${c.alerts ? ` · ${c.alerts} safety` : ""}`));
     const best = (c.highlights || []).find((h) => h.kind === "alert") || (c.highlights || []).find((h) => h.kind === "roast");
-    if (best) left.append(el("small", "x-row-moment", `${best.kind === "alert" ? "🛟" : "🔥"} “${best.text}”`));
+    if (best) left.append(withSticker("small", "x-row-moment", best.kind === "alert" ? "i-buoy" : "i-flame", `“${best.text}”`));
     li.append(left, el("span", "x-score x-stars", app.history.starsOf(c) ? app.history.starText(app.history.starsOf(c)) : "–"));
     list.append(li);
   }
@@ -59,7 +64,7 @@ function cooksSheet(app) {
     if (!confirm("Delete all your scores, badges and settings from this phone?")) return;
     app.history.clearAll(); app.closeSheet();
   });
-  wrap.append(el("p", "x-note", "🔒 Saved only on this phone, never uploaded."), clear);
+  wrap.append(withSticker("p", "x-note", "i-lock", "Saved only on this phone, never uploaded."), clear);
   return wrap;
 }
 
@@ -72,7 +77,8 @@ export function initCooks(app, menu) {
     slot.querySelector(".x-badges-pill")?.remove();
     const fresh = checkNewBadges(app);
     if (!fresh.length) return;
-    const pill = el("button", "x-badges-pill", fresh.length === 1 ? `${fresh[0].icon} New badge: ${fresh[0].name}` : `🏅 ${fresh.length} new badges`);
+    const pill = withSticker("button", "x-badges-pill", fresh.length === 1 ? fresh[0].icon : "i-medal",
+      fresh.length === 1 ? `New badge: ${fresh[0].name}` : `${fresh.length} new badges`, { fill: fresh.length === 1 && fresh[0].icon === "i-star" ? "#ffd166" : undefined });
     pill.addEventListener("click", (e) => { e.stopPropagation(); app.keepGoodbye(); app.openSheet(cooksSheet(app)); });
     slot.prepend(pill);
   });

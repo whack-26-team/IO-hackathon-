@@ -13,14 +13,14 @@
 ```bash
 uvicorn server.main:app --reload --port 8000
 ```
-Open **http://localhost:8000** in Chrome. Tick **Pretend Remy**, pick a recipe, press
+Open **http://localhost:8000** in Chrome. Add `?pretend=1` to the address for Pretend Remy (no AI), pick a recipe, press
 **Start cooking**, and allow the camera. Fake tips, a roast, a timer and a red alert
 should appear over the next ~25 seconds.
 
 ## 3. Turn on the real AI (needs the team OpenAI key)
 1. Copy `server/.env.example` to `server/.env`.
 2. Paste the key Ahmed sends you **privately** after `OPENAI_API_KEY=`.
-3. Restart the server, then untick **Pretend Remy**.
+3. Restart the server, then open it without `?pretend=1`.
 
 ⚠️ Never put the key anywhere else: not in GitHub, not in chat.
 
