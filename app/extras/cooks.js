@@ -64,7 +64,7 @@ function cooksSheet(app) {
 }
 
 export function initCooks(app, menu) {
-  menu.add("🏆", "Your cooks", () => app.openSheet(cooksSheet(app)));
+  menu.add("#i-trophy", "Your cooks", () => app.openSheet(cooksSheet(app)));
 
   // New badges: one small pill on the goodbye screen; tapping it opens Your cooks
   app.on("goodbye", () => {

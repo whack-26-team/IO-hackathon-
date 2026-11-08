@@ -376,3 +376,28 @@ html[data-mode="gentle"] .score-card { background: #f4f9fe; }
   animation: rip-bit 1s ease-out .45s forwards; }
 @keyframes rip-bit { 0% { opacity: 1; transform: translate(0, 0) rotate(0); } 100% { opacity: 0; transform: translate(var(--dx), calc(var(--dy) + 90px)) rotate(var(--spin)); } }
 @media (prefers-reduced-motion: reduce) { .timer.rip { animation: none; opacity: 0; } }
+
+/* ---------- start screen comes alive (all off with "reduce motion") ---------- */
+.hat-y { position: relative; display: inline-block; }
+.name-hat { position: absolute; left: 50%; top: -0.2em; width: 0.62em; transform: translateX(-50%) rotate(14deg); animation: hat-bob 3.2s ease-in-out infinite; }
+@keyframes hat-bob { 0%, 100% { transform: translateX(-50%) rotate(14deg); } 50% { transform: translateX(-50%) translateY(-2px) rotate(8deg); } }
+#start-screen .mode-bar { animation: bar-in .45s cubic-bezier(.3, 1.5, .5, 1) both; }
+#start-screen .mode-bar:nth-of-type(2) { animation-delay: .08s; }
+#start-screen .mode-bar:nth-of-type(3) { animation-delay: .16s; }
+@keyframes bar-in { from { transform: translateY(26px) scale(.94); opacity: 0; } to { transform: none; opacity: 1; } }
+.hero-face { animation: pop .3s ease-out, face-bob 2.8s ease-in-out .3s infinite; transform-origin: 50% 90%; }
+@keyframes face-bob { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-5px) rotate(-2deg); } }
+.hero-face.react-gentle { animation: halo-in .7s cubic-bezier(.3, 1.6, .5, 1), face-bob 2.8s ease-in-out .7s infinite; }
+@keyframes halo-in { 0% { transform: translateY(14px) scale(.85); } 60% { transform: translateY(-10px) scale(1.06); } 100% { transform: none; } }
+.hero-face.react-honest { animation: smirk .6s ease-out, face-bob 2.8s ease-in-out .6s infinite; }
+@keyframes smirk { 0% { transform: scale(.92); } 40% { transform: rotate(-7deg) scale(1.05); } 70% { transform: rotate(4deg); } 100% { transform: none; } }
+.hero-face .blinker { display: none; }
+.hero-face.blink .blinker { display: inline; }
+.greeting.typing::after { content: "▍"; margin-left: 1px; animation: caret .5s steps(2) infinite; }
+@keyframes caret { 50% { opacity: 0; } }
+#start-btn { animation: start-jiggle 6s ease-in-out 2.5s infinite; }
+@keyframes start-jiggle { 0%, 88%, 100% { transform: none; } 91% { transform: rotate(-2deg) scale(1.03); } 94% { transform: rotate(2deg) scale(1.03); } 97% { transform: rotate(-1deg); } }
+#start-btn:active { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  #start-screen .mode-bar, .hero-face, .hero-face.react-gentle, .hero-face.react-honest, #start-btn, .name-hat { animation: none; }
+}

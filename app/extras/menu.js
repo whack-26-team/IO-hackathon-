@@ -9,7 +9,11 @@ export function createMenu() {
   return {
     add(icon, label, onTap) {
       const b = document.createElement("button");
-      b.className = "x-menu-btn"; b.textContent = icon; b.title = label; b.setAttribute("aria-label", label);
+      b.className = "x-menu-btn"; b.title = label; b.setAttribute("aria-label", label);
+      if (icon.startsWith("#")) {   // a drawn sticker icon (SVG symbol in index.html)
+        b.classList.add("sticker");
+        b.innerHTML = `<svg viewBox="0 0 100 100" aria-hidden="true"><use href="${icon}"/></svg>`;
+      } else b.textContent = icon;
       b.addEventListener("click", onTap);
       (count++ % 2 === 0 ? left : right).append(b);
       return b;
