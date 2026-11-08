@@ -35,6 +35,7 @@ import { initWatchMyPan } from "./watch.js";
 import { initFeel } from "./feel.js";
 import { initRecipeBrowser } from "./recipes.js";
 import { initRatePlate } from "./plate.js";
+import { initSetupCard } from "./setup-guide.js";
 
 // The start screen must never scroll: if an extra makes it overflow on this phone, hide the
 // optional bits (the challenge chip) instead.
@@ -55,6 +56,7 @@ export function initExtras(app) {
   const menu = createMenu();
   start("wake lock", () => initWakeLock(app));
   start("your cooks", () => initCooks(app, menu));
+  start("setup card", () => initSetupCard(app, menu));
   start("recipes", () => initRecipeBrowser(app, menu));
   start("highlights", () => initHighlights(app));   // before share, so highlights sit above the Share button
   start("share", () => initShare(app));
