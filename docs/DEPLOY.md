@@ -36,3 +36,11 @@ Owner: Matthew (issue #5). It takes about 10 minutes, once.
 | 💸 **The link is public** | Anyone who has it can use REMY and spend AI credits. Share it only with the team and judges. The spending limit on the API key (issue #13) is the hard cap. |
 | 🗑️ **Nothing is stored** | Render's disk resets on every deploy. That's fine, because REMY doesn't save anything. |
 | 🧪 **Testing changes** | Branches aren't deployed, only `main`. To try a branch on an iPhone, use `python tools/share.py` on a laptop. |
+
+## Lock-screen timer alerts (optional)
+Add two environment variables in Render → remy → Environment, then save (Render redeploys):
+- `VAPID_PUBLIC_KEY`
+- `VAPID_PRIVATE_KEY`
+
+Matthew has the values (generated once, never committed). Without them the ⚙️ Settings toggle says
+alerts aren't set up yet. iPhone only shows these from the home-screen app (iOS 16.4+).

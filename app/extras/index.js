@@ -35,6 +35,7 @@ import { initFeel } from "./feel.js";
 import { initRecipeBrowser } from "./recipes.js";
 import { initSetupCard, openSetupCard } from "./setup-guide.js";
 import { initSettings } from "./settings.js";
+import { initPush } from "./push.js";
 
 // The start screen must never scroll: if an extra makes it overflow on this phone, hide the
 // optional bits (the challenge chip) instead.
@@ -63,5 +64,6 @@ export function initExtras(app) {
   start("judge mode", () => initJudgeMode());
   start("watch my pan", () => initWatchMyPan(app));
   start("look & feel", () => initFeel(app));
+  start("lock-screen alerts", () => initPush(app));
   start("challenge", async () => { await initChallenge(app); keepStartOnOneScreen(); });
 }

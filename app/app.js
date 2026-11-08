@@ -234,7 +234,7 @@ const timerSound = (kind) => { if (state.live && (kind === "check" || kind === "
 const timers = createTimers($("timers"), (type, data) => {
   if (type === "timer_done") stats.timersDone++;
   fire(type, data);
-  state.remy?.send(type, data);
+  if (type === "timer_check" || type === "timer_done") state.remy?.send(type, data);
 }, timerSound);
 
 // ---------- session recap (shown on the goodbye screen) ----------
@@ -577,7 +577,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v102`,
+      `version  v103`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);

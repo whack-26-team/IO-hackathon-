@@ -112,3 +112,7 @@ html[data-mode="cooking"] .cook-tools { flex-wrap: wrap; }
 .x-tab.on { background: var(--butter); }
 .hidden { display: none !important; }
 .x-lesson-best { padding: 0 14px; }
+
+/* ---- lock-screen timer alerts (Settings) ---- */
+.x-push { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.x-push .x-toggle:disabled { opacity: .6; }

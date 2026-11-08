@@ -38,6 +38,7 @@ export function createTimers(container, emit, beep = () => {}) {
       t.interval = setInterval(() => tick(t), 250);
       timers.set(id, t);
     }
+    emit("timer_changed", { id, label, end_at: t.endAt });
     tick(t);
     return id;
   }
@@ -106,6 +107,7 @@ export function createTimers(container, emit, beep = () => {}) {
     if (t.endAt > now) { t.done = false; t.el.classList.remove("done"); }
     flash(t.el, "updated");
     tick(t);
+    emit("timer_changed", { id, label: t.label, end_at: t.endAt });
   }
 
   function flash(el, cls) {
@@ -120,6 +122,7 @@ export function createTimers(container, emit, beep = () => {}) {
     clearInterval(t.interval);
     t.el.remove();
     timers.delete(id);
+    emit("timer_removed", { id });
   }
 
   function clearAll() {

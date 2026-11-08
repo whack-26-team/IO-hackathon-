@@ -9,6 +9,7 @@ What it does:
   * POST /api/recipes/ai     -> safety-check a recipe Remy wrote itself (create_recipe)
   * POST /api/chat           -> backup Remy: Gemini writes his reply when ElevenLabs is down
   * GET  /api/qr?text=       -> QR code (SVG) for one of REMY's own links (judge page)
+  * GET  /api/push/key, POST /api/push/timer -> lock-screen timer alerts (server/push.py)
   * GET  /api/recipes/{id}   -> one full recipe
   * POST /api/brain          -> Remy's instructions + actions for ANY voice route
   * POST /api/session        -> a short-lived pass for the live OpenAI call,
@@ -38,6 +39,7 @@ from server.recipe_check import check_ai_recipe
 from server.recipe_sources import IMPORT_DIR, find_recipe
 from server import vision
 from server import chat
+from server import push
 
 ROOT = Path(__file__).resolve().parent.parent
 APP_DIR = ROOT / "app"
@@ -372,6 +374,29 @@ def list_lessons():
         out.append({"id": r["id"], "title": r["title"], "summary": r.get("summary", ""),
                     "steps": len(r.get("steps", [])), "score_on": r.get("score_on", [])})
     return out
+
+
+class PushTimer(BaseModel):
+    subscription: dict
+    id: str
+    label: str = ""
+    fire_at: float | None = None     # when the timer ends, ms since 1970
+    cancel: bool = False
+
+
+@app.get("/api/push/key")
+def push_key():
+    """Public key for lock-screen timer alerts (empty + enabled:false until set up on Render)."""
+    return {"enabled": push.enabled(), "key": push.public_key()}
+
+
+@app.post("/api/push/timer")
+def push_timer(req: PushTimer):
+    """Schedule, move or cancel a lock-screen alert for one timer (server/push.py)."""
+    try:
+        return push.schedule(req.subscription, req.id, req.label, req.fire_at, req.cancel)
+    except push.PushError as e:
+        raise HTTPException(e.status, e.message) from None
 
 
 @app.get("/api/allergens")

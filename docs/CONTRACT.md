@@ -97,3 +97,9 @@ empty slots in `index.html` (`#slot-start-chip`, `#slot-start-menu`, `#slot-cook
 `#slot-goodbye`, `#slot-sheets`) and the `app` object (`on`, `stats`, `startCooking`, `setMode`,
 `say`, `openSheet`/`closeSheet`, `history`). Full list in the comment at the top of
 `app/extras/index.js`. Stored data stays on the phone (`app/history.js`, localStorage).
+
+## Lock-screen timer alerts
+`GET /api/push/key` → `{enabled, key}`. `POST /api/push/timer {subscription, id, label, fire_at(ms), cancel?}`
+schedules, moves or cancels one alert. The screen sends these from `app/extras/push.js` when the
+timers report `timer_changed` / `timer_removed` (app/timers.js). The server sends the push when due
+(`server/push.py`); `app/sw.js` shows it.
