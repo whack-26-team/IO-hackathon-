@@ -15,6 +15,21 @@ export function unlockSound() {
   if (!ctx) ctx = new AudioCtx();
   if (ctx.state === "suspended") ctx.resume();
   beep("start");
+  primeSpeech();
+}
+
+// iPhones only let a page speak if the first spoken line starts inside a tap. Remy's first line
+// arrives a second later, so on the first Start he stayed silent. A silent line now, in the tap,
+// unlocks the phone's voice for the rest of the visit.
+export function primeSpeech() {
+  try {
+    const synth = window.speechSynthesis;
+    if (!synth || primeSpeech.done) return;
+    const u = new SpeechSynthesisUtterance(" ");
+    u.volume = 0; u.rate = 2;
+    synth.speak(u);
+    primeSpeech.done = true;
+  } catch { /* no voice on this phone */ }
 }
 
 // Make the sound engine without the Start "ding" (any tap counts on iPhone)

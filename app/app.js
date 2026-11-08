@@ -659,7 +659,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
       `camera   ${state.cameraInfo ? `${state.cameraInfo.label} ${state.cameraInfo.width}x${state.cameraInfo.height} zoom ${state.cameraInfo.zoom}${state.cameraInfo.to ? ` (was ${state.cameraInfo.from})` : ""}${state.cameraInfo.zoomed ? " zoomed to 1x" : ""}` : "not started"}`,
-      `version  v123`,
+      `version  v124`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
