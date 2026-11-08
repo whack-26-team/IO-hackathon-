@@ -9,9 +9,17 @@ import { createLiveRemy } from "./remy/live.js";
 import { createDemoRemy } from "./demo/demo-remy.js"; // ?demo=1 (Felix)
 import { initModeSwitch } from "./extras/mode-switch.js"; // tap the badge mid-cook (Felix)
 import { initSetupGuide } from "./extras/setup-guide.js"; // first-time setup card (Felix)
+import { initExtras } from "./extras/index.js"; // all other extras (Felix)
+import * as history from "./history.js"; // scores/settings, kept only on this phone
 
 const $ = (id) => document.getElementById(id);
-const state = { recipe: null, mode: "honest", remy: null, stream: null, cooking: false, live: false };
+const state = { recipe: null, mode: "honest", remy: null, stream: null, cooking: false, live: false, preRecipeId: null };
+
+// ---------- events for extras (app/extras/, Felix) ----------
+const bus = {};
+function fire(event, data) {
+  for (const fn of bus[event] || []) { try { fn(data); } catch (e) { console.error("[extras]", event, e); } }
+}
 
 // ---------- no zooming ----------
 // Safari on iPhone ignores "user-scalable=no" in index.html, so we also block the
@@ -80,6 +88,7 @@ $("start-btn").addEventListener("click", async () => {
   unlockSound();
   state.mode = checkedMode();
   state.recipe = null; // no recipe yet: Remy asks what you're cooking
+  const preRecipeId = state.preRecipeId; state.preRecipeId = null; // chosen beforehand (recipe browser, challenge)
   resetStats();
   state.cooking = true;
 
@@ -108,8 +117,15 @@ $("start-btn").addEventListener("click", async () => {
   const useMock = $("use-mock").checked;
   state.live = !useMock && !useDemo; // real Remy speaks timer reminders himself (see the timers' sound below)
   const factory = useDemo ? createDemoRemy : useMock ? createMockRemy : createLiveRemy;
+  // A recipe picked before Start (extras): load it so Remy starts on it
+  let preRecipe = null;
+  if (preRecipeId) {
+    try { preRecipe = await (await fetch(`/api/recipes/${encodeURIComponent(preRecipeId)}`)).json(); } catch { preRecipe = null; }
+    if (preRecipe?.steps) showRecipe({ recipe: preRecipe, source: "remy", checked_by_human: preRecipe.checked_by_human });
+    else preRecipe = null;
+  }
   state.remy = factory({
-    recipe: null,
+    recipe: preRecipe,
     mode: state.mode,
     stream: state.stream,
     video: $("camera"),
@@ -117,6 +133,7 @@ $("start-btn").addEventListener("click", async () => {
   });
   wireRemy(state.remy);
   state.remy.start();
+  fire("start", { mode: state.mode, recipe: preRecipe });
 });
 
 $("stop-btn").addEventListener("click", stopCooking);
@@ -146,6 +163,7 @@ function stopCooking() {
   $("cook-screen").classList.add("hidden");
   document.documentElement.dataset.mode = state.mode; // the attitude's page colour behind the goodbye
   showGoodbye();
+  fire("stop", {});
 }
 
 // Remy signs off in his attitude's voice, then the start screen comes back by itself.
@@ -175,6 +193,12 @@ function showGoodbye() {
   const g = GOODBYES[state.mode] || GOODBYES.honest;
   $("goodbye-text").textContent = g.text;
   renderRecap();
+  const summary = statsSummary();
+  if (summary.dish || summary.timers || summary.roasts || summary.alerts) {
+    history.addCook({ dish: summary.dish, mode: state.mode, score: summary.score, timers: summary.timers,
+      alerts: summary.alerts, roasts: summary.roasts, highlights: summary.highlights.slice(0, 10) });
+  }
+  fire("goodbye", { stats: summary });
   const face = $("goodbye-face");
   setUse(face, g.face);
   face.setAttribute("viewBox", g.face === "f-savage" ? "-28 -12 156 116" : "-18 -12 136 116");
@@ -201,12 +225,15 @@ $("goodbye").addEventListener("click", backToStart);
 const timerSound = (kind) => { if (state.live && (kind === "check" || kind === "done")) return; beep(kind); };
 const timers = createTimers($("timers"), (type, data) => {
   if (type === "timer_done") stats.timersDone++;
+  fire(type, data);
   state.remy?.send(type, data);
 }, timerSound);
 
 // ---------- session recap (shown on the goodbye screen) ----------
 let stats;
-function resetStats() { stats = { timers: new Set(), timersDone: 0, alerts: 0, roasts: 0, stepsDone: 0, recipe: null }; }
+function resetStats() { stats = { timers: new Set(), timersDone: 0, alerts: 0, roasts: 0, stepsDone: 0, recipe: null, highlights: [] }; }
+// Best moments of the session (roasts, safety saves, timers) for the highlights reel. Text only.
+function highlight(kind, text) { if (text && stats.highlights.length < 30) stats.highlights.push({ kind, text: String(text).slice(0, 160) }); }
 resetStats();
 // Remy's score out of 10: starts at 7, timers finished and steps done help, roasts and safety
 // alerts cost points. Just for fun.
@@ -221,6 +248,10 @@ const SCORE_LINES = {
   honest: (n) => n >= 8 ? `${n}/10. Suspiciously competent.` : n >= 5 ? `${n}/10. Edible. Probably.` : `${n}/10. We'll call it practice.`,
   savage: (n) => n >= 8 ? `${n}/10. Don't let it go to your head.` : n >= 5 ? `${n}/10. My nan cooks better, and she's an app too.` : `${n}/10. A fish could cook better than you.`,
 };
+function statsSummary() {
+  return { dish: stats.recipe, timers: stats.timers.size, timersDone: stats.timersDone, alerts: stats.alerts,
+    roasts: stats.roasts, stepsDone: stats.stepsDone, score: recapScore(), highlights: [...stats.highlights] };
+}
 function renderRecap() {
   const chips = [
     stats.recipe && `🍽 ${stats.recipe}`,
@@ -234,6 +265,7 @@ function renderRecap() {
 }
 
 function wireRemy(remy) {
+  for (const type of ["status", "recipe", "tip", "roast", "alert", "step", "timer_start", "timer_cancel"]) remy.on(type, (d) => fire(type, d));
   remy.on("status", setStatus);
   remy.on("recipe", (d) => { showRecipe(d); stats.recipe = d.recipe?.title || stats.recipe; });
   remy.on("tip", (d) => showBubble(d));
@@ -246,6 +278,7 @@ function wireRemy(remy) {
   });
   remy.on("timer_start", (d) => {
     stats.timers.add(d.id);
+    highlight("timer", timerPhrase(d.label, d.seconds / 60, state.recipe));
     timers.start({ ...d, estimate: isEstimate(d.label) });
     // Say on screen what the timer is for ("⏱ 11-minute timer for the rigatoni pasta"),
     // unless a safety alert is up (that always wins)
@@ -304,6 +337,7 @@ function showBubble({ text, severity = "info", level }) {
 let pendingRoast = null;
 function showRoast({ text, level = 1 }) {
   stats.roasts++;
+  highlight("roast", text);
   if (alertShowing()) { pendingRoast = { text, level }; return; }
   showBubble({ text, severity: "roast", level: Math.min(Math.max(level, 1), 3) });
 }
@@ -328,6 +362,7 @@ function alertShowing() { return !$("alert-flash").classList.contains("hidden");
 
 function showAlert(text) {
   stats.alerts++;
+  highlight("alert", text);
   $("alert-text").textContent = text;
   const f = $("alert-flash");
   f.classList.remove("hidden");
@@ -481,8 +516,42 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v88`,
+      `version  v89`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
 }
+
+// ---------- the app object extras use (app/extras/index.js, Felix) ----------
+// See the comment at the top of app/extras/index.js for what each part does.
+const remyApp = {
+  on(event, fn) { (bus[event] ||= []).push(fn); },
+  stats: () => statsSummary(),
+  startCooking({ recipeId = null, mode = null } = {}) {
+    if (state.cooking) return false;
+    if (mode && MODE_NAMES[mode]) {
+      const input = document.querySelector(`input[name="mode"][value="${mode}"]`);
+      if (input && mode !== "savage") { input.checked = true; applyMode(mode); }
+    }
+    state.preRecipeId = recipeId;
+    $("start-btn").click();
+    return true;
+  },
+  setMode,
+  say(text) { showBubble({ text, severity: "info" }); if (!state.live) sayLocally(text); },
+  openSheet(el) {
+    const host = $("slot-sheets");
+    const backdrop = Object.assign(document.createElement("div"), { className: "sheet-backdrop" });
+    const sheet = Object.assign(document.createElement("div"), { className: "sheet" });
+    sheet.append(el); backdrop.append(sheet);
+    backdrop.addEventListener("click", (e) => { if (e.target === backdrop) remyApp.closeSheet(); });
+    host.replaceChildren(backdrop);
+    return sheet;
+  },
+  closeSheet() { $("slot-sheets").replaceChildren(); },
+  history,
+  get mode() { return state.mode; },
+  get cooking() { return state.cooking; },
+};
+window.remyApp = remyApp; // handy for testing extras from the browser console
+try { initExtras(remyApp); } catch (e) { console.error("[extras] failed to start", e); }

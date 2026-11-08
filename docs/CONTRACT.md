@@ -85,3 +85,10 @@ Two actions need an answer from the server, which the live connection passes bac
 `looks_right` / `looks_wrong` / `done_when` on every step, and every timer must match the
 `cook-times.json` entry named in `from`. Raw imports live in `remy-brain/recipes/_imported/` and
 aren't listed in the app.
+
+## Extras API (screen ↔ Felix's extras)
+Felix's features live in `app/extras/` and plug in through `initExtras(app)` (`app/extras/index.js`):
+empty slots in `index.html` (`#slot-start-chip`, `#slot-start-menu`, `#slot-cook-tools`,
+`#slot-goodbye`, `#slot-sheets`) and the `app` object (`on`, `stats`, `startCooking`, `setMode`,
+`say`, `openSheet`/`closeSheet`, `history`). Full list in the comment at the top of
+`app/extras/index.js`. Stored data stays on the phone (`app/history.js`, localStorage).
