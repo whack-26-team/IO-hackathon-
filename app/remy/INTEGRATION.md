@@ -7,7 +7,7 @@ OpenAI starter is retained in `openai.js`; it has not been retested.
 
 1. The screen provides its camera, canvas and microphone stream.
 2. `/api/brain` supplies the complete merged instructions, selected personality,
-   knowledge and eight action schemas. These are sent as `session_brain`.
+   knowledge and the current action schemas. These are sent as `session_brain`.
 3. ElevenLabs handles spoken conversation. Its `remy_action` client tool dispatches
    schema-checked actions to the existing screen events. Recipe actions use the
    server's checked recipe endpoints.
@@ -19,17 +19,19 @@ OpenAI starter is retained in `openai.js`; it has not been retested.
    cooking. A cook can also request an explicit reminder duration. Ambiguous
    compound durations are rejected; repeat as a number of minutes or seconds.
 
-`agent-prompt.md` is our copy of the agent's dashboard prompt: only the ElevenLabs transport
+`agent-prompt.md` is our copy of the agent's published dashboard prompt: only the ElevenLabs transport
 instructions (voice tags, `remy_action`, timers, camera) followed by `{{session_brain}}`. Remy's core
 rules are **not** repeated there: the server sends the latest ones at the start of `session_brain`
-(`/api/brain`), so they're paid for once per reply (about 7,300 fewer characters) and never go
-stale. If you edit the dashboard prompt, keep it in step with this file.
+(`/api/brain`). The dashboard prompt fell from 10,738 to about 3,697 characters when the
+duplicate rules were removed. That is a character count, not a measured credit saving.
+The source-only HTML comment at the top of `agent-prompt.md` is not in the dashboard.
+If you edit either copy, keep the other in step.
 
-The copied ElevenLabs settings use patient turn eagerness, background voice
-detection on, and Ignore Default Personality off. Realtime Max keeps the system
-prompt, voices, tools, and turn settings, but costs more per token than Mini.
-Check its actual response delay, kitchen-noise behaviour, and usage during the
-real phone cook-along before deciding whether to keep Max. The agent copy and
+The published agent uses Realtime Mini and the Grandfather Joe primary voice,
+with the Savage secondary voice. The copied ElevenLabs settings use patient turn
+eagerness, background voice detection on, and Ignore Default Personality off.
+Check actual response delay, kitchen-noise behaviour, and usage during the
+real phone cook-along. The agent copy and
 app connection need a real cook-along after this branch is deployed; creating
 the copy alone does not redirect the deployed site.
 
