@@ -272,9 +272,11 @@ export function createActions({ emit, request, alive, now = Date.now }) {
         }
         case 'clear_recipe': return clearRecipe();
         case 'lesson_score': {
-          const score = Math.max(1, Math.min(10, Math.round(args.score)));
+          if (!recipe?.lesson) throw new Error('Lesson stars can only be awarded during a lesson.');
+          if (args.score < 1 || args.score > 5) throw new Error('Award 1 to 5 stars, not a score out of ten.');
+          const score = args.score;
           emit('lesson_score', { score, comment: String(args.comment || '').slice(0, 200) });
-          return { ok: true, message: `Lesson score ${score}/10 shown on screen. Say it once.` };
+          return { ok: true, message: `${score} out of 5 stars shown on screen. Say it once.` };
         }
         case 'cancel_timer': emit('timer_cancel', { id: args.id }); timers.delete(args.id); break;
         case 'adjust_timer': {
@@ -291,7 +293,9 @@ export function createActions({ emit, request, alive, now = Date.now }) {
           step = args.current_step + (args.step_complete ? 1 : 0);
           emit('step', args); break;
         case 'show_tip': emit('tip', args); break;
-        case 'roast': emit('roast', args); break;
+        case 'roast':
+          if (args.text.length > 180) throw new Error('Roast too long. Use one short punchline, under 180 characters.');
+          emit('roast', args); break;
         case 'safety_alert': emit('alert', args); break;
       }
       return { ok: true };

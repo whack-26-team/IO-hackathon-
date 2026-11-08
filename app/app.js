@@ -14,6 +14,7 @@ import { initExtras } from "./extras/index.js"; // all other extras (Felix)
 import * as history from "./history.js"; // scores/settings, kept only on this phone
 import { loadAllergens, clashes } from "./allergens.js"; // diet/allergy ⚠ in the recipe panel
 import { scaleIngredients } from "./servings.js"; // "Serves 2 − +"
+import { waitForVoice } from "./review-flow.js";
 loadAllergens();
 
 const $ = (id) => document.getElementById(id);
@@ -123,7 +124,7 @@ initSetupGuide();
 
 // Switch attitude while cooking (Felix builds the picker in extras/mode-switch.js)
 function setMode(mode) {
-  if (!MODE_NAMES[mode] || mode === state.mode) return;
+  if (state.mode === "lesson" || !MODE_NAMES[mode] || mode === state.mode) return;
   state.mode = mode;
   $("mode-badge").textContent = MODE_NAMES[mode];
   state.remy?.send("mode_changed", { mode });
@@ -135,16 +136,18 @@ $("start-btn").addEventListener("click", async () => {
   // This tap is important: iPhones only allow sound and mic after a tap.
   // Unlock sound FIRST, before any waiting, or the iPhone forgets the tap.
   unlockSound();
-  state.mode = checkedMode();
+  state.mode = state.preRecipeId?.startsWith("lesson-") ? "lesson" : checkedMode();
   state.recipe = null; // no recipe yet: Remy asks what you're cooking
   const preRecipeId = state.preRecipeId; state.preRecipeId = null; // chosen beforehand (recipe browser, challenge)
   resetStats();
   state.cooking = true;
+  state.lastStatus = null;
 
   $("start-screen").classList.add("hidden");
   $("cook-screen").classList.remove("hidden");
   document.documentElement.dataset.mode = "cooking";
-  $("mode-badge").textContent = MODE_NAMES[state.mode];
+  $("mode-badge").classList.toggle("hidden", state.mode === "lesson");
+  $("mode-badge").textContent = MODE_NAMES[state.mode] || "";
   showRecipe(null);
   showGettingReady();
   setStatus({ status: "connecting", message: "connecting…" });
@@ -205,26 +208,26 @@ $("start-btn").addEventListener("click", async () => {
   fire("start", { mode: state.mode, recipe: preRecipe });
 });
 
-$("stop-btn").addEventListener("click", stopCooking);
+$("stop-btn").addEventListener("click", () => stopCooking());
 
-function stopCooking() {
+async function stopCooking(expectReply = false) {
   if (!state.cooking) return; // Remy's "stopped" status can call this too; only run once
   state.cooking = false;
   clearTimeout(state.finishing); state.finishing = null;
   const remy = state.remy, wasLive = state.live;
-  state.remy = null;
-  // Remy says goodbye out loud in his attitude. Real Remy speaks it himself, so his voice
-  // stays connected until the goodbye screen ends; Pretend Remy uses the phone's own voice.
+  // Automatic completion can fire before Remy's last sentence starts. Wait for that sentence
+  // and then for the goodbye before replacing the cook screen with the review.
+  if (wasLive && remy) await waitForVoice(remy, state.lastStatus?.status, expectReply);
   const bye = goodbyeFor();
-  // send() returns false if real Remy isn't connected (e.g. he never connected): then the phone says it
+  // send() returns false if real Remy isn't connected: the phone says the line instead.
   if (wasLive && remy && remy.send("goodbye", { text: bye.text }) === true) {
-    pendingStop = remy;
-    state.stream?.getVideoTracks().forEach((t) => t.stop()); // camera off now, mic until he's done
+    state.stream?.getVideoTracks().forEach((t) => t.stop());
+    await waitForVoice(remy, state.lastStatus?.status, true);
   } else {
-    remy?.stop();
-    state.stream?.getTracks().forEach((t) => t.stop());
-    sayLocally(bye.text);
+    await sayLocally(bye.text);
   }
+  remy?.stop(); state.remy = null;
+  state.stream?.getTracks().forEach((t) => t.stop());
   timers.clearAll();
   $("idle-banner").classList.add("hidden");
   $("paused").classList.add("hidden"); state.paused = false;
@@ -244,25 +247,31 @@ const GOODBYES = {
   honest: { face: "f-proud", text: "Plate it. Take the credit. I'm an app." },
   savage: { face: "f-savage", text: "Bloody hell, we survived. Plate it and get out of my kitchen." },
 };
+const LESSON_GOODBYE = { face: "f-proud", text: "Lesson complete. Keep practising that technique." };
 // Savage with 5 stars: he can't believe it (shocked face, grudging line)
 const SAVAGE_FIVE = { face: "f-shock", text: "Fine. FINE. That was actually decent. Don't tell anyone." };
-const goodbyeFor = () => state.mode === "savage" && recapStars() === 5 ? SAVAGE_FIVE : (GOODBYES[state.mode] || GOODBYES.honest);
+const goodbyeFor = () => stats.lesson ? LESSON_GOODBYE
+  : state.mode === "savage" && recapStars() === 5 ? SAVAGE_FIVE : (GOODBYES[state.mode] || GOODBYES.honest);
 const GOODBYE_MS = 8000; // long enough for Remy to say it and to read the recap
-let pendingStop = null;   // real Remy, kept on until he's said goodbye
 
 // Pretend Remy has no voice of his own, so the phone reads the goodbye (Stop was a tap, so iOS allows it)
 function sayLocally(text) {
-  try {
-    if (!("speechSynthesis" in window)) return;
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = "en-GB";
-    // a British male voice if the phone has one (iPhone: Daniel / Arthur), closest to Remy
-    const voices = speechSynthesis.getVoices?.() || [];
-    u.voice = voices.find((v) => /daniel|arthur|oliver|uk english male|george|harry/i.test(v.name) && /en.GB/i.test(v.lang))
-      || voices.find((v) => /en.GB/i.test(v.lang)) || null; u.rate = state.mode === "savage" ? 1.1 : state.mode === "gentle" ? 0.95 : 1;
-    speechSynthesis.speak(u);
-  } catch { /* no voice available: the goodbye is still on screen */ }
+  return new Promise(resolve => {
+    try {
+      if (!("speechSynthesis" in window)) { resolve(); return; }
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "en-GB";
+      // a British male voice if the phone has one (iPhone: Daniel / Arthur), closest to Remy
+      const voices = speechSynthesis.getVoices?.() || [];
+      u.voice = voices.find((v) => /daniel|arthur|oliver|uk english male|george|harry/i.test(v.name) && /en.GB/i.test(v.lang))
+        || voices.find((v) => /en.GB/i.test(v.lang)) || null;
+      u.rate = state.mode === "savage" ? 1.1 : state.mode === "gentle" ? 0.95 : 1;
+      const timeout = setTimeout(resolve, 12000);
+      u.onend = u.onerror = () => { clearTimeout(timeout); resolve(); };
+      speechSynthesis.speak(u);
+    } catch { resolve(); }
+  });
 }
 function showGoodbye() {
   const g = goodbyeFor();
@@ -285,7 +294,6 @@ function showGoodbye() {
 }
 function backToStart() {
   clearTimeout(showGoodbye.t);
-  pendingStop?.stop(); pendingStop = null;
   state.stream?.getTracks().forEach((t) => t.stop());
   $("goodbye").classList.add("hidden");
   $("start-screen").classList.remove("hidden");
@@ -316,9 +324,9 @@ resetStats();
 // Remy's stars, 1 to 5: one for turning up, one for the first half of the recipe, one for the second
 // half (the last step actually done), then, only once it's finished, one for 2 roasts or fewer and
 // one for no safety alerts. Not finished = 2 stars at most; no recipe at all = 2 at most.
-// Cooking school: Remy's technique score (1-10) becomes stars.
+// Cooking school: Remy awards 1-5 technique stars directly.
 function recapStars() {
-  if (stats.lesson && stats.lessonScore) return Math.max(1, Math.min(5, Math.round(stats.lessonScore / 2)));
+  if (stats.lesson) return stats.lessonScore ? Math.max(1, Math.min(5, stats.lessonScore)) : 1;
   const steps = state.recipe?.steps?.length || 0;
   if (!steps) return 1 + (stats.timersDone > 0 ? 1 : 0);   // no recipe on screen: a finished timer earns one
   const half = stats.stepsDone >= Math.ceil(steps / 2), finished = stats.stepsDone >= steps;
@@ -330,6 +338,7 @@ const SCORE_LINES = {
   honest: (n) => n >= 5 ? "Suspiciously competent." : n >= 3 ? "Edible. Probably." : "We'll call it practice.",
   savage: (n) => n >= 5 ? "I'm speechless. Don't get used to it." : n >= 3 ? "My nan cooks better, and she's an app too." : "A fish could cook better than you.",
 };
+const LESSON_SCORE_LINE = (n) => n >= 4 ? "Strong technique. Keep practising it." : "Good practice. Try the technique again.";
 function statsSummary() {
   return { dish: stats.recipe, timers: stats.timers.size, timersDone: stats.timersDone, alerts: stats.alerts,
     roasts: stats.roasts, stepsDone: stats.stepsDone, stars: recapStars(), highlights: [...stats.highlights], lesson: stats.lesson };
@@ -337,7 +346,8 @@ function statsSummary() {
 // Score card: dish, 1-5 stars, Remy's line, one small icon row
 function renderRecap() {
   const stars = recapStars();
-  const line = (SCORE_LINES[state.mode] || SCORE_LINES.honest)(stars);
+  const line = stats.lesson ? (stats.lessonComment || LESSON_SCORE_LINE(stars))
+    : (SCORE_LINES[state.mode] || SCORE_LINES.honest)(stars);
   $("recap-dish").textContent = stats.lesson ? `Lesson: ${stats.recipe || "technique"}` : (stats.recipe || "Freestyle cook");
   // five stars that pop in one by one (filled ones first)
   $("recap-num").replaceChildren(...[1, 2, 3, 4, 5].map((i) => {
@@ -346,9 +356,10 @@ function renderRecap() {
     return s;
   }));
   $("recap-num").setAttribute("aria-label", `${stars} out of 5 stars`);
-  $("recap-line").textContent = stats.lesson && stats.lessonComment ? stats.lessonComment : line;
+  $("recap-line").textContent = line;
   $("recap-score").textContent = `${history.starText(stars)} ${line}`;
-  const items = [["i-timer", stats.timers.size, "timers"], ["i-buoy", stats.alerts, "safety saves"], ["i-flame", stats.roasts, "roasts"]];
+  const items = stats.lesson ? [["i-cap", stats.stepsDone, "lesson steps"], ["i-buoy", stats.alerts, "safety saves"]]
+    : [["i-timer", stats.timers.size, "timers"], ["i-buoy", stats.alerts, "safety saves"], ["i-flame", stats.roasts, "roasts"]];
   $("recap").replaceChildren(...items.map(([icon, n, label]) => {
     const s = Object.assign(document.createElement("span"), { className: "recap-item" });
     s.innerHTML = `<svg viewBox="0 0 100 100" aria-hidden="true"><use href="#${icon}"/></svg><b>${n}</b>`;   // sticker icon + count
@@ -362,10 +373,13 @@ function wireRemy(remy) {
   remy.on("status", setStatus);
   remy.on("voice", (d) => setVoice(d.kind));   // live.js: ElevenLabs or the backup voice
   remy.on("heard", () => keepRemy());   // the cook spoke
-  remy.on("recipe", (d) => { showRecipe(d); stats.recipe = d.recipe?.title || stats.recipe; if (d.recipe?.lesson) stats.lesson = d.recipe.id; });
+  remy.on("recipe", (d) => { showRecipe(d); stats.recipe = d.recipe?.title || stats.recipe; if (d.recipe?.lesson) {
+    stats.lesson = d.recipe.id;
+    if (state.mode !== "lesson") { state.mode = "lesson"; $("mode-badge").classList.add("hidden"); remy.send("mode_changed", { mode: "lesson" }); }
+  } });
   // Cooking school: Remy's technique score becomes the session score
-  remy.on("lesson_score", (d) => { if (!state.finishing) state.finishing = setTimeout(() => { state.finishing = null; stopCooking(); }, 4500);   // lesson marked: review page
-    stats.lessonScore = d.score; stats.lessonComment = d.comment; showBubble({ text: `${history.starText(Math.max(1, Math.min(5, Math.round(d.score / 2))))} ${d.comment}`, severity: "info" }); });
+  remy.on("lesson_score", (d) => { if (!state.finishing) state.finishing = setTimeout(() => { state.finishing = null; stopCooking(true); }, 1200);
+    stats.lessonScore = d.score; stats.lessonComment = d.comment; showBubble({ text: `${history.starText(d.score)} ${d.comment}`, severity: "info" }); });
   // "Clear the recipe": take it off the screen (timers keep running)
   remy.on("recipe_clear", () => { state.recipe = null; showRecipe(null); });
   remy.on("tip", (d) => showBubble(d));
@@ -377,7 +391,7 @@ function wireRemy(remy) {
     // A short pause lets Remy finish his line. Lessons wait for Remy's score instead (lesson_score).
     const steps = state.recipe?.steps?.length || 0;
     if (d.step_complete && steps && stats.stepsDone >= steps && !state.recipe?.lesson && !state.finishing) {
-      state.finishing = setTimeout(() => { state.finishing = null; stopCooking(); }, 2500);
+      state.finishing = setTimeout(() => { state.finishing = null; stopCooking(true); }, 1200);
     }
     renderSteps(d.current_step, d.step_complete);
     if (d.next_instruction) showBubble({ text: d.next_instruction, severity: "info" });
@@ -395,8 +409,8 @@ function wireRemy(remy) {
   // +/- time, or { to } = set what's left (e.g. "make the pasta timer 8 minutes")
   remy.on("timer_adjust", (d) => timers.adjust(d.id, d.to != null ? d.to - (timers.remaining(d.id)?.left ?? 0) : d.seconds));
   remy.on("command", (d) => {
-    // "end the session" / "I've finished the recipe" / "done" on the last step: straight to the review page
-    if (d.name === "end_session") { setTimeout(() => stopCooking(), d.finished ? 900 : 300); return; }
+    // The voice finishes its response and sign-off before the review replaces this screen.
+    if (d.name === "end_session") { setTimeout(() => stopCooking(true), 700); return; }
     if (d.name === "repeat" && d.text) showBubble({ text: d.text, severity: "info" });
     if (d.name === "time_left") {
       const r = timers.remaining(d.id);
@@ -466,8 +480,10 @@ let pendingRoast = null;
 function showRoast({ text, level = 1, heckle = false }) {
   if (alertShowing()) { if (!heckle) pendingRoast = { text, level }; return; }  // counted when it's actually shown
   if (!heckle) stats.roasts++;   // Savage heckles (no mistake) don't cost a star
-  highlight("roast", text);
-  showBubble({ text, severity: "roast", level: Math.min(Math.max(level, 1), 3) });
+  const short = String(text || "").slice(0, 180).trimEnd();
+  const visible = short.length < String(text || "").length ? `${short}…` : short;
+  highlight("roast", visible);
+  showBubble({ text: visible, severity: "roast", level: Math.min(Math.max(level, 1), 3) });
 }
 
 // "11-minute timer for the rigatoni pasta". Pasta shapes get "pasta" added so it's obvious.
@@ -683,7 +699,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
       `camera   ${state.cameraInfo ? `${state.cameraInfo.label} ${state.cameraInfo.width}x${state.cameraInfo.height} zoom ${state.cameraInfo.zoom} (${state.cameraInfo.tried})${state.cameraInfo.zoomed ? " zoomed to 1x" : ""}${state.cameraInfo.retried ? " RETRIED (was black)" : ""} track ${state.stream?.getVideoTracks()[0]?.readyState || "-"}` : "not started"}`,
-      `version  v133`,
+      `version  v134`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
@@ -772,8 +788,9 @@ const READY_LINES = {
   gentle: "Washing my hands, chef…",
   honest: "Finding my good spatula…",
   savage: "Sharpening my knives. Don't touch anything.",
+  lesson: "Setting up your lesson…",
 };
-const READY_FACE = { gentle: "f-gentle", honest: "f-sus", savage: "f-savage" };
+const READY_FACE = { gentle: "f-gentle", honest: "f-sus", savage: "f-savage", lesson: "f-watch" };
 function showGettingReady() {
   const box = $("getting-ready");
   $("gr-line").textContent = READY_LINES[state.mode] || READY_LINES.honest;

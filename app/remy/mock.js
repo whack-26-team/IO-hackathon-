@@ -62,7 +62,15 @@ export function createMockRemy({ mode, recipe: preloaded = null }) {
   }
 
   // [seconds from start, what to do]
-  const script = [
+  const script = preloaded?.lesson ? [
+    [1, () => emit("status", { status: "live", message: "Listening (pretend Remy)" })],
+    [2, () => say("tip", { text: "Let's practise the technique. Show me your board.", severity: "info" })],
+    [5, async () => { const r = await loadRecipe(); recipe = r.recipe; emit("recipe", r); }],
+    [8, () => { if (recipe?.steps?.[0]) say("step", { current_step: 0, step_complete: true, next_instruction: recipe.steps[1]?.instruction }); }],
+    [13, () => { if (recipe?.steps?.[1]) say("step", { current_step: 1, step_complete: true, next_instruction: recipe.steps[2]?.instruction }); }],
+    [18, () => { if (recipe?.steps?.[2]) say("step", { current_step: 2, step_complete: true }); }],
+    [21, () => say("lesson_score", { score: 4, comment: "Good control. Keep the cuts steady." })],
+  ] : [
     [1, () => emit("status", { status: "live", message: "Listening (pretend Remy)" })],
     [2, () => say("tip", { text: "Evening, chef. What are we cooking today?", severity: "info" })],
     [5, async () => {
@@ -84,7 +92,6 @@ export function createMockRemy({ mode, recipe: preloaded = null }) {
     [26, () => emit("roast", { text: lines[2], level: 3 })],
     [34, () => emit("step", { current_step: 1, step_complete: true, next_instruction: recipe.steps[2]?.instruction })],
     [36, () => say("tip", { text: "Garlic's going too fast. Pull it off now!", severity: "urgent" })],
-    [40, () => { if (recipe?.lesson) say("lesson_score", { score: 7, comment: "Solid claw, a bit slow. Practice makes dinner." }); }],
   ];
 
   return {
