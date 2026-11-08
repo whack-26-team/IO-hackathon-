@@ -16,9 +16,17 @@ export async function pickMainCamera(stream, { width = 1280 } = {}) {
       const cams = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === "videoinput" && d.label);
       const best = cams.find((d) => /^back camera$/i.test(d.label.trim())) || cams.find((d) => PLAIN_BACK(d.label));
       if (best && best.deviceId !== track.getSettings?.().deviceId) {
-        const only = await navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: best.deviceId }, width: { ideal: width } }, audio: false });
-        const next = only.getVideoTracks()[0];
-        if (next) { stream.removeTrack(track); track.stop(); stream.addTrack(next); track = next; switched.to = next.label; }
+        // iPhones prefer one capture at a time: close camera + mic, then open both again with the 1x lens
+        const hadAudio = stream.getAudioTracks().length > 0;
+        const old = stream.getTracks();
+        old.forEach((t) => t.stop());
+        let fresh;
+        try { fresh = await navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: best.deviceId }, width: { ideal: width } }, audio: hadAudio }); }
+        catch { fresh = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment", width: { ideal: width } }, audio: hadAudio }); }
+        old.forEach((t) => stream.removeTrack(t));
+        fresh.getTracks().forEach((t) => stream.addTrack(t));
+        track = stream.getVideoTracks()[0];
+        if (track?.label !== switched.from) switched.to = track?.label;
       }
     } catch { /* keep the camera we have */ }
   }
