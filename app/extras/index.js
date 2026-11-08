@@ -18,7 +18,6 @@
 //   app.startCooking({ recipeId, mode })   start a cook with a recipe already chosen
 //   app.setMode(mode)   switch attitude mid-cook (Savage: ask 18+ first)
 //   app.say(text, {voice}) show a Remy bubble; voice:true = Remy says it (real Remy or the phone)
-//   app.setPlate(score, verdict)   Rate my plate result (counts for half the recap score)
 //   app.openSheet(el) / app.closeSheet()   a bottom sheet over the screen (scrolls inside)
 //   app.keepGoodbye() / app.backToStart()  hold the goodbye screen / leave it now
 //   app.history         on-phone store: get/set, cooks(), addCook(), settings(), clearAll()
@@ -34,7 +33,6 @@ import { initJudgeMode, initHighlights } from "./judge.js";
 import { initWatchMyPan } from "./watch.js";
 import { initFeel } from "./feel.js";
 import { initRecipeBrowser } from "./recipes.js";
-import { initRatePlate } from "./plate.js";
 import { initSetupCard, openSetupCard } from "./setup-guide.js";
 import { initSettings } from "./settings.js";
 
@@ -64,7 +62,6 @@ export function initExtras(app) {
   start("share", () => initShare(app));
   start("judge mode", () => initJudgeMode());
   start("watch my pan", () => initWatchMyPan(app));
-  start("rate my plate", () => initRatePlate(app));
   start("look & feel", () => initFeel(app));
   start("challenge", async () => { await initChallenge(app); keepStartOnOneScreen(); });
 }
