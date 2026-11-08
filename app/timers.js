@@ -9,6 +9,25 @@
 
 const RIP_AFTER_MS = 15000; // a finished ticket stays red this long, then rips off
 
+// Cartoon extras for a ripping ticket: a "RIIIP!" pop, a jagged strip left on the rail and a few
+// paper scraps flying off. All removed after a second; skipped when the user prefers less motion.
+function ripEffects(el) {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const r = el.getBoundingClientRect();
+  if (!r.width) return;
+  const add = (cls, css, text = "") => {
+    const d = document.createElement("div"); d.className = cls; d.textContent = text;
+    Object.assign(d.style, { left: `${r.left}px`, top: `${r.top}px`, ...css });
+    document.body.append(d); setTimeout(() => d.remove(), 1400); return d;
+  };
+  add("rip-strip", { width: `${r.width}px` });                                     // torn strip stays on the rail
+  add("rip-word", { left: `${r.left + r.width / 2}px`, top: `${r.top + 18}px` }, "RIIIP!");
+  for (let i = 0; i < 7; i++) {                                                   // paper scraps
+    add("rip-bit", { left: `${r.left + 10 + Math.random() * (r.width - 20)}px`, top: `${r.top + 6}px`,
+      "--dx": `${(Math.random() - 0.5) * 120}px`, "--dy": `${-20 - Math.random() * 50}px`, "--spin": `${Math.random() * 540 - 270}deg` });
+  }
+}
+
 export function createTimers(container, emit, beep = () => {}) {
   const timers = new Map();
 
@@ -127,12 +146,13 @@ export function createTimers(container, emit, beep = () => {}) {
     clearInterval(t.interval);
     clearTimeout(t.ripTimer);
     timers.delete(id);
-    // the receipt rips off the rail and falls away, then it's gone
+    // the receipt rips off the rail and flutters away, then it's gone
     const el = t.el;
+    ripEffects(el);
     el.classList.add("rip");
     const gone = () => el.remove();
     el.addEventListener("animationend", (e) => { if (e.animationName === "rip") gone(); });
-    setTimeout(gone, 900);   // in case the animation doesn't run (reduced motion, hidden screen)
+    setTimeout(gone, 1600);   // in case the animation doesn't run (reduced motion, hidden screen)
     emit("timer_removed", { id });
   }
 
