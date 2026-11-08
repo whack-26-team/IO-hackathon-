@@ -16,6 +16,38 @@ export function unlockSound() {
   if (ctx.state === "suspended") ctx.resume();
   beep("start");
   primeSpeech();
+  primeAlarm();
+}
+
+// ---- Safety alarm as a normal audio clip ----
+// While Remy's voice call uses the mic, iPhones often pause or quieten Web Audio, so the alert beeps
+// went silent. An <audio> clip (made here, no file to download) still plays; it's unlocked in the Start tap.
+let alarm = null;
+function alarmClip() {
+  const rate = 22050, pattern = [[440, 0.14], [880, 0.14], [440, 0.14], [880, 0.14], [440, 0.14], [880, 0.14], [440, 0.14], [880, 0.14]];
+  const total = Math.round(rate * pattern.reduce((s, [, d]) => s + d + 0.02, 0));
+  const data = new Int16Array(total); let i = 0;
+  for (const [f, d] of pattern) {
+    const n = Math.round(rate * d);
+    for (let k = 0; k < n; k++, i++) data[i] = Math.round(Math.sin(2 * Math.PI * f * k / rate) * 0.6 * 32767 * Math.min(1, k / 200, (n - k) / 200));
+    i += Math.round(rate * 0.02);
+  }
+  const buf = new ArrayBuffer(44 + data.length * 2), v = new DataView(buf);
+  const w = (o, s) => [...s].forEach((c, j) => v.setUint8(o + j, c.charCodeAt(0)));
+  w(0, "RIFF"); v.setUint32(4, 36 + data.length * 2, true); w(8, "WAVEfmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true);
+  v.setUint16(22, 1, true); v.setUint32(24, rate, true); v.setUint32(28, rate * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  w(36, "data"); v.setUint32(40, data.length * 2, true); new Int16Array(buf, 44).set(data);
+  return URL.createObjectURL(new Blob([buf], { type: "audio/wav" }));
+}
+function primeAlarm() {
+  try {
+    if (!alarm) { alarm = new Audio(alarmClip()); alarm.preload = "auto"; alarm.setAttribute("playsinline", ""); }
+    alarm.muted = true;
+    alarm.play().then(() => { alarm.pause(); alarm.currentTime = 0; alarm.muted = false; }).catch(() => { alarm.muted = false; });
+  } catch { /* no audio on this phone */ }
+}
+function playAlarm() {
+  try { if (alarm) { alarm.muted = false; alarm.currentTime = 0; alarm.volume = 1; alarm.play().catch(() => {}); } } catch { /* fine */ }
 }
 
 // iPhones only let a page speak if the first spoken line starts inside a tap. Remy's first line
@@ -87,7 +119,9 @@ function tone(freq, start, length, volume = 0.25) {
 
 // Named sounds, so the rest of the app just says beep("done")
 export function beep(kind) {
+  if (kind === "alert") playAlarm();   // works even when Web Audio is paused by the voice call
   if (!ctx) return;
+  if (ctx.state !== "running") ctx.resume?.().catch(() => {});   // iPhone pauses it during calls
   if (kind === "start") { tone(660, 0, 0.15); tone(990, 0.15, 0.25); }          // "ding-dong" on Start
   if (kind === "check") { tone(880, 0, 0.12); tone(880, 0.2, 0.12); }          // two quick pips
   if (kind === "done")  { for (let i = 0; i < 3; i++) tone(1046, i * 0.35, 0.25, 0.35); } // three loud beeps

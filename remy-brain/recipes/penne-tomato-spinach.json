@@ -18,8 +18,8 @@
     "tomato and spinach sauce",
     "penne with tomato and spinach sauce"
   ],
-  "source": "Pranav's requested recipe, 2026-11-08. Pasta, sauce and spinach timers from cook-times.json; not yet kitchen-tested.",
-  "checked_by_human": false,
+  "source": "Pranav's requested recipe, 2026-11-08. Pasta, sauce and spinach timers from cook-times.json; not yet kitchen-tested. Checked by Matthew on 2026-11-08.",
+  "checked_by_human": true,
   "serves": 2,
   "total_minutes": 25,
   "equipment": [
