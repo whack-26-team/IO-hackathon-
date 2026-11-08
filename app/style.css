@@ -560,3 +560,9 @@ body.x-speaking .speech:not(.quiet):not(.roast) .cook-face { animation: talk-bob
 .idle-stay { flex: none; border: 2.5px solid var(--ink); border-radius: 12px; background: var(--tomato); color: var(--cream); box-shadow: 3px 3px 0 var(--ink);
   font-family: "Baloo 2", var(--font); font-weight: 700; font-size: 17px; padding: 8px 12px; }
 .idle-stay:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+
+/* "Remy hung up while you were away" (reuses the getting-ready card look) */
+.getting-ready.paused { z-index: 12; background: var(--cream); }
+.paused .gr-face { animation: gr-bob 1.6s ease-in-out infinite; }
+.paused-sub { font-family: "Baloo 2", var(--font); font-weight: 700; color: var(--muted); }
+.paused .go { max-width: 320px; margin-top: 6px; }

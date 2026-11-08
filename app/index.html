@@ -24,8 +24,8 @@
   <link rel="preconnect" href="https://esm.sh" crossorigin>
   <link rel="preconnect" href="https://api.elevenlabs.io" crossorigin>
   <link rel="preconnect" href="https://livekit.rtc.elevenlabs.io" crossorigin>
-  <link rel="stylesheet" href="style.css?v=128">
-  <link rel="stylesheet" href="extras/extras.css?v=128">
+  <link rel="stylesheet" href="style.css?v=129">
+  <link rel="stylesheet" href="extras/extras.css?v=129">
 </head>
 <body>
   <!-- the start screen's colour, overhanging every edge of the screen -->
@@ -236,6 +236,14 @@
 
   <!-- COOKING SCREEN -->
   <section id="cook-screen" class="screen hidden">
+    <!-- Remy paused while the app was in the background: one tap wakes him (app.js, pauseRemy) -->
+    <div id="paused" class="getting-ready paused hidden" role="dialog" aria-label="Remy is paused">
+      <svg class="gr-face" viewBox="-18 -12 136 116" aria-hidden="true"><use href="#f-watch"/></svg>
+      <b>Remy hung up while you were away.</b>
+      <span class="paused-sub">Your recipe and timers are still here.</span>
+      <button id="paused-go" class="go">Wake Remy up</button>
+      <button id="paused-stop" class="link">Stop cooking</button>
+    </div>
     <!-- idle hang-up warning: countdown + "I'm here" (app.js, idle) -->
     <div id="idle-banner" class="idle-banner hidden" role="alert">
       <span>No one's talked for a while. <b>Remy hangs up in <span id="idle-left">30</span>s</b></span>
@@ -318,6 +326,6 @@
   <!-- Bottom sheets opened by extras (app.openSheet) -->
   <div id="slot-sheets"></div>
 
-  <script type="module" src="app.js?v=128"></script>
+  <script type="module" src="app.js?v=129"></script>
 </body>
 </html>
