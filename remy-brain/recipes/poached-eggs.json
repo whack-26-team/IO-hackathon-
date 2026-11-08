@@ -1,0 +1,66 @@
+{
+  "id": "poached-eggs",
+  "title": "Poached eggs",
+  "summary": "Soft white, runny yolk, no special kit.",
+  "aliases": [
+    "poached eggs",
+    "poached egg",
+    "eggs benedict",
+    "poached eggs on toast"
+  ],
+  "source": "Written for REMY by Claude, timers from cook-times.json (eggs). Waiting for Matthew's review.",
+  "checked_by_human": false,
+  "serves": 1,
+  "total_minutes": 8,
+  "equipment": [
+    "Wide saucepan",
+    "Slotted spoon",
+    "Small cup or bowl",
+    "Kitchen paper"
+  ],
+  "notes": "Fresh eggs hold together best. Runny yolks are a personal choice. For anyone vulnerable (pregnant, elderly, very young, unwell), cook until yolk and white are firm: see food-safety.json.",
+  "ingredients": [
+    "2 very fresh eggs",
+    "Water (about 8cm deep)",
+    "1 tsp vinegar (optional, helps the white set)",
+    "Toast to serve"
+  ],
+  "steps": [
+    {
+      "instruction": "Bring the water to a gentle simmer and add the vinegar. Crack each egg into its own cup.",
+      "looks_right": [
+        "small bubbles rising, the surface just trembling"
+      ],
+      "looks_wrong": [
+        "a rolling boil (too fierce: it tears the egg apart)"
+      ],
+      "done_when": "The water is barely simmering."
+    },
+    {
+      "instruction": "Stir the water to make a gentle swirl, then tip the egg into the middle, close to the surface.",
+      "looks_right": [
+        "the white wrapping around the yolk"
+      ],
+      "looks_wrong": [
+        "the white spreading into wispy strands (water too fierce or egg not fresh)"
+      ],
+      "timer": {
+        "label": "Poached eggs",
+        "minutes": 3,
+        "check_at": 2.5,
+        "from": "eggs/poached"
+      },
+      "done_when": "The white is set and opaque but the yolk still wobbles when you lift it with the spoon."
+    },
+    {
+      "instruction": "Lift the egg out with the slotted spoon, drain it on kitchen paper and serve on toast.",
+      "looks_right": [
+        "a neat, set white with a soft yolk"
+      ],
+      "looks_wrong": [
+        "clear, runny white (put it back for 30 seconds)"
+      ],
+      "done_when": "On the toast."
+    }
+  ]
+}

@@ -201,7 +201,7 @@ def find_recipe(query: str) -> dict:
         return {"found": False, "source": None, "checked_by_human": False, "ask": True,
                 "message": (f"'{query}' is just a food, not a dish. Don't pick a recipe yet: ask the cook how "
                             f"they'd like their {name} ({VAGUE_FOODS[food]}?), then call find_recipe again "
-                            f"with their answer.")}
+                            f"with their answer and the food together (e.g. 'fried {name}').")}
     r = match_local(query)
     if r:
         msg = f"Found our recipe: {r['title']}."

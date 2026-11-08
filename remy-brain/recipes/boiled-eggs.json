@@ -1,0 +1,86 @@
+{
+  "id": "boiled-eggs",
+  "title": "Boiled eggs",
+  "summary": "Soft, jammy or hard: pick your yolk.",
+  "aliases": [
+    "boiled eggs",
+    "boiled egg",
+    "soft boiled eggs",
+    "soft boiled egg",
+    "hard boiled eggs",
+    "hard boiled egg",
+    "jammy eggs",
+    "dippy eggs",
+    "eggs and soldiers",
+    "dippy egg",
+    "hard boiled",
+    "soft boiled",
+    "hard-boiled eggs",
+    "soft-boiled eggs"
+  ],
+  "source": "Written for REMY by Claude, timers from cook-times.json (eggs). Waiting for Matthew's review.",
+  "checked_by_human": false,
+  "serves": 1,
+  "total_minutes": 15,
+  "equipment": [
+    "Saucepan",
+    "Slotted spoon",
+    "Bowl of cold water"
+  ],
+  "notes": "REMY: before starting the timer, ASK how they like the yolk (soft and runny, jammy, or hard) and use step 2's timer_by_shape. Times are for fridge-cold large eggs lowered into already boiling water. Runny yolks are a personal choice. For anyone vulnerable (pregnant, elderly, very young, unwell), cook until yolk and white are firm: see food-safety.json.",
+  "ingredients": [
+    "2 eggs (straight from the fridge)",
+    "Water to cover",
+    "Toast soldiers to serve (optional)"
+  ],
+  "steps": [
+    {
+      "instruction": "Bring a saucepan of water to a full boil. Have a bowl of cold water ready.",
+      "looks_right": [
+        "big, rolling bubbles"
+      ],
+      "looks_wrong": [
+        "only small bubbles at the bottom (not boiling yet)"
+      ],
+      "done_when": "The water is at a rolling boil."
+    },
+    {
+      "instruction": "Gently lower the eggs into the boiling water with a spoon, then turn the heat down so it bubbles steadily.",
+      "looks_right": [
+        "eggs resting on the bottom, steady bubbles"
+      ],
+      "looks_wrong": [
+        "eggs dropped in and cracking",
+        "water boiling so hard the eggs bash around"
+      ],
+      "timer_by_shape": {
+        "soft": {
+          "label": "Soft-boiled eggs",
+          "minutes": 6.5,
+          "from": "eggs/boiled_soft_runny_yolk"
+        },
+        "jammy": {
+          "label": "Jammy eggs",
+          "minutes": 7.5,
+          "from": "eggs/boiled_jammy"
+        },
+        "hard": {
+          "label": "Hard-boiled eggs",
+          "minutes": 10,
+          "from": "eggs/boiled_hard"
+        }
+      },
+      "done_when": "The timer for the yolk they chose has finished."
+    },
+    {
+      "instruction": "Lift the eggs straight into the cold water for a minute so they stop cooking, then peel or crack the top off.",
+      "looks_right": [
+        "eggs sitting in cold water"
+      ],
+      "looks_wrong": [
+        "eggs left in the hot pan (they keep cooking)"
+      ],
+      "done_when": "Cool enough to hold and ready to eat."
+    }
+  ]
+}

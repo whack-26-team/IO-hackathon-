@@ -301,10 +301,13 @@ function highlight(kind, text) { if (text && stats.highlights.length < 30) stats
 resetStats();
 // Remy's stars, 1 to 5: one for turning up, then one each for cooking a recipe, getting through it
 // (half the steps or a finished timer), keeping roasts down (2 or fewer) and no safety alerts.
+// Stopping before the recipe's last step caps it at 1-2 stars.
 // Cooking school: Remy's technique score (1-10) becomes stars.
 function recapStars() {
   if (stats.lesson && stats.lessonScore) return Math.max(1, Math.min(5, Math.round(stats.lessonScore / 2)));
   const steps = state.recipe?.steps?.length || 0;
+  // Stopped before the last step of the recipe: 1 star, or 2 if at least half of it was done
+  if (steps > 1 && stats.stepsDone < steps - 1) return stats.stepsDone >= steps / 2 ? 2 : 1;
   return 1 + (stats.recipe ? 1 : 0) + (stats.timersDone > 0 || (steps && stats.stepsDone >= steps / 2) ? 1 : 0)
     + (stats.roasts <= 2 ? 1 : 0) + (stats.alerts === 0 ? 1 : 0);
 }
@@ -656,7 +659,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
       `camera   ${state.cameraInfo ? `${state.cameraInfo.label} ${state.cameraInfo.width}x${state.cameraInfo.height} zoom ${state.cameraInfo.zoom}${state.cameraInfo.to ? ` (was ${state.cameraInfo.from})` : ""}${state.cameraInfo.zoomed ? " zoomed to 1x" : ""}` : "not started"}`,
-      `version  v122`,
+      `version  v123`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
