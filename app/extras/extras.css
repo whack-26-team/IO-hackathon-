@@ -139,3 +139,9 @@ html[data-mode="savage"] .x-menu-btn.sticker svg { filter: drop-shadow(2px 3px 0
   background: var(--ink); color: var(--butter); border-radius: 6px; padding: 1px 7px; margin-bottom: 3px; }
 
 .x-stars { color: #e8a400; letter-spacing: 1px; font-size: 16px; white-space: nowrap; }
+
+/* Settings: how Remy scores (folded) */
+.x-scoring { border: 2.5px solid var(--ink, #1a1a1a); border-radius: 14px; background: #fff; padding: 10px 14px; }
+.x-scoring summary { font-weight: 800; cursor: pointer; }
+.x-scoring-list { list-style: none; margin: 4px 0; padding: 0; display: grid; gap: 6px; }
+.x-scoring-list li { display: flex; gap: 10px; align-items: baseline; font-size: 15px; }

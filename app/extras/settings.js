@@ -22,6 +22,19 @@ function toggles(app, key, options) {
   return box;
 }
 
+// How Remy scores a cook (same rules as recapStars() in app.js). Folded away so it isn't clutter.
+const STAR_RULES = [["⭐", "Turning up: every cook gets one"], ["📖", "Cooking a recipe (not freestyle)"],
+  ["✅", "Getting through it: half the steps done or a timer finished"], ["🔥", "Two roasts or fewer"], ["🛟", "No safety alerts"]];
+function scoringHelp(h) {
+  const d = document.createElement("details"); d.className = "x-scoring";
+  d.append(h("summary", "", "⭐ How Remy scores your cooks"));
+  const ul = h("ul", "x-scoring-list", "");
+  for (const [icon, text] of STAR_RULES) { const li = h("li", "", ""); li.append(h("span", "", icon), h("span", "", text)); ul.append(li); }
+  d.append(h("p", "x-note", "Up to 5 stars, one for each:"), ul,
+    h("p", "x-note", "Cooking school lessons: Remy marks your technique and turns it into stars."));
+  return d;
+}
+
 export function initSettings(app, menu, openSetup) {
   menu.add("#i-whisk", "Settings", () => {
     const wrap = document.createElement("div"); wrap.className = "x-sheet";
@@ -31,6 +44,7 @@ export function initSettings(app, menu, openSetup) {
       h("h3", "x-sub", "Allergies"), toggles(app, "allergies", ALLERGIES),
       h("p", "x-note", "Remy steers away from these and flags them ⚠ in recipes. He can't detect allergens: always check every label. Saved only on this phone."),
       h("h3", "x-sub", "Timers"), pushToggle(app));
+    wrap.append(h("h3", "x-sub", "Scoring"), scoringHelp(h));
     const setup = h("button", "x-clear x-setup-link", "❓ How to set up your phone");
     setup.addEventListener("click", () => openSetup());
     wrap.append(setup);
