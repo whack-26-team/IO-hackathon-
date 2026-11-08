@@ -149,7 +149,8 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', profile = nul
       // The camera caught a mistake and Remy only talked: show his words as a roast anyway (Gentle: a tip)
       const unhandled = /\[CAMERA EVENT\]/.test(extraNote) && !results.some(x => ['roast', 'show_tip', 'safety_alert'].includes(x.action)) ? actions.takeUnhandledCamera() : null;
       if (/\[HECKLE\]/.test(extraNote) && data.say && !results.some(x => x.action === 'roast')) emit('roast', { text: data.say, level: 1, heckle: true });
-      if (unhandled && data.say) emit(mode === 'gentle' ? 'tip' : 'roast', mode === 'gentle' ? { text: data.say, severity: 'warning' } : { text: data.say, level: 1, mistake: unhandled.type });
+      if (unhandled && data.say) emit(mode === 'gentle' || mode === 'lesson' ? 'tip' : 'roast',
+        mode === 'gentle' || mode === 'lesson' ? { text: data.say, severity: 'warning' } : { text: data.say, level: 1, mistake: unhandled.type });
       await say(data.say);
       // Recipe lookups / refused actions: let Remy react to the result (max two follow-ups)
       const needsFollowUp = results.some(x => ['find_recipe', 'create_recipe'].includes(x.action) || x.result?.ok === false);
@@ -171,7 +172,7 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', profile = nul
     on(type, fn) { (handlers[type] ||= []).push(fn); },
     send(type, data = {}) {
       if (!active) return false;
-      if (type === 'mode_changed' && ['gentle', 'honest', 'savage'].includes(data.mode)) { mode = data.mode; return true; }
+      if (type === 'mode_changed' && ['gentle', 'honest', 'savage', 'lesson'].includes(data.mode)) { mode = data.mode; return true; }
       if (type === 'goodbye' && typeof data.text === 'string') { say(data.text); return true; }
       if (type === 'say' && typeof data.text === 'string') { say(data.text); return true; }
       if (type === 'heckle') { if (!busy) turn('', "[HECKLE] No mistake right now. Throw ONE short original Savage jab (max 15 words) at the cook's pace, technique, the dish or the kitchen; swearing and a playful nickname are fine. Don't claim a mistake, don't call roast, then carry on."); return true; }
@@ -196,7 +197,7 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', profile = nul
       if (!(globalThis.SpeechRecognition || globalThis.webkitSpeechRecognition)) {
         emit('tip', { text: "This browser can't listen for speech, so backup Remy can only watch and talk. Try Safari or Chrome.", severity: 'warning' });
       }
-      vision = createVision({ video, canvas, request, actions, emit, now, schedule, cancel, alive: () => active,
+      vision = createVision({ video, canvas, request, actions, emit, now, schedule, cancel, alive: () => active, getMode: () => mode,
         context: text => { notes.push(text); notes = notes.slice(-4); },
         speak: (text, urgent) => turn('', text) });
       vision.start();

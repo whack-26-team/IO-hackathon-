@@ -48,11 +48,13 @@ Reply with JSON only, in exactly this shape:
   "observations": ["short visible facts, e.g. 'garlic edges turning brown'"],
   "issues": [{{"type": "burning|overcooking|undercooking|boiling_over|smoke|too_hot|too_cold|messy|wrong_order|other",
                "detail": "what you see", "confidence": 0.0-1.0}}],
-  "safety": "" or "IMMEDIATE danger you can see: flames or fire, knife near fingers, child near the hob, raw meat touching ready-to-eat food",
+  "safety": "" or "IMMEDIATE danger you can see: flames or fire, fingertips clearly ahead of or under the cutting edge, a hand crossing the blade, child near the hob, raw meat touching ready-to-eat food",
   "step_done": true/false/null,          // does the photo show this step's done_when? null if unsure
   "answer": "" or "answer to Remy's question, based only on the photo"
 }}
 Smoke or steam from a pan is never a safety item: report very heavy smoke as a "too_hot" issue instead.
+In a claw grip the knife normally passes close to the guiding knuckles. Do not flag proximity alone.
+If the hand or blade path is unclear from this photo, leave safety empty and report uncertainty.
 Use confidence below 0.6 when unsure (shadows, steam vs smoke, blur). Empty lists are fine."""
 
 

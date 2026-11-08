@@ -57,7 +57,7 @@ REALTIME_MODEL = os.getenv("OPENAI_REALTIME_MODEL", "gpt-realtime")
 REMY_VOICE = os.getenv("REMY_VOICE", "marin")
 SESSION_MINUTES = int(os.getenv("SESSION_MINUTES", "10"))
 
-MODES = ("gentle", "honest", "savage")
+MODES = ("gentle", "honest", "savage", "lesson")
 
 app = FastAPI(title="REMY")
 
@@ -103,9 +103,11 @@ find_recipe / create_recipe: use those."""
 def lesson_rule(recipe: dict) -> str:
     """Cooking school: coach a technique and score it, instead of cooking a meal."""
     score_on = ", ".join(str(s) for s in (recipe.get("score_on") or [])[:6]) or "the technique"
-    return ("# LESSON MODE\nThis is a short technique lesson, not a meal. Coach one tip at a time and judge: "
-            f"{score_on}. When the last step is done, call lesson_score once with a score from 1 to 10 and one short "
-            "comment, and say the score. Never roast while a knife is in use; safety alerts always come first.")
+    return ("# LESSON MODE\nThis is a short technique lesson, not a meal. Use one calm coaching voice, "
+            "without Gentle, Honest or Savage attitudes, heckles, or roasts. Coach one tip at a time and judge: "
+            f"{score_on}. When the last step is done, call lesson_score once with 1 to 5 stars and one short "
+            "specific coaching comment. Say the stars out of five, never out of ten. Never roast while a knife is in use; "
+            "a blade beside tucked knuckles is normal, and safety alerts come first for clear danger.")
 
 
 SWAP_RULE = """# MISSING AN INGREDIENT
@@ -173,22 +175,24 @@ def profile_line(profile: dict | None) -> str:
 def build_instructions(recipe: dict | None, mode: str, lite: bool = False, profile: dict | None = None) -> str:
     """Glue Pranav's personality files + Matthew's recipe/knowledge into one prompt."""
     core = _read_text(BRAIN_DIR / "instructions.md")
-    personality = _read_text(BRAIN_DIR / "personality" / f"{mode}.md")
+    is_lesson = bool(recipe and recipe.get("lesson"))
+    personality = ("Calm, clear technique coaching. Praise progress specifically." if is_lesson
+                   else _read_text(BRAIN_DIR / "personality" / f"{mode}.md"))
     roasts = BRAIN_DIR / "personality" / "roasts.json"
-    roast_text = for_remy(roasts_for_mode(_read_json(roasts), mode)) if roasts.exists() else "{}"
+    roast_text = for_remy(roasts_for_mode(_read_json(roasts), mode)) if roasts.exists() and not is_lesson else "{}"
     # only what matters for this dish (plus the essential safety rules): server/knowledge.py
     cook_times = as_text(relevant_cook_times(recipe))
     safety = as_text(relevant_food_safety(recipe))
 
     return "\n\n".join([
         core,
-        f"# PERSONALITY MODE: {mode.upper()}\n{personality}",
+        f"# {'LESSON COACH' if is_lesson else 'PERSONALITY MODE: ' + mode.upper()}\n{personality}",
         NAME_RULE,
-        *([HECKLE_RULE] if mode == "savage" else []),
+        *([HECKLE_RULE] if mode == "savage" and not is_lesson else []),
         *([lesson_rule(recipe)] if recipe and recipe.get("lesson") else []),
         SWAP_RULE,
         *([profile_line(profile)] if profile_line(profile) else []),
-        *([] if lite else ["# ROAST & CATCHPHRASE LIBRARY (riff on these, don't just repeat them)\n" + roast_text]),
+        *([] if lite or is_lesson else ["# ROAST & CATCHPHRASE LIBRARY (riff on these, don't just repeat them)\n" + roast_text]),
         ("# TODAY'S RECIPE\n" + json.dumps(recipe, ensure_ascii=False)) if recipe else NO_RECIPE_YET,
         "# COOKING TIMES (use these for start_timer, never guess)\n" + cook_times,
         "# FOOD SAFETY (fixed facts, never contradict these)\n" + safety,
@@ -197,6 +201,11 @@ def build_instructions(recipe: dict | None, mode: str, lite: bool = False, profi
 
 def load_tools() -> list:
     return _read_json(BRAIN_DIR / "actions.json")["tools"]
+
+
+def tools_for(recipe: dict | None) -> list:
+    tools = load_tools()
+    return [tool for tool in tools if tool["name"] != "roast"] if recipe and recipe.get("lesson") else tools
 
 
 # ---------- API ----------
@@ -280,10 +289,13 @@ def get_brain(req: SessionRequest):
     if req.mode not in MODES:
         raise HTTPException(400, f"mode must be one of {MODES}")
     recipe = load_recipe(req.recipe_id) if req.recipe_id else None
+    if req.mode == "lesson" and not (recipe and recipe.get("lesson")):
+        raise HTTPException(400, "lesson mode requires a lesson recipe")
+    tools = tools_for(recipe)
     return {
         "instructions": build_instructions(recipe, req.mode, req.lite, req.profile),
-        "tools": load_tools(),   # full schemas: the app checks every call against these
-        "tools_text": tools_text(load_tools(), recipe),   # compact list the voice reads (saves ElevenLabs tokens)
+        "tools": tools,   # full schemas: the app checks every call against these
+        "tools_text": tools_text(tools, recipe),   # compact list the voice reads (saves ElevenLabs tokens)
         "recipe": recipe,
         "mode": req.mode,
         "max_minutes": SESSION_MINUTES,
@@ -295,6 +307,8 @@ async def create_session(req: SessionRequest):
     if req.mode not in MODES:
         raise HTTPException(400, f"mode must be one of {MODES}")
     recipe = load_recipe(req.recipe_id) if req.recipe_id else None
+    if req.mode == "lesson" and not (recipe and recipe.get("lesson")):
+        raise HTTPException(400, "lesson mode requires a lesson recipe")
     instructions = build_instructions(recipe, req.mode)
 
     if not OPENAI_API_KEY:
@@ -312,7 +326,7 @@ async def create_session(req: SessionRequest):
             "type": "realtime",
             "model": REALTIME_MODEL,
             "instructions": instructions,
-            "tools": load_tools(),
+            "tools": tools_for(recipe),
             "audio": {"output": {"voice": REMY_VOICE}},
         },
     }
@@ -368,9 +382,11 @@ def chat_reply(req: ChatRequest, request: Request):
     if req.mode not in MODES:
         raise HTTPException(400, f"mode must be one of {MODES}")
     recipe = req.recipe if isinstance(req.recipe, dict) else (load_recipe(req.recipe_id) if req.recipe_id else None)
+    if req.mode == "lesson" and not (recipe and recipe.get("lesson")):
+        raise HTTPException(400, "lesson mode requires a lesson recipe")
     caller = (request.headers.get("x-forwarded-for") or (request.client.host if request.client else "?")).split(",")[0]
     try:
-        return chat.reply(build_instructions(recipe, req.mode, lite=True, profile=req.profile), load_tools(), req.history, req.note,
+        return chat.reply(build_instructions(recipe, req.mode, lite=True, profile=req.profile), tools_for(recipe), req.history, req.note,
                           caller=caller.strip())
     except chat.ChatError as e:
         raise HTTPException(e.status, e.message) from None

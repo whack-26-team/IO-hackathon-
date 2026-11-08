@@ -15,10 +15,10 @@
   "score_on": [
     "board stable",
     "fingertips tucked",
-    "knife moving away from fingertips",
+    "blade guided beside knuckles with fingertips tucked behind",
     "controlled slices"
   ],
-  "notes": "Safety first. Never roast or rush someone while they handle a knife. Stop and give a clear safety alert if fingers enter the blade path.",
+  "notes": "Safety first. Never roast or rush someone while they handle a knife. The blade normally passes close to the guiding knuckles; that is not danger by itself. Alert only when fingertips are clearly ahead of or under the cutting edge, the hand crosses the blade, or the board slips during a cut. Ask for a better angle if unsure.",
   "steps": [
     {
       "instruction": "Put the board on a damp cloth so it cannot slide. Place the banana or cucumber on the board.",
@@ -33,10 +33,10 @@
       "done_when": "The board and food are stable before the knife is used."
     },
     {
-      "instruction": "Curl your guiding fingertips behind your knuckles. Keep the blade away from your fingertips.",
+      "instruction": "Curl your guiding fingertips behind your knuckles. Let the side of the blade pass beside your knuckles, with the edge clear of your fingertips.",
       "looks_right": [
         "fingertips tucked behind knuckles",
-        "blade clear of fingertips"
+        "blade beside knuckles, with the edge clear of tucked fingertips"
       ],
       "looks_wrong": [
         "fingertips extended into the blade path",
@@ -45,10 +45,11 @@
       "done_when": "The guiding hand is in a safe claw position before slicing."
     },
     {
-      "instruction": "Slice slowly, moving the knife away from your tucked fingertips. Stop if your grip slips.",
+      "instruction": "Slice slowly beside your guiding knuckles, moving your tucked hand back between cuts. Stop if your grip slips.",
       "looks_right": [
         "controlled slices",
         "fingertips remain tucked",
+        "blade passes beside the knuckles, not over the fingertips",
         "board remains stable"
       ],
       "looks_wrong": [

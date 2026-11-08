@@ -26,9 +26,12 @@ rules are **not** repeated there: the server sends the latest ones at the start 
 duplicate rules were removed. That is a character count, not a measured credit saving.
 The source-only HTML comment at the top of `agent-prompt.md` is not in the dashboard.
 If you edit either copy, keep the other in step.
+The dashboard's first message is "Hey, I'm Remy. What are we making or practising today?" so it fits
+both cooking and lessons. The agent's First message override is off, so the app does not replace it.
 
 The published agent uses Realtime Mini and Oliver - Clean, British and Steady as its only voice.
-Gentle, Honest and Savage change delivery, not voice. The copied ElevenLabs settings use patient turn
+Gentle, Honest and Savage change delivery, not voice. Lessons use a neutral coaching mode and hide
+the attitude badge. The copied ElevenLabs settings use patient turn
 eagerness, background voice detection on, and Ignore Default Personality off.
 Check actual response delay, kitchen-noise behaviour, and usage during the
 real phone cook-along. The agent copy and

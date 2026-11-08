@@ -63,13 +63,14 @@ test('checked server recipe is used and out-of-range steps are rejected',async()
 });
 test('invalid and unknown tool calls cannot create screen events',async()=>{
   const {actions,events}=actionFixture(); const count=events.length;
-  for (const [name,args] of [['roast',{text:'x',level:9}],['safety_alert',{text:9}],['delete_everything',{}]]) assert.equal((await actions.call(name,args)).ok,false);
+  for (const [name,args] of [['roast',{text:'x',level:9}],['roast',{text:'A'.repeat(181),level:1}],['safety_alert',{text:9}],['delete_everything',{}]]) assert.equal((await actions.call(name,args)).ok,false);
   assert.equal(events.length,count);
 });
-function visionFixture(response) {
+function visionFixture(response, { mode = 'honest', activeRecipe = recipe } = {}) {
   let clock=1000; const tasks=[],events=[],context=[],speech=[],requests=[];
   const vision=createVision({video:{videoWidth:1280,videoHeight:720,readyState:2},canvas:{getContext:()=>({drawImage(){}}),toDataURL:()=> 'data:image/jpeg;base64,abc'},
-    request:async(...args)=>{requests.push(args);return response(...args);},actions:{currentStep:()=>recipe.steps[0]},context:t=>context.push(t),speak:(t,u)=>speech.push({t,u}),emit:(type,data)=>events.push({type,data}),alive:()=>true,
+    request:async(...args)=>{requests.push(args);return response(...args);},actions:{currentStep:()=>activeRecipe.steps[0],snapshot:()=>({recipe:activeRecipe})},
+    context:t=>context.push(t),speak:(t,u)=>speech.push({t,u}),emit:(type,data)=>events.push({type,data}),alive:()=>true,getMode:()=>mode,
     now:()=>clock,schedule:fn=>{tasks.push(fn);return fn;},cancel:()=>{}});
   return {vision,tasks,events,context,speech,requests,setTime:t=>clock=t};
 }
@@ -89,6 +90,16 @@ test('camera safety is immediate, and repeated frames do not repeat ordinary war
   const urgent=visionFixture(async()=>({safety:'Smoke from oil',issues:[]}));
   urgent.vision.start(); await tick();
   assert.equal(urgent.events[0].type,'alert'); assert.equal(urgent.speech[0].u,true); urgent.vision.stop();
+});
+test('Savage jabs at an ordinary visible salad without calling it a mistake; lessons stay quiet',async()=>{
+  const picture=async()=>({summary:'A salad on a board',observations:['lettuce and tomato visible'],can_see_cooking:true,issues:[],safety:''});
+  const cook=visionFixture(picture,{mode:'savage'});
+  cook.vision.start(); await tick(); await cook.tasks.shift()();
+  assert.equal(cook.speech.length,1); assert.match(cook.speech[0].t,/SAVAGE SCENE/);
+  assert.equal(cook.events.filter(e=>e.type==='roast').length,0);
+  cook.vision.stop();
+  const lesson=visionFixture(picture,{mode:'savage',activeRecipe:{...recipe,lesson:true}});
+  lesson.vision.start(); await tick(); assert.equal(lesson.speech.length,0); lesson.vision.stop();
 });
 test('late camera response is discarded after stop, and stale analysis does not drive action',async()=>{
   let finish; const f=visionFixture(()=>new Promise(r=>finish=r));
