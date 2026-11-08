@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { createActions } from './actions.js';
 import { createVision } from './vision.js';
-import { createElevenLabsRemy } from './elevenlabs.js';
+import { createElevenLabsRemy, prefetchBrain } from './elevenlabs.js';
 const tools = JSON.parse(await readFile(new URL('../../remy-brain/actions.json', import.meta.url), 'utf8')).tools;
 const core = await readFile(new URL('../../remy-brain/instructions.md', import.meta.url), 'utf8');
 const recipe = { id: 'example', title: 'Toast', steps: [{instruction:'Wait',timer:{label:'Toast',minutes:2,check_at:1}}, {instruction:'Move tray into oven'}] };
@@ -244,4 +244,17 @@ test('hands-free commands: next/back/repeat, timer cancel/adjust/time left, only
   assert.equal(events.at(-1).data.id,'rigatoni');
   assert.equal(actions.hear('Remy, cancel the rigatoni timer').command,'cancel timer');
   assert.deepEqual(events.at(-1),{type:'timer_cancel',data:{id:'rigatoni'}});
+});
+
+test('faster start: a brain prefetched on the start screen is used once; a different attitude fetches again',async()=>{
+  const calls=[]; const brain={instructions:core,tools};
+  const fetcher=async(url,init)=>{calls.push([url,init?.body&&JSON.parse(init.body).mode]);return {ok:true,json:async()=>brain};};
+  await prefetchBrain({mode:'savage',profile:null,fetcher});
+  const make=(mode)=>createElevenLabsRemy({mode,page:Object.assign(new EventTarget(),{hidden:false}),fetcher,
+    loadSDK:async()=>({Conversation:{startSession:async()=>({endSession:async()=>{},sendContextualUpdate(){},sendUserMessage(){}})}}),
+    schedule:(fn,ms)=>({fn,ms}),cancel:()=>{}});
+  const a=make('savage'); await a.start(); await a.stop();
+  assert.equal(calls.filter(c=>c[0]==='/api/brain').length,1);          // only the prefetch
+  const b=make('honest'); await b.start(); await b.stop();
+  assert.deepEqual(calls.filter(c=>c[0]==='/api/brain').map(c=>c[1]),['savage','honest']);
 });

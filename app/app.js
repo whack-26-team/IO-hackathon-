@@ -5,7 +5,7 @@
 import { createTimers } from "./timers.js";
 import { unlockSound, beep } from "./sound.js";
 import { createMockRemy } from "./remy/mock.js";
-import { createLiveRemy } from "./remy/live.js";
+import { createLiveRemy, preloadLive } from "./remy/live.js";
 import { createDemoRemy } from "./demo/demo-remy.js"; // ?demo=1 (Felix)
 import { initModeSwitch } from "./extras/mode-switch.js"; // tap the badge mid-cook (Felix)
 import { initSetupGuide } from "./extras/setup-guide.js"; // first-time setup card (Felix)
@@ -577,7 +577,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v103`,
+      `version  v104`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
@@ -623,3 +623,13 @@ const remyApp = {
 };
 window.remyApp = remyApp; // handy for testing extras from the browser console
 try { initExtras(remyApp); } catch (e) { console.error("[extras] failed to start", e); }
+
+// ---------- faster start: warm up real Remy while the start screen is open ----------
+function warmUpRemy() {
+  if ($("use-mock").checked || new URLSearchParams(location.search).get("demo") === "1") return;
+  const st = history.settings();
+  preloadLive({ mode: checkedMode(), profile: { diet: st.diet || [], allergies: st.allergies || [] } });
+}
+setTimeout(warmUpRemy, 1200);
+$("use-mock").addEventListener("change", warmUpRemy);
+document.querySelectorAll('input[name="mode"]').forEach((el) => el.addEventListener("change", () => setTimeout(warmUpRemy, 300)));
