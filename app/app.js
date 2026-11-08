@@ -62,6 +62,8 @@ function applyMode(mode) {
 const checkedMode = () => document.querySelector('input[name="mode"]:checked').value;
 
 // ---------- start screen comes alive ----------
+// Pretend Remy (scripted, no AI) is for testing only now: add ?pretend=1 to the page address
+function usePretend() { return new URLSearchParams(location.search).has("pretend"); }
 const calm = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 // The greeting types itself out (instantly when the phone asks for less motion)
 function typeGreeting(text) {
@@ -162,7 +164,7 @@ $("start-btn").addEventListener("click", async () => {
 
   quietRemy(); // Remy on screen from the start, with this attitude's face
   const useDemo = new URLSearchParams(location.search).get("demo") === "1"; // scripted demo (docs/DEMO.md)
-  const useMock = $("use-mock").checked;
+  const useMock = usePretend();   // Pretend Remy only with ?pretend=1 on the page address (testing)
   state.live = !useMock && !useDemo; // real Remy speaks timer reminders himself (see the timers' sound below)
   const factory = useDemo ? createDemoRemy : useMock ? createMockRemy : createLiveRemy;   // live = Gemini backup voice unless ?full=1 / ?eleven=1 (saves ElevenLabs credits)
   state.voice = useMock || useDemo ? "pretend" : null;   // real Remy reports live/backup itself
@@ -317,7 +319,7 @@ function statsSummary() {
 function renderRecap() {
   const stars = recapStars();
   const line = (SCORE_LINES[state.mode] || SCORE_LINES.honest)(stars);
-  $("recap-dish").textContent = stats.lesson ? `🎓 ${stats.recipe || "Lesson"}` : (stats.recipe || "Freestyle cook");
+  $("recap-dish").textContent = stats.lesson ? `Lesson: ${stats.recipe || "technique"}` : (stats.recipe || "Freestyle cook");
   // five stars that pop in one by one (filled ones first)
   $("recap-num").replaceChildren(...[1, 2, 3, 4, 5].map((i) => {
     const s = Object.assign(document.createElement("span"), { className: `star${i <= stars ? " on" : ""}`, textContent: i <= stars ? "★" : "☆" });
@@ -342,7 +344,7 @@ function wireRemy(remy) {
   remy.on("voice", (d) => setVoice(d.kind));   // live.js: ElevenLabs or the backup voice
   remy.on("recipe", (d) => { showRecipe(d); stats.recipe = d.recipe?.title || stats.recipe; if (d.recipe?.lesson) stats.lesson = d.recipe.id; });
   // Cooking school: Remy's technique score becomes the session score
-  remy.on("lesson_score", (d) => { stats.lessonScore = d.score; stats.lessonComment = d.comment; showBubble({ text: `🎓 ${history.starText(Math.max(1, Math.min(5, Math.round(d.score / 2))))} ${d.comment}`, severity: "info" }); });
+  remy.on("lesson_score", (d) => { stats.lessonScore = d.score; stats.lessonComment = d.comment; showBubble({ text: `${history.starText(Math.max(1, Math.min(5, Math.round(d.score / 2))))} ${d.comment}`, severity: "info" }); });
   // "Clear the recipe": take it off the screen (timers keep running)
   remy.on("recipe_clear", () => { state.recipe = null; showRecipe(null); });
   remy.on("tip", (d) => showBubble(d));
@@ -494,9 +496,9 @@ function showRecipe(data) {
   $("recipe-title").textContent = recipe.title;
   // Tag: hand-checked by our team, or written by Remy's AI (or ours but not yet checked)
   const tag = $("recipe-tag");
-  if (recipe.lesson) { tag.textContent = "🎓 Lesson"; tag.className = "tag checked"; }
+  if (recipe.lesson) { tag.textContent = "Lesson"; tag.className = "tag checked"; }
   else if (data.checked_by_human) { tag.textContent = "✓ Checked recipe"; tag.className = "tag checked"; }
-  else if (data.source === "ai") { tag.textContent = "🤖 Remy's recipe"; tag.className = "tag ai"; }
+  else if (data.source === "ai") { tag.textContent = "Remy's recipe"; tag.className = "tag ai"; }
   else { tag.textContent = "Unchecked recipe"; tag.className = "tag unchecked"; }
 
   // Safe temperatures (from the server's food-safety table, never made up by the AI)
@@ -650,7 +652,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v119`,
+      `version  v120`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
@@ -699,12 +701,11 @@ try { initExtras(remyApp); } catch (e) { console.error("[extras] failed to start
 
 // ---------- faster start: warm up real Remy while the start screen is open ----------
 function warmUpRemy() {
-  if ($("use-mock").checked || new URLSearchParams(location.search).get("demo") === "1") return;
+  if (usePretend() || new URLSearchParams(location.search).get("demo") === "1") return;
   const st = history.settings();
   preloadLive({ mode: checkedMode(), profile: { diet: st.diet || [], allergies: st.allergies || [] } });
 }
 setTimeout(warmUpRemy, 1200);
-$("use-mock").addEventListener("change", warmUpRemy);
 document.querySelectorAll('input[name="mode"]').forEach((el) => el.addEventListener("change", () => setTimeout(warmUpRemy, 300)));
 
 // Savage start screen: little embers drifting up behind everything (CSS animates them)

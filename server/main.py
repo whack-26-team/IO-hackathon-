@@ -9,6 +9,7 @@ What it does:
   * POST /api/recipes/ai     -> safety-check a recipe Remy wrote itself (create_recipe)
   * POST /api/chat           -> backup Remy: Gemini writes his reply when ElevenLabs is down
   * GET  /api/qr?text=       -> QR code (SVG) for one of REMY's own links (judge page)
+  * GET  /api/check/credits  -> ElevenLabs characters left (pitch checklist at /check)
   * GET  /api/push/key, POST /api/push/timer -> lock-screen timer alerts (server/push.py)
   * GET  /api/recipes/{id}   -> one full recipe
   * POST /api/brain          -> Remy's instructions + actions for ANY voice route
@@ -431,6 +432,30 @@ def qr_code(text: str):
 @app.get("/")
 def index():
     return FileResponse(APP_DIR / "index.html")
+
+
+@app.get("/check")
+def check_page():
+    """Pitch checklist (app/extras/check.html): not linked anywhere, open /check before going on stage."""
+    return FileResponse(APP_DIR / "extras" / "check.html")
+
+
+@app.get("/api/check/credits")
+def check_credits():
+    """ElevenLabs characters left on the account whose API key is on the server (numbers only, never the key)."""
+    key = os.getenv("ELEVENLABS_API_KEY", "").strip()
+    if not key:
+        return {"ok": False, "reason": "No ElevenLabs API key on the server, so credits can't be read here."}
+    try:
+        r = httpx.get("https://api.elevenlabs.io/v1/user/subscription", headers={"xi-api-key": key}, timeout=8)
+    except httpx.HTTPError:
+        return {"ok": False, "reason": "Couldn't reach ElevenLabs."}
+    if r.status_code != 200:
+        return {"ok": False, "reason": f"ElevenLabs said {r.status_code} (the key may not be allowed to read the subscription)."}
+    d = r.json()
+    used, limit = int(d.get("character_count") or 0), int(d.get("character_limit") or 0)
+    return {"ok": True, "used": used, "limit": limit, "left": max(0, limit - used), "tier": d.get("tier"),
+            "resets_at": d.get("next_character_count_reset_unix")}
 
 
 @app.get("/judge")

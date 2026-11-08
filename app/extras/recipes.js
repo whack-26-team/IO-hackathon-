@@ -2,9 +2,7 @@
 // Picking one starts cooking with it already loaded.
 import { loadAllergens, clashes } from "../allergens.js";
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
-// cartoon sticker icon from the app's SVG pieces (index.html), then optional text
-const sticker = (id, cls = "x-ico", fill) => { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("viewBox", "0 0 100 100"); s.setAttribute("class", cls); s.setAttribute("aria-hidden", "true"); s.innerHTML = `<use href="#${id}"${fill ? ` fill="${fill}"` : ""}/>`; return s; };
-const withIcon = (tag, cls, id, text) => { const e = el(tag, cls); e.append(sticker(id), el("span", "", text)); return e; };
+import { sticker, withSticker as withIcon } from "./sticker.js";
 
 // Cooking school: short technique lessons; Remy watches and gives you 1-5 stars
 async function lessonsList(app) {
@@ -76,7 +74,7 @@ async function browserSheet(app) {
       if (warn.length) main.append(el("small", "x-warn", `⚠ May contain: ${warn.join(", ")}`));
       main.addEventListener("click", () => cook(r.id));
       const star = el("button", "x-star" + (f.includes(r.id) ? " on" : ""));
-      star.append(sticker("i-star", "x-fav", f.includes(r.id) ? "#ffd166" : "#fff"));
+      star.append(sticker("i-star", { cls: "x-fav", fill: f.includes(r.id) ? "#ffd166" : "#fff" }));
       star.setAttribute("aria-label", "Favourite");
       star.addEventListener("click", () => {
         const now = favs(); const i = now.indexOf(r.id);

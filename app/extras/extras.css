@@ -165,3 +165,25 @@ html[data-mode="savage"] .x-menu-btn.sticker svg { filter: drop-shadow(2px 3px 0
 .x-star.on .x-fav { transform: rotate(-8deg) scale(1.08); }
 .x-star { display: flex; align-items: center; }
 .x-special-badge .x-ico { fill: #ffd166; }
+
+/* ---------- cartoon stickers everywhere (sticker.js) ---------- */
+.x-toggle, .x-badges-pill, .x-share, .x-challenge, .x-row-moment, .x-note, .x-push button, .x-tool { display: inline-flex; align-items: center; gap: 4px; }
+.x-toggle .x-ico { width: 1.4em; height: 1.4em; margin-right: 2px; }
+.x-row-title { display: flex !important; align-items: center; gap: 2px; }
+.x-row-title .x-ico { width: 1.6em; height: 1.4em; transform: none; }
+.x-row-moment .x-ico { width: 1.25em; height: 1.25em; }
+.x-challenge { justify-content: center; }
+.x-scoring summary { display: flex; align-items: center; gap: 2px; }
+.x-scoring-list .x-ico { width: 1.4em; height: 1.4em; margin-right: 0; }
+.x-push .off .x-ico, button.off > .x-ico { filter: grayscale(1); opacity: .5; }
+.x-tool .x-ico { width: 26px; height: 26px; margin: 0; transform: none; }
+.x-steam-ico { width: 34px; height: 34px; display: block; }
+/* badges: earned ones are tilted stickers; locked ones are grey outlines */
+.x-badge-icon { width: 42px; height: 42px; display: block; margin-bottom: 4px; transform: rotate(var(--tilt, -4deg)); filter: drop-shadow(2px 2px 0 rgba(0,0,0,.18)); }
+.x-badge:not(.got) .x-badge-icon { filter: grayscale(1) brightness(1.15); opacity: .35; transform: none; }
+.x-badge.got { transform: rotate(calc(var(--tilt, 0deg) / 3)); }
+/* a badge earned in the last few minutes slaps onto the page */
+.x-badge.x-slap .x-badge-icon { animation: slap .55s cubic-bezier(.3, 1.6, .5, 1) .25s both; }
+@keyframes slap { 0% { transform: scale(2.6) rotate(-30deg); opacity: 0; } 60% { transform: scale(.9) rotate(var(--tilt, -4deg)); opacity: 1; } 100% { transform: rotate(var(--tilt, -4deg)); } }
+.x-badges-pill .x-ico { width: 1.6em; height: 1.6em; }
+@media (prefers-reduced-motion: reduce) { .x-badge.x-slap .x-badge-icon { animation: none; } }

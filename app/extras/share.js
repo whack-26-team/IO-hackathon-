@@ -1,4 +1,5 @@
 // Share card (#116): turn the recap into an image and open the phone's share sheet.
+import { sticker } from "./sticker.js";
 // Only made when the cook taps Share; nothing is saved automatically.
 const BG = { gentle: "#eaf3fb", honest: "#fff4e0", savage: "#2a1714" };
 const FG = { gentle: "#1a1a1a", honest: "#1a1a1a", savage: "#fff4e0" };
@@ -87,7 +88,7 @@ export function initShare(app) {
     const slot = document.getElementById("slot-goodbye");
     slot.querySelector(".x-share")?.remove();
     const btn = document.createElement("button");
-    btn.className = "x-share"; btn.textContent = "📤 Share";
+    btn.className = "x-share"; btn.append(sticker("i-send"), document.createTextNode("Share"));
     btn.addEventListener("click", async (e) => {
       e.stopPropagation();              // the goodbye screen goes back to start on tap
       app.keepGoodbye();                // and stays put while sharing

@@ -1,4 +1,5 @@
 // Weekly challenge (#115): one checked recipe a week, shown as a chip above Start cooking.
+import { sticker } from "./sticker.js";
 const ROTATION = ["scrambled-eggs", "boiled-pasta", "steak", "rigatoni", "toast", "instant-noodles",
   "fruit-salad", "cheese-sandwich", "overnight-oats", "cereal"];
 
@@ -23,7 +24,7 @@ export async function initChallenge(app) {
   chip.className = "x-challenge";
   const render = () => {
     const best = app.history.cooks().filter((c) => c.dish === recipe.title).reduce((m, c) => Math.max(m, app.history.starsOf(c)), 0);
-    chip.textContent = `🎯 This week: ${recipe.title.replace(/ \(.*\)$/, "")}${best ? ` · best ${best}★` : ""}`;
+    chip.replaceChildren(sticker("i-target"), document.createTextNode(`This week: ${recipe.title.replace(/ \(.*\)$/, "")}${best ? ` · best ${best}★` : ""}`));
   };
   render();
   chip.addEventListener("click", () => app.startCooking({ recipeId: id }));

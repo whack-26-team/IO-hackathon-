@@ -37,7 +37,7 @@ in a judging room and works on any table.
 
 1. Open https://remy-2wc2.onrender.com once, to wake the free server (the first load can take about 50 seconds).
 2. Open REMY from the home screen and check the camera and mic permissions still work.
-3. **Untick Pretend Remy.** Choose **Honest**. Don't press Start yet.
+3. **Open the pitch link (`?full=1`).** Choose **Honest**. Don't press Start yet.
 4. Point the phone at the board and bowl. Check the big screen shows it.
 
 ---
@@ -129,7 +129,7 @@ While the recap is still up (it stays 8 seconds, then the app goes back to the s
 | Problem | What to do |
 |---|---|
 | Remy doesn't answer within 5 s | Cook repeats the line, closer to the phone |
-| Remy still silent / "error" chip | **Phone:** Stop, tick **Pretend Remy**, Start (or open `?demo=1` demo mode, #83, once it's built). **Talker** narrates. |
+| Remy still silent / "error" chip | **Phone:** Stop, open the site with `?pretend=1`, Start (or open `?demo=1` demo mode, #83, once it's built). **Talker** narrates. |
 | No timer after "noodles are in" | Cook: "Remy, start a 3-minute noodle timer." |
 | ElevenLabs down / out of credits | Nothing to do: Remy **switches to his backup voice by itself** (the phone's voice, with Gemini writing his lines) and says so on screen. To skip ElevenLabs entirely, open `https://remy-2wc2.onrender.com/?backup=1`. |
 | No safety alert on the knife | Cook: "Remy, how's my knife grip?" Never speed up the knife to force it. |
@@ -138,6 +138,6 @@ While the recap is still up (it stays 8 seconds, then the app goes back to the s
 
 ## Rehearsal checklist
 - [ ] Run it 3 times start to finish with a timer. Target: under 3:15.
-- [ ] Once with `?backup=1` (the backup voice) and once on Pretend Remy only.
+- [ ] Once with `?backup=1` (the backup voice) and once with `?pretend=1` (Pretend Remy).
 - [ ] Once with the room's big screen, if you can get access.
 - [ ] Write what Remy actually said in each beat under this line, then update the script.

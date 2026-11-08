@@ -1,4 +1,5 @@
 // Look & feel (#119): make the cooking screen feel alive, using only the app's events and CSS
+import { sticker } from "./sticker.js";
 // classes on <body> (styles in extras.css).
 const PRAISE = /\b(perfect|beautiful|lovely|excellent|great job|nailed|proud|gorgeous|magnificent|flawless|competent|well done|nice one)\b/i;
 
@@ -29,7 +30,7 @@ function steam() {
   if (!face) return;
   const r = face.getBoundingClientRect();
   for (const side of [-1, 1]) {
-    const puff = document.createElement("span"); puff.className = "x-steam"; puff.textContent = "💨";
+    const puff = document.createElement("span"); puff.className = "x-steam"; puff.append(sticker("i-puff", { cls: "x-steam-ico" }));
     puff.style.left = `${r.left + r.width / 2 + side * r.width * 0.45}px`;
     puff.style.top = `${r.top + r.height * 0.25}px`;
     puff.style.setProperty("--dir", side);
