@@ -447,3 +447,11 @@ html[data-mode="gentle"] .score-card { background: #f4f9fe; }
 .recipe[open] .current-step-text { display: none; }
 .recipe:not([open]) { max-height: none; }
 .recipe:not([open]) > summary { box-shadow: none; }
+
+/* Goodbye card: 1-5 stars, popping in one after another */
+.recap-num { display: flex; justify-content: center; gap: 2px; letter-spacing: 0; }
+.recap-num .star { display: inline-block; color: rgba(0, 0, 0, .18); animation: star-pop .45s cubic-bezier(.3, 1.6, .5, 1) both; }
+.recap-num .star.on { color: var(--butter); -webkit-text-stroke: 2.5px var(--ink); text-shadow: 3px 3px 0 var(--ink); }
+html[data-mode="savage"] .recap-num .star:not(.on) { color: rgba(255, 255, 255, .25); }
+@keyframes star-pop { 0% { transform: scale(0) rotate(-40deg); opacity: 0; } 100% { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .recap-num .star { animation: none; } }

@@ -241,7 +241,7 @@ function showGoodbye() {
   renderRecap();
   const summary = statsSummary();
   if (summary.dish || summary.timers || summary.roasts || summary.alerts) {
-    history.addCook({ dish: summary.dish, mode: state.mode, score: summary.score, timers: summary.timers,
+    history.addCook({ dish: summary.dish, mode: state.mode, stars: summary.stars, timers: summary.timers,
       alerts: summary.alerts, roasts: summary.roasts, highlights: summary.highlights.slice(0, 10), ...(summary.lesson ? { lesson: summary.lesson } : {}) });
   }
   fire("goodbye", { stats: summary });
@@ -281,33 +281,38 @@ function resetStats() { stats = { timers: new Set(), timersDone: 0, alerts: 0, r
 // Best moments of the session (roasts, safety saves, timers) for the highlights reel. Text only.
 function highlight(kind, text) { if (text && stats.highlights.length < 30) stats.highlights.push({ kind, text: String(text).slice(0, 160) }); }
 resetStats();
-// Remy's score out of 10: starts at 7, timers finished and steps done help, roasts and safety
-// alerts cost points. Just for fun.
-function recapScore() {
+// Remy's stars, 1 to 5: one for turning up, then one each for cooking a recipe, getting through it
+// (half the steps or a finished timer), keeping roasts down (2 or fewer) and no safety alerts.
+// Cooking school: Remy's technique score (1-10) becomes stars.
+function recapStars() {
+  if (stats.lesson && stats.lessonScore) return Math.max(1, Math.min(5, Math.round(stats.lessonScore / 2)));
   const steps = state.recipe?.steps?.length || 0;
-  let score = 7 + (stats.timersDone > 0 ? 1 : 0) + (steps && stats.stepsDone >= steps / 2 ? 1 : 0)
-    - Math.min(stats.roasts, 3) - Math.min(stats.alerts, 2) * 1.5;
-  score = Math.max(1, Math.min(10, score));
-  if (stats.lesson && stats.lessonScore) return stats.lessonScore;   // cooking school: Remy's technique score
-  return Math.max(1, Math.min(10, Math.round(score)));
+  return 1 + (stats.recipe ? 1 : 0) + (stats.timersDone > 0 || (steps && stats.stepsDone >= steps / 2) ? 1 : 0)
+    + (stats.roasts <= 2 ? 1 : 0) + (stats.alerts === 0 ? 1 : 0);
 }
 const SCORE_LINES = {
-  gentle: (n) => n >= 7 ? `${n}/10. Proud of you, chef!` : `${n}/10. Every cook starts somewhere!`,
-  honest: (n) => n >= 8 ? `${n}/10. Suspiciously competent.` : n >= 5 ? `${n}/10. Edible. Probably.` : `${n}/10. We'll call it practice.`,
-  savage: (n) => n >= 8 ? `${n}/10. Don't let it go to your head.` : n >= 5 ? `${n}/10. My nan cooks better, and she's an app too.` : `${n}/10. A fish could cook better than you.`,
+  gentle: (n) => n >= 4 ? "Proud of you, chef!" : "Every cook starts somewhere!",
+  honest: (n) => n >= 5 ? "Suspiciously competent." : n >= 3 ? "Edible. Probably." : "We'll call it practice.",
+  savage: (n) => n >= 5 ? "Don't let it go to your head." : n >= 3 ? "My nan cooks better, and she's an app too." : "A fish could cook better than you.",
 };
 function statsSummary() {
   return { dish: stats.recipe, timers: stats.timers.size, timersDone: stats.timersDone, alerts: stats.alerts,
-    roasts: stats.roasts, stepsDone: stats.stepsDone, score: recapScore(), highlights: [...stats.highlights], lesson: stats.lesson };
+    roasts: stats.roasts, stepsDone: stats.stepsDone, stars: recapStars(), highlights: [...stats.highlights], lesson: stats.lesson };
 }
-// Score card: dish, big score, Remy's line, one small icon row
+// Score card: dish, 1-5 stars, Remy's line, one small icon row
 function renderRecap() {
-  const score = recapScore();
-  const sentence = (SCORE_LINES[state.mode] || SCORE_LINES.honest)(score);   // "3/10. We'll call it practice."
+  const stars = recapStars();
+  const line = (SCORE_LINES[state.mode] || SCORE_LINES.honest)(stars);
   $("recap-dish").textContent = stats.lesson ? `🎓 ${stats.recipe || "Lesson"}` : (stats.recipe || "Freestyle cook");
-  $("recap-num").textContent = `${score}/10`;
-  $("recap-line").textContent = stats.lesson && stats.lessonComment ? stats.lessonComment : sentence.replace(/^\d+\/10\.\s*/, "");
-  $("recap-score").textContent = sentence;
+  // five stars that pop in one by one (filled ones first)
+  $("recap-num").replaceChildren(...[1, 2, 3, 4, 5].map((i) => {
+    const s = Object.assign(document.createElement("span"), { className: `star${i <= stars ? " on" : ""}`, textContent: i <= stars ? "★" : "☆" });
+    s.style.animationDelay = `${0.15 + i * 0.12}s`;
+    return s;
+  }));
+  $("recap-num").setAttribute("aria-label", `${stars} out of 5 stars`);
+  $("recap-line").textContent = stats.lesson && stats.lessonComment ? stats.lessonComment : line;
+  $("recap-score").textContent = `${history.starText(stars)} ${line}`;
   const items = [["⏱", stats.timers.size, "timers"], ["🛟", stats.alerts, "safety saves"], ["🔥", stats.roasts, "roasts"]];
   $("recap").replaceChildren(...items.map(([icon, n, label]) => {
     const s = Object.assign(document.createElement("span"), { className: "recap-item", textContent: `${icon} ${n}` });
@@ -322,7 +327,7 @@ function wireRemy(remy) {
   remy.on("voice", (d) => setVoice(d.kind));   // live.js: ElevenLabs or the backup voice
   remy.on("recipe", (d) => { showRecipe(d); stats.recipe = d.recipe?.title || stats.recipe; if (d.recipe?.lesson) stats.lesson = d.recipe.id; });
   // Cooking school: Remy's technique score becomes the session score
-  remy.on("lesson_score", (d) => { stats.lessonScore = d.score; stats.lessonComment = d.comment; showBubble({ text: `🎓 ${d.score}/10. ${d.comment}`, severity: "info" }); });
+  remy.on("lesson_score", (d) => { stats.lessonScore = d.score; stats.lessonComment = d.comment; showBubble({ text: `🎓 ${history.starText(Math.max(1, Math.min(5, Math.round(d.score / 2))))} ${d.comment}`, severity: "info" }); });
   // "Clear the recipe": take it off the screen (timers keep running)
   remy.on("recipe_clear", () => { state.recipe = null; showRecipe(null); });
   remy.on("tip", (d) => showBubble(d));
@@ -628,7 +633,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v111`,
+      `version  v112`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);

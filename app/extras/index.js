@@ -14,7 +14,7 @@
 //   app.on(event, fn)   events: "start" {mode, recipe}, "stop", "goodbye" {stats},
 //                       "recipe", "recipe_clear", "tip", "roast", "alert", "step", "timer_start",
 //                       "timer_check", "timer_done", "status" (same data as docs/CONTRACT.md)
-//   app.stats()         {dish, timers, timersDone, alerts, roasts, stepsDone, score, highlights[]}
+//   app.stats()         {dish, timers, timersDone, alerts, roasts, stepsDone, stars (1-5), highlights[]}
 //   app.startCooking({ recipeId, mode })   start a cook with a recipe already chosen
 //   app.setMode(mode)   switch attitude mid-cook (Savage: ask 18+ first)
 //   app.say(text, {voice}) show a Remy bubble; voice:true = Remy says it (real Remy or the phone)
