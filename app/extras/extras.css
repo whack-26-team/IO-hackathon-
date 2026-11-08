@@ -145,3 +145,8 @@ html[data-mode="savage"] .x-menu-btn.sticker svg { filter: drop-shadow(2px 3px 0
 .x-scoring summary { font-weight: 800; cursor: pointer; }
 .x-scoring-list { list-style: none; margin: 4px 0; padding: 0; display: grid; gap: 6px; }
 .x-scoring-list li { display: flex; gap: 10px; align-items: baseline; font-size: 15px; }
+
+/* Sheets and extras use the box font too */
+.x-title, .x-tab, .x-surprise, .x-toggle, .x-row-main b, .x-stat b, .x-scoring summary, .x-clear, .x-share, .x-challenge, .x-special-badge, .x-score {
+  font-family: "Baloo 2", var(--font); font-weight: 700; letter-spacing: 0; }
+.x-title { font-size: 28px; line-height: 1.1; }

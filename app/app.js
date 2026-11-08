@@ -3,7 +3,7 @@
 // so pretend Remy (remy/mock.js) and real Remy (remy/live.js) are interchangeable.
 
 import { createTimers } from "./timers.js";
-import { unlockSound, beep } from "./sound.js";
+import { unlockSound, beep, wakeSound, starPops } from "./sound.js";
 import { createMockRemy } from "./remy/mock.js";
 import { createLiveRemy, preloadLive } from "./remy/live.js";
 import { createDemoRemy } from "./demo/demo-remy.js"; // ?demo=1 (Felix)
@@ -93,6 +93,7 @@ document.querySelectorAll('input[name="mode"]').forEach((el) =>
   el.addEventListener("change", () => {
     if (!el.checked) return;
     applyMode(el.value);
+    if (el.value === "savage" && !calm()) { wakeSound(); beep("sizzle"); }
     history.saveSettings({ mode: el.value });                       // remembered for next time
     // 18+ asked once per phone: after a "yes" it doesn't ask again
     if (el.value === "savage" && !history.settings().ageOk) $("age-dialog").classList.remove("hidden");
@@ -141,6 +142,7 @@ $("start-btn").addEventListener("click", async () => {
   document.documentElement.dataset.mode = "cooking";
   $("mode-badge").textContent = MODE_NAMES[state.mode];
   showRecipe(null);
+  showGettingReady();
   setStatus({ status: "connecting", message: "connecting…" });
 
   try {
@@ -153,6 +155,7 @@ $("start-btn").addEventListener("click", async () => {
   } catch (e) {
     showBubble({ text: "I can't see anything! Allow camera and microphone access, then try again.", severity: "urgent" });
     setStatus({ status: "error", message: "No camera" });
+    hideGettingReady();
     return;
   }
 
@@ -195,7 +198,7 @@ function stopCooking() {
   state.remy = null;
   // Remy says goodbye out loud in his attitude. Real Remy speaks it himself, so his voice
   // stays connected until the goodbye screen ends; Pretend Remy uses the phone's own voice.
-  const bye = GOODBYES[state.mode] || GOODBYES.honest;
+  const bye = goodbyeFor();
   // send() returns false if real Remy isn't connected (e.g. he never connected): then the phone says it
   if (wasLive && remy && remy.send("goodbye", { text: bye.text }) === true) {
     pendingStop = remy;
@@ -222,6 +225,9 @@ const GOODBYES = {
   honest: { face: "f-proud", text: "Plate it. Take the credit. I'm an app." },
   savage: { face: "f-savage", text: "Bloody hell, we survived. Plate it and get out of my kitchen." },
 };
+// Savage with 5 stars: he can't believe it (shocked face, grudging line)
+const SAVAGE_FIVE = { face: "f-shock", text: "Fine. FINE. That was actually decent. Don't tell anyone." };
+const goodbyeFor = () => state.mode === "savage" && recapStars() === 5 ? SAVAGE_FIVE : (GOODBYES[state.mode] || GOODBYES.honest);
 const GOODBYE_MS = 8000; // long enough for Remy to say it and to read the recap
 let pendingStop = null;   // real Remy, kept on until he's said goodbye
 
@@ -240,7 +246,7 @@ function sayLocally(text) {
   } catch { /* no voice available: the goodbye is still on screen */ }
 }
 function showGoodbye() {
-  const g = GOODBYES[state.mode] || GOODBYES.honest;
+  const g = goodbyeFor();
   $("goodbye-text").textContent = g.text;
   renderRecap();
   const summary = statsSummary();
@@ -251,8 +257,10 @@ function showGoodbye() {
   fire("goodbye", { stats: summary });
   const face = $("goodbye-face");
   setUse(face, g.face);
-  face.setAttribute("viewBox", g.face === "f-savage" ? "-28 -12 156 116" : "-18 -12 136 116");
+  face.setAttribute("viewBox", g.face === "f-savage" || g.face === "f-shock" ? "-28 -12 156 116" : "-18 -12 136 116");
+  face.classList.toggle("shocked", g.face === "f-shock");
   $("goodbye").classList.remove("hidden");
+  if (!calm()) starPops(summary.stars);
   clearTimeout(showGoodbye.t);
   showGoodbye.t = setTimeout(backToStart, GOODBYE_MS);
 }
@@ -297,7 +305,7 @@ function recapStars() {
 const SCORE_LINES = {
   gentle: (n) => n >= 4 ? "Proud of you, chef!" : "Every cook starts somewhere!",
   honest: (n) => n >= 5 ? "Suspiciously competent." : n >= 3 ? "Edible. Probably." : "We'll call it practice.",
-  savage: (n) => n >= 5 ? "Don't let it go to your head." : n >= 3 ? "My nan cooks better, and she's an app too." : "A fish could cook better than you.",
+  savage: (n) => n >= 5 ? "I'm speechless. Don't get used to it." : n >= 3 ? "My nan cooks better, and she's an app too." : "A fish could cook better than you.",
 };
 function statsSummary() {
   return { dish: stats.recipe, timers: stats.timers.size, timersDone: stats.timersDone, alerts: stats.alerts,
@@ -317,9 +325,10 @@ function renderRecap() {
   $("recap-num").setAttribute("aria-label", `${stars} out of 5 stars`);
   $("recap-line").textContent = stats.lesson && stats.lessonComment ? stats.lessonComment : line;
   $("recap-score").textContent = `${history.starText(stars)} ${line}`;
-  const items = [["⏱", stats.timers.size, "timers"], ["🛟", stats.alerts, "safety saves"], ["🔥", stats.roasts, "roasts"]];
+  const items = [["i-timer", stats.timers.size, "timers"], ["i-buoy", stats.alerts, "safety saves"], ["i-flame", stats.roasts, "roasts"]];
   $("recap").replaceChildren(...items.map(([icon, n, label]) => {
-    const s = Object.assign(document.createElement("span"), { className: "recap-item", textContent: `${icon} ${n}` });
+    const s = Object.assign(document.createElement("span"), { className: "recap-item" });
+    s.innerHTML = `<svg viewBox="0 0 100 100" aria-hidden="true"><use href="#${icon}"/></svg><b>${n}</b>`;   // sticker icon + count
     s.title = `${n} ${label}`; s.setAttribute("aria-label", `${n} ${label}`);
     return s;
   }));
@@ -370,6 +379,7 @@ const VOICE_LABEL = { live: "live voice", backup: "backup voice", pretend: "pret
 function setVoice(kind) { state.voice = kind; setStatus(state.lastStatus || { status: "connecting" }); }
 function setStatus({ status, message }) {
   state.lastStatus = { status, message };
+  if (status !== "connecting") hideGettingReady();   // Remy's ready (or gave up): show the kitchen
   const pill = $("status");
   pill.className = `chip status ${status}`;  // keep the chip look
   let text = status === "remy-speaking" ? "Remy is speaking" : (message || status);
@@ -406,6 +416,7 @@ function setFace(id) {
 }
 
 function showBubble({ text, severity = "info", level }) {
+  hideGettingReady();
   const sp = $("speech");
   sp.className = "speech";      // reset, then force the browser to notice,
   void sp.offsetWidth;          // so the pop/shake animation replays every time
@@ -637,7 +648,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v115`,
+      `version  v116`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
@@ -720,3 +731,28 @@ document.querySelectorAll('input[name="mode"]').forEach((el) => el.addEventListe
     cookBlink();
   }, 2500 + Math.random() * 2500);
 })();
+
+// "Remy is getting ready": covers the wait while his voice connects (hidden once he's live,
+// talks, or gives up; 20 s at most)
+const READY_LINES = {
+  gentle: "Washing my hands, chef…",
+  honest: "Finding my good spatula…",
+  savage: "Sharpening my knives. Don't touch anything.",
+};
+const READY_FACE = { gentle: "f-gentle", honest: "f-sus", savage: "f-savage" };
+function showGettingReady() {
+  const box = $("getting-ready");
+  $("gr-line").textContent = READY_LINES[state.mode] || READY_LINES.honest;
+  setUse($("gr-face"), READY_FACE[state.mode] || "f-sus");
+  $("gr-face").setAttribute("viewBox", state.mode === "savage" ? "-32 -14 164 120" : "-18 -12 136 116");
+  box.className = `getting-ready mode-${state.mode}`;
+  clearTimeout(showGettingReady.t);
+  showGettingReady.t = setTimeout(hideGettingReady, 20000);
+}
+function hideGettingReady() {
+  clearTimeout(showGettingReady.t);
+  const box = $("getting-ready");
+  if (!box || box.classList.contains("hidden") || box.classList.contains("leaving")) return;
+  box.classList.add("leaving");
+  setTimeout(() => box.classList.add("hidden"), 350);
+}

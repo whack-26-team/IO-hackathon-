@@ -458,7 +458,46 @@ html[data-mode="savage"] .recap-num .star:not(.on) { color: rgba(255, 255, 255, 
 
 /* Fonts: REMY in Leckerli One (cartoon script); tagline in Caveat Brush; words inside the boxes in Baloo 2 */
 .wordmark { font-family: "Leckerli One", var(--font); font-weight: 400; letter-spacing: 0; }
-.wordmark small { font-family: "Caveat Brush", var(--font); font-weight: 400; font-size: 17px; letter-spacing: .2px; }
+.wordmark small { font-family: "Caveat Brush", var(--font); font-weight: 400; font-size: 17px; letter-spacing: .2px; line-height: 1; margin-top: 7px; }  /* clear of the REMY letters */
 /* Baloo 2 sits tall, so a tighter line height keeps the start screen from scrolling on small phones */
 .greeting, .mode-bar b, .go, #bubble-text, .goodbye-bubble, .recap-line, .recap-dish, .current-step-text {
   font-family: "Baloo 2", var(--font); font-weight: 700; letter-spacing: 0; line-height: 1.15; }
+
+/* Same box font everywhere: chips, timer tickets */
+.chip, .timer .time, .timer .controls button { font-family: "Baloo 2", var(--font); font-weight: 700; }
+
+/* Picked attitude's small face comes alive: Gentle floats (halo glows), Honest smirks (Savage steams) */
+.mode-gentle .mode-bar:has(input:checked) .face { animation: bar-float 2.6s ease-in-out infinite; }
+.mode-honest .mode-bar:has(input:checked) .face { animation: bar-smirk 3.2s ease-in-out infinite; transform-origin: 50% 80%; }
+@keyframes bar-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes bar-smirk { 0%, 60%, 100% { transform: none; } 70% { transform: rotate(-7deg) translateX(-1px); } 85% { transform: rotate(4deg); } }
+
+/* Getting ready: Remy bounces in over the camera while his voice connects */
+.getting-ready { position: absolute; inset: 0; z-index: 8; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px; padding: 24px; text-align: center; background: var(--cream); color: var(--ink); transition: opacity .35s; }
+.getting-ready.mode-gentle { background: var(--sky-2); }
+.getting-ready.mode-savage { background: #2a1714; color: var(--cream); }
+.getting-ready.leaving { opacity: 0; pointer-events: none; }
+.gr-face { width: 150px; animation: gr-drop .7s cubic-bezier(.3, 1.5, .5, 1) both, gr-bob 1.6s ease-in-out .7s infinite; }
+.getting-ready b { font-family: "Baloo 2", var(--font); font-size: 24px; line-height: 1.15; max-width: 300px; }
+.gr-dots { display: flex; gap: 8px; }
+.gr-dots i { width: 12px; height: 12px; border-radius: 50%; background: currentColor; animation: gr-dot 1s ease-in-out infinite; }
+.gr-dots i:nth-child(2) { animation-delay: .15s; } .gr-dots i:nth-child(3) { animation-delay: .3s; }
+@keyframes gr-drop { 0% { transform: translateY(-120px) scale(.6); opacity: 0; } 70% { transform: translateY(6px) scale(1.06, .94); opacity: 1; } 100% { transform: none; } }
+@keyframes gr-bob { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-6px) rotate(-3deg); } }
+@keyframes gr-dot { 0%, 100% { transform: translateY(0); opacity: .35; } 50% { transform: translateY(-7px); opacity: 1; } }
+
+/* Savage 5 stars: shocked Remy jolts */
+.goodbye-face.shocked { animation: shock-jolt .6s cubic-bezier(.3, 1.8, .5, 1) .2s both; }
+@keyframes shock-jolt { 0% { transform: scale(.9); } 40% { transform: translateY(-14px) scale(1.15); } 100% { transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .mode-bar .face, .gr-face, .gr-dots i, .goodbye-face.shocked { animation: none !important; }
+}
+
+/* goodbye card: sticker icons instead of emoji */
+.recap-item { display: inline-flex; align-items: center; gap: 6px; font-family: "Baloo 2", var(--font); font-weight: 700; font-size: 22px; }
+.recap-item svg { width: 30px; height: 30px; flex: none; transform: rotate(-6deg); filter: drop-shadow(1.5px 1.5px 0 rgba(0,0,0,.25)); }
+.recap-item:nth-child(2) svg { transform: rotate(5deg); }
+
+/* Remy's faces may glow/steam a little past their box (no hard edge on the halo glow) */
+.hero-face, .mode-bar .face, .goodbye-face, .gr-face, .dialog-face, .cook-face { overflow: visible; }

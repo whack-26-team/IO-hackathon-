@@ -149,6 +149,7 @@ export function createTimers(container, emit, beep = () => {}) {
     // the receipt rips off the rail and flutters away, then it's gone
     const el = t.el;
     ripEffects(el);
+    beep("rip");
     el.classList.add("rip");
     const gone = () => el.remove();
     el.addEventListener("animationend", (e) => { if (e.animationName === "rip") gone(); });
