@@ -218,6 +218,7 @@ async function stopCooking(expectReply = false) {
   // Automatic completion can fire before Remy's last sentence starts. Wait for that sentence
   // and then for the goodbye before replacing the cook screen with the review.
   if (wasLive && remy) await waitForVoice(remy, state.lastStatus?.status, expectReply);
+  remy?.send("ending"); // stop fresh camera prompts while Remy says his final line
   const bye = goodbyeFor();
   // send() returns false if real Remy isn't connected: the phone says the line instead.
   if (wasLive && remy && remy.send("goodbye", { text: bye.text }) === true) {
@@ -252,7 +253,7 @@ const LESSON_GOODBYE = { face: "f-proud", text: "Lesson complete. Keep practisin
 const SAVAGE_FIVE = { face: "f-shock", text: "Fine. FINE. That was actually decent. Don't tell anyone." };
 const goodbyeFor = () => stats.lesson ? LESSON_GOODBYE
   : state.mode === "savage" && recapStars() === 5 ? SAVAGE_FIVE : (GOODBYES[state.mode] || GOODBYES.honest);
-const GOODBYE_MS = 8000; // long enough for Remy to say it and to read the recap
+const GOODBYE_MS = 8000; // starts only after Remy finishes speaking
 
 // Pretend Remy has no voice of his own, so the phone reads the goodbye (Stop was a tap, so iOS allows it)
 function sayLocally(text) {
@@ -267,7 +268,7 @@ function sayLocally(text) {
       u.voice = voices.find((v) => /daniel|arthur|oliver|uk english male|george|harry/i.test(v.name) && /en.GB/i.test(v.lang))
         || voices.find((v) => /en.GB/i.test(v.lang)) || null;
       u.rate = state.mode === "savage" ? 1.1 : state.mode === "gentle" ? 0.95 : 1;
-      const timeout = setTimeout(resolve, 12000);
+      const timeout = setTimeout(() => { speechSynthesis.cancel(); resolve(); }, 20000);
       u.onend = u.onerror = () => { clearTimeout(timeout); resolve(); };
       speechSynthesis.speak(u);
     } catch { resolve(); }
@@ -699,7 +700,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
       `camera   ${state.cameraInfo ? `${state.cameraInfo.label} ${state.cameraInfo.width}x${state.cameraInfo.height} zoom ${state.cameraInfo.zoom} (${state.cameraInfo.tried})${state.cameraInfo.zoomed ? " zoomed to 1x" : ""}${state.cameraInfo.retried ? " RETRIED (was black)" : ""} track ${state.stream?.getVideoTracks()[0]?.readyState || "-"}` : "not started"}`,
-      `version  v134`,
+      `version  v136`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
@@ -862,7 +863,6 @@ $("idle-stay").addEventListener("click", keepRemy);
 // stay. Coming back shows "Wake Remy up" (a tap is needed anyway for the mic and sound on iPhone).
 function pauseRemy() {
   try { speechSynthesis.cancel(); } catch { /* no voice */ }
-  pendingStop?.stop(); pendingStop = null;   // the goodbye, if he was mid-goodbye
   if (!state.cooking || !state.remy) return;
   const remy = state.remy; state.remy = null;
   try { remy.stop(); } catch { /* already stopped */ }
@@ -899,18 +899,3 @@ $("paused-go").addEventListener("click", wakeRemy);
 $("paused-stop").addEventListener("click", () => stopCooking());
 document.addEventListener("visibilitychange", () => { if (document.hidden) pauseRemy(); });
 addEventListener("pagehide", pauseRemy);
-
-// ---------- Savage heckles: insults even without a mistake ----------
-// Every 60-100 s in Savage, when nothing else is happening (Remy quiet for 15 s, no alert, not
-// paused or about to hang up), the app asks Remy for one short jab. Shown as a roast, not counted.
-const heckle = { next: 0, lastSpoke: 0 };
-const HECKLE_TEST = Number(new URLSearchParams(location.search).get("heckle")) || 0;   // ?heckle=8: every ~8 s (testing)
-const scheduleHeckle = () => { heckle.next = Date.now() + (HECKLE_TEST ? HECKLE_TEST * 1000 : 60000 + Math.random() * 40000); };
-setInterval(() => {
-  if (!state.cooking || !state.remy || state.mode !== "savage" || state.paused || alertShowing() || idle.warned) { scheduleHeckle(); return; }
-  if (state.lastStatus?.status === "remy-speaking") { heckle.lastSpoke = Date.now(); return; }
-  if (!heckle.next) scheduleHeckle();
-  if (Date.now() < heckle.next || Date.now() - heckle.lastSpoke < (HECKLE_TEST ? 1000 : 15000)) return;
-  scheduleHeckle();
-  state.remy.send("heckle");
-}, 1000);

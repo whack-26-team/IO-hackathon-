@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { createActions } from './actions.js';
 import { createVision } from './vision.js';
 import { createElevenLabsRemy, prefetchBrain } from './elevenlabs.js';
+import { isWakeCall } from './wake.js';
 const tools = JSON.parse(await readFile(new URL('../../remy-brain/actions.json', import.meta.url), 'utf8')).tools;
 const core = await readFile(new URL('../../remy-brain/instructions.md', import.meta.url), 'utf8');
 const recipe = { id: 'example', title: 'Toast', steps: [{instruction:'Wait',timer:{label:'Toast',minutes:2,check_at:1}}, {instruction:'Move tray into oven'}] };
@@ -71,7 +72,7 @@ function visionFixture(response, { mode = 'honest', activeRecipe = recipe } = {}
   const vision=createVision({video:{videoWidth:1280,videoHeight:720,readyState:2},canvas:{getContext:()=>({drawImage(){}}),toDataURL:()=> 'data:image/jpeg;base64,abc'},
     request:async(...args)=>{requests.push(args);return response(...args);},actions:{currentStep:()=>activeRecipe.steps[0],snapshot:()=>({recipe:activeRecipe})},
     context:t=>context.push(t),speak:(t,u)=>speech.push({t,u}),emit:(type,data)=>events.push({type,data}),alive:()=>true,getMode:()=>mode,
-    now:()=>clock,schedule:fn=>{tasks.push(fn);return fn;},cancel:()=>{}});
+    now:()=>clock,schedule:(fn,ms)=>{fn.delay=ms;tasks.push(fn);return fn;},cancel:()=>{}});
   return {vision,tasks,events,context,speech,requests,setTime:t=>clock=t};
 }
 test('camera sends the current recipe step as an object accepted by the vision API',async()=>{
@@ -80,6 +81,7 @@ test('camera sends the current recipe step as an object accepted by the vision A
   assert.equal(f.requests[0][0],'/api/vision/look');
   assert.deepEqual(f.requests[0][1].step,recipe.steps[0]);
   assert.equal(typeof f.requests[0][1].step,'object');
+  assert.equal(f.tasks[0].delay,2200, 'next picture follows after 2.2 seconds');
   f.vision.stop();
 });
 test('camera safety is immediate, and repeated frames do not repeat ordinary warnings',async()=>{
@@ -91,15 +93,26 @@ test('camera safety is immediate, and repeated frames do not repeat ordinary war
   urgent.vision.start(); await tick();
   assert.equal(urgent.events[0].type,'alert'); assert.equal(urgent.speech[0].u,true); urgent.vision.stop();
 });
-test('Savage jabs at an ordinary visible salad without calling it a mistake; lessons stay quiet',async()=>{
+test('ordinary camera frames stay quiet in Savage and lessons',async()=>{
   const picture=async()=>({summary:'A salad on a board',observations:['lettuce and tomato visible'],can_see_cooking:true,issues:[],safety:''});
   const cook=visionFixture(picture,{mode:'savage'});
   cook.vision.start(); await tick(); await cook.tasks.shift()();
-  assert.equal(cook.speech.length,1); assert.match(cook.speech[0].t,/SAVAGE SCENE/);
+  assert.equal(cook.speech.length,0);
   assert.equal(cook.events.filter(e=>e.type==='roast').length,0);
   cook.vision.stop();
   const lesson=visionFixture(picture,{mode:'savage',activeRecipe:{...recipe,lesson:true}});
   lesson.vision.start(); await tick(); assert.equal(lesson.speech.length,0); lesson.vision.stop();
+});
+test('camera asks for a better view once until the view recovers',async()=>{
+  const f=visionFixture(async()=>({summary:'No pan visible',can_see_cooking:false,camera_tip:'Point at the hob',issues:[],safety:''}));
+  f.vision.start(); await tick(); f.setTime(60000); await f.tasks.shift()();
+  assert.equal(f.speech.length,1);
+  f.vision.stop();
+});
+test('a standalone call wakes Remy but a named request stays a request',()=>{
+  assert.equal(isWakeCall('Remy?'),true);
+  assert.equal(isWakeCall('Hey, Remy!'),true);
+  assert.equal(isWakeCall('Remy, how long is left?'),false);
 });
 test('late camera response is discarded after stop, and stale analysis does not drive action',async()=>{
   let finish; const f=visionFixture(()=>new Promise(r=>finish=r));
@@ -108,14 +121,34 @@ test('late camera response is discarded after stop, and stale analysis does not 
   stale.vision.start(); await tick(); assert.equal(stale.speech.length,0); assert.match(stale.context[0],/STALE/); stale.vision.stop();
 });
 function voiceFixture(start, stream) {
-  let options, closed=0, clock=10000; const events=[],sent=[],context=[],tasks=[];
+  let options, closed=0, clock=10000; const events=[],sent=[],context=[],tasks=[],micMuted=[];
   const page=new EventTarget(); page.hidden=false;
-  const session={endSession:async()=>{closed++;},sendContextualUpdate:t=>context.push(t),sendUserMessage:t=>sent.push(t)};
+  const session={endSession:async()=>{closed++;},sendContextualUpdate:t=>context.push(t),sendUserMessage:t=>sent.push(t),setMicMuted:value=>micMuted.push(value)};
   const remy=createElevenLabsRemy({page,stream,now:()=>clock, schedule:(fn,ms)=>{const t={fn,ms};tasks.push(t);return t;},cancel:t=>{if(t)t.cancelled=true;},
     fetcher:async()=>({ok:true,json:async()=>brain}),loadSDK:async()=>({Conversation:{startSession:async o=>{options=o;return start?start(session,o):session;}}})});
   for(const type of ['status','timer_start','tip']) remy.on(type,data=>events.push({type,data}));
-  return {remy,page,events,sent,context,tasks,get options(){return options;},get closed(){return closed;},setTime:t=>clock=t};
+  return {remy,page,events,sent,context,tasks,micMuted,get options(){return options;},get closed(){return closed;},setTime:t=>clock=t};
 }
+test('wake call is one reply and the mic is muted while Remy speaks',async()=>{
+  const f=voiceFixture(); await f.remy.start();
+  f.options.onMessage({source:'user',message:'Hey Remy?'});
+  assert.match(f.context.at(-1),/Yes, chef\?/);
+  f.options.onModeChange({mode:'speaking'});
+  f.options.onMessage({source:'user',message:'Remy'});
+  assert.deepEqual(f.micMuted,[true]);
+  assert.equal(f.context.filter(x=>x.includes('[WAKE CALL]')).length,1);
+  f.options.onModeChange({mode:'listening'});
+  assert.deepEqual(f.micMuted,[true,false]);
+  await f.remy.stop();
+});
+test('ending stops background prompts but lets the goodbye finish',async()=>{
+  const f=voiceFixture(); await f.remy.start();
+  assert.equal(f.remy.send('ending'),true);
+  assert.equal(f.remy.send('say',{text:'A random extra line'}),false);
+  assert.equal(f.remy.send('goodbye',{text:'Bye, chef.'}),true);
+  assert.equal(f.sent.length,1); assert.match(f.sent[0],/GOODBYE/);
+  await f.remy.stop();
+});
 test('runtime full brain and client tool are delivered; timer expiry triggers spoken instruction',async()=>{
   const f=voiceFixture(); await f.remy.start();
   assert.ok(f.options.dynamicVariables.session_brain.startsWith(core));
