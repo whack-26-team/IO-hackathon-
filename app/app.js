@@ -316,7 +316,7 @@ $("goodbye").addEventListener("click", backToStart);
 // Timer sounds: with real Remy, he says the reminder out loud ("taste one now"), so the
 // "check" and "done" beeps are skipped (Ahmed's request on #10). Pretend Remy keeps the beeps.
 // The cards still turn yellow/red, and the safety-alert sound always plays.
-const timerSound = (kind) => { if (state.live && (kind === "check" || kind === "done")) return; beep(kind); };
+const timerSound = (kind) => { if (state.live && kind === "check") return; beep(kind); };   // "done" always beeps
 const timers = createTimers($("timers"), (type, data) => {
   if (type === "timer_done") stats.timersDone++;
   fire(type, data);
@@ -707,7 +707,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
       `camera   ${state.cameraInfo ? `${state.cameraInfo.label} ${state.cameraInfo.width}x${state.cameraInfo.height} zoom ${state.cameraInfo.zoom} (${state.cameraInfo.tried})${state.cameraInfo.zoomed ? " zoomed to 1x" : ""}${state.cameraInfo.retried ? " RETRIED (was black)" : ""} track ${state.stream?.getVideoTracks()[0]?.readyState || "-"}` : "not started"}`,
-      `version  v138`,
+      `version  v139`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
