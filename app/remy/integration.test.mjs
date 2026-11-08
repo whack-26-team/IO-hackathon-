@@ -15,9 +15,11 @@ function actionFixture(options={}, initialRecipe=recipe) {
   actions.configure({...brain,recipe:initialRecipe});
   return {actions,events};
 }
-test('agent prompt carries only the voice instructions; the core rules come once, from the server', async()=> {
+test('agent prompt keeps one voice and receives core rules once from the server', async()=> {
   const prompt=await readFile(new URL('./agent-prompt.md',import.meta.url),'utf8');
-  assert.ok(prompt.includes('{{session_brain}}')); assert.ok(prompt.includes('<Savage>')); assert.ok(prompt.includes('remy_action'));
+  assert.ok(prompt.includes('{{session_brain}}')); assert.ok(prompt.includes('remy_action'));
+  assert.ok(prompt.includes('single selected voice'));
+  assert.ok(!prompt.includes('<Savage>'));
   // the core rules must not be repeated in the dashboard prompt (they'd be paid for twice on every reply)
   assert.ok(!prompt.includes(core.split('\n').find(l=>l.startsWith('# ')))); assert.ok(!prompt.includes('## Order of priorities'));
 });
