@@ -102,11 +102,25 @@ test('knife steps send a clearer frame without changing ordinary photo size',asy
 test('camera safety is immediate, and repeated frames do not repeat ordinary warnings',async()=>{
   const f=visionFixture(async()=>({summary:'pan',issues:[{type:'burning',confidence:0.9,detail:'black edges'}],safety:''}));
   f.vision.start(); await tick(); await f.tasks.shift()();
-  // an unchanged second frame is not re-sent to Remy (saves voice tokens)
-  assert.equal(f.speech.length,1); assert.equal(f.context.length,1); f.vision.stop();
+  f.setTime(65000); await f.tasks.shift()();
+  // One continuing mistake does not become a new roast after the old 30-second cooldown.
+  assert.equal(f.speech.length,1); assert.equal(f.context.length,2); f.vision.stop();
   const urgent=visionFixture(async()=>({safety:'Smoke from oil',issues:[]}));
   urgent.vision.start(); await tick();
   assert.equal(urgent.events[0].type,'alert'); assert.equal(urgent.speech[0].u,true); urgent.vision.stop();
+});
+test('a new mistake needs two clear frames; a step completion is announced once',async()=>{
+  let issues=[{type:'burning',confidence:0.9,detail:'black edges'}], done=true;
+  const f=visionFixture(async()=>({summary:'pan',issues,safety:'',step_done:done}));
+  f.vision.start(); await tick();
+  issues=[]; done=false; await f.tasks.shift()();
+  issues=[{type:'burning',confidence:0.9,detail:'black edges'}]; done=true; await f.tasks.shift()();
+  assert.equal(f.speech.filter(x=>x.t.includes('[CAMERA EVENT]')).length,1);
+  assert.equal(f.speech.filter(x=>x.t.includes('[POSSIBLE STEP COMPLETE]')).length,1);
+  issues=[]; done=false; await f.tasks.shift()(); await f.tasks.shift()();
+  issues=[{type:'burning',confidence:0.9,detail:'new black edges'}]; await f.tasks.shift()();
+  assert.equal(f.speech.filter(x=>x.t.includes('[CAMERA EVENT]')).length,2);
+  f.vision.stop();
 });
 test('ordinary camera frames stay quiet in Savage and lessons',async()=>{
   const picture=async()=>({summary:'A salad on a board',observations:['lettuce and tomato visible'],can_see_cooking:true,issues:[],safety:''});
@@ -159,8 +173,8 @@ test('the cook can interrupt while Remy speaks',async()=>{
 test('Savage gets an immediate food jab without changing the other greetings',async()=>{
   const f=voiceFixture(null,null,'savage'); await f.remy.start();
   assert.equal(f.options.dynamicVariables.remy_opening,FIRST_MESSAGES.savage);
-  assert.match(FIRST_MESSAGES.savage,/sad salad/);
-  assert.doesNotMatch(FIRST_MESSAGES.gentle,/sad salad/);
+  assert.match(FIRST_MESSAGES.savage,/bloody salad/);
+  assert.doesNotMatch(FIRST_MESSAGES.gentle,/bloody salad/);
   await f.remy.stop();
 });
 test('ending stops background prompts but lets the goodbye finish',async()=>{
