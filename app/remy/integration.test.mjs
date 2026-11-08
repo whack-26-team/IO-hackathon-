@@ -369,3 +369,21 @@ test('a pasta packet the camera read can supply the timer length (packet wins)',
   a.notePacket({ shape: 'penne', minutes: 10 });
   assert.equal((await a.call('start_timer', { id: 'p', label: 'Penne', minutes: 10 })).ok, true);    // printed on the packet
 });
+
+test('lessons: two camera frames showing the step done move on without the cook saying it', async () => {
+  const lesson = { id: 'lesson-x', title: 'L', lesson: true, steps: [{ instruction: 'A', done_when: 'a' }, { instruction: 'B', done_when: 'b' }] };
+  const a = createActions({ emit: () => {}, request: async () => ({}), alive: () => true });
+  a.configure({ tools: [], recipe: lesson });
+  const speech = [], tasks = []; let clock = 1000;
+  const canvas = { getContext: () => ({ drawImage() {} }), toDataURL: () => 'data:image/jpeg;base64,abc' };
+  const vision = createVision({ video: { videoWidth: 1280, videoHeight: 720, readyState: 2 }, canvas,
+    request: async () => ({ summary: 'done', can_see_cooking: true, issues: [], safety: '', step_done: true }), actions: a,
+    context: () => {}, speak: (t) => speech.push(t), emit: () => {}, alive: () => true, getMode: () => 'honest',
+    now: () => clock, schedule: (fn) => { tasks.push(fn); return fn; }, cancel: () => {} });
+  vision.start(); await tick();
+  assert.equal(a.snapshot().current_step, 0);           // one frame isn't enough
+  await tasks.shift()();
+  assert.equal(a.snapshot().current_step, 1);           // second frame: moved to step 2 by itself
+  assert.ok(speech.some((t) => t.startsWith('[STEP DONE ON CAMERA]')));
+  vision.stop();
+});

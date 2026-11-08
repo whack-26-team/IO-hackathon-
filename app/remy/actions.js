@@ -308,6 +308,13 @@ export function createActions({ emit, request, alive, now = Date.now }) {
   return {
     call, hear, autoRecipe,
     cameraEvent(issue) { cameraIssue = { issue, at: now() }; },
+    // Lessons: the camera saw the step's done_when -> move on without waiting for the cook to say so.
+    // Returns { step, finished } (step = the new 1-based step number).
+    cameraStepDone() {
+      if (!recipe?.lesson || step >= recipe.steps.length) return null;
+      goToStep(step + 1);
+      return { step: Math.min(step + 1, recipe.steps.length), finished: step >= recipe.steps.length };
+    },
     notePacket(p) { if (p?.shape) packet = { shape: p.shape, minutes: p.minutes || null, at: now() }; },
     // The camera saw a mistake and Remy answered without a roast/tip: returns the issue once (then forgets it)
     takeUnhandledCamera(maxAge = 20000) { const c = cameraIssue; cameraIssue = null; return c && now() - c.at < maxAge ? c.issue : null; },

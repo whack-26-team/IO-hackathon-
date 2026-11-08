@@ -42,7 +42,7 @@
   ],
   "steps": [
     {
-      "instruction": "Chop the tomatoes into small pieces first. Keep your fingertips tucked and clear of the blade.",
+      "instruction": "Prep first, before any heat: rinse the tomatoes and spinach, then cut the tomatoes into small pieces on a board. Keep your fingertips tucked and clear of the blade.",
       "looks_right": [
         "tomatoes cut into small pieces on a stable board",
         "guiding fingertips tucked away from the cutting edge"
@@ -51,7 +51,7 @@
         "whole tomatoes still on the board",
         "fingertips visibly ahead of or under the cutting edge (safety alert first)"
       ],
-      "done_when": "All four tomatoes are chopped into small pieces and the knife is set down."
+      "done_when": "All the tomatoes are cut into small pieces and the spinach is rinsed and ready."
     },
     {
       "instruction": "Bring about 2 litres of water to a rolling boil in a large pot, then add the pasta salt.",

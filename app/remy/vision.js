@@ -1,6 +1,6 @@
 // Owner: Ahmed. One request at a time; stale pictures cannot revive an old session.
 export function createVision({ video, canvas, request, actions, context, speak, emit, alive, now = Date.now, schedule = setTimeout, cancel = clearTimeout }) {
-  let running = false, timer, failures = 0, generation = 0, seen = new Map(), doneAnnounced = false, cameraSetupAsked = false;
+  let running = false, timer, failures = 0, generation = 0, seen = new Map(), doneAnnounced = false, cameraSetupAsked = false, doneStreak = 0;
   let lastStepKey = null, activeIssues = new Set(), missingIssueFrames = new Map();
   let lastKey = null, lastSent = 0; // last camera note sent to Remy (see below)
   const recent = (key, interval) => { const last = seen.get(key); if (last !== undefined && now() - last < interval) return true; seen.set(key, now()); return false; };
@@ -15,7 +15,7 @@ export function createVision({ video, canvas, request, actions, context, speak, 
       const step = actions.currentStep();
       const state = actions.snapshot?.();
       const stepKey = JSON.stringify([state?.recipe?.id, state?.current_step, step?.instruction]);
-      if (stepKey !== lastStepKey) { lastStepKey = stepKey; doneAnnounced = false; }
+      if (stepKey !== lastStepKey) { lastStepKey = stepKey; doneAnnounced = false; doneStreak = 0; }
       // A knife step needs a little more detail to distinguish a tucked claw grip from a fingertip in the blade's path.
       const knifeStep = /\b(knife|chop\w*|slic\w*|dic\w*|cut\w*|minc\w*|julienne|claw grip)\b/i.test(JSON.stringify(step || {}));
       const scale = Math.min(1, (knifeStep ? 640 : 512) / Math.max(video.videoWidth, video.videoHeight));
@@ -80,7 +80,15 @@ export function createVision({ video, canvas, request, actions, context, speak, 
         cameraSetupAsked = true;
         speak('[CAMERA SETUP] ' + JSON.stringify({ camera_tip: result.camera_tip }));
       }
-      if (result.step_done === true && !doneAnnounced && step) {
+      // Lessons: two photos in a row showing the step done -> the app moves on by itself (no need to say it)
+      doneStreak = result.step_done === true ? doneStreak + 1 : 0;
+      const moved = state?.recipe?.lesson && doneStreak >= 2 ? actions.cameraStepDone?.() : null;
+      if (moved) {
+        doneStreak = 0; doneAnnounced = true;
+        speak(moved.finished
+          ? '[LESSON DONE ON CAMERA] The camera saw the last step done; the app finished it. Call lesson_score now with one short comment.'
+          : `[STEP DONE ON CAMERA] The camera saw it done; the app moved to step ${moved.step}. Say "nice" in a few words, then give that step's instruction.`, false, true);
+      } else if (result.step_done === true && !doneAnnounced && step) {
         doneAnnounced = true;
         speak('[POSSIBLE STEP COMPLETE] Check the latest evidence against done_when before updating the step.');
       }
