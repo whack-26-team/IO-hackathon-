@@ -255,6 +255,28 @@
         "properties": {},
         "required": []
       }
+    },
+    {
+      "type": "function",
+      "name": "lesson_score",
+      "description": "Cooking-school lessons only: when the last step is done, give the technique a score from 1 to 10 and one short comment. Call once per lesson.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "score": {
+            "type": "integer",
+            "description": "1 to 10"
+          },
+          "comment": {
+            "type": "string",
+            "description": "One short sentence about the technique."
+          }
+        },
+        "required": [
+          "score",
+          "comment"
+        ]
+      }
     }
   ]
 }

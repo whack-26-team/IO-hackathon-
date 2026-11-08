@@ -43,6 +43,7 @@ ROOT = Path(__file__).resolve().parent.parent
 APP_DIR = ROOT / "app"
 BRAIN_DIR = ROOT / "remy-brain"
 RECIPES_DIR = BRAIN_DIR / "recipes"
+LESSONS_DIR = BRAIN_DIR / "lessons"   # cooking-school lessons (same shape as recipes, "lesson": true)
 
 load_dotenv(ROOT / "server" / ".env")
 
@@ -69,8 +70,8 @@ def _read_text(path: Path) -> str:
 
 
 def load_recipe(recipe_id: str) -> dict:
-    # Our recipes first, then ones found online earlier (cached in _imported/)
-    for folder in (RECIPES_DIR, IMPORT_DIR):
+    # Our recipes first, then cooking-school lessons, then ones found online earlier (cached in _imported/)
+    for folder in (RECIPES_DIR, LESSONS_DIR, IMPORT_DIR):
         path = folder / f"{recipe_id}.json"
         # Only allow plain file names, so nobody can ask for ../../secret
         if path.parent == folder and path.exists():
@@ -89,6 +90,14 @@ check, ask what they'd like to cook (they can also tell you what ingredients the
    If find_recipe gave a "reference" recipe, you may adapt it.
 3. create_recipe returns the checked recipe: use ITS timers (they may have been
    corrected), mention any estimates, and give the attached safe temperatures."""
+
+
+def lesson_rule(recipe: dict) -> str:
+    """Cooking school: coach a technique and score it, instead of cooking a meal."""
+    score_on = ", ".join(str(s) for s in (recipe.get("score_on") or [])[:6]) or "the technique"
+    return ("# LESSON MODE\nThis is a short technique lesson, not a meal. Coach one tip at a time and judge: "
+            f"{score_on}. When the last step is done, call lesson_score once with a score from 1 to 10 and one short "
+            "comment, and say the score. Never roast while a knife is in use; safety alerts always come first.")
 
 
 SWAP_RULE = """# MISSING AN INGREDIENT
@@ -146,6 +155,7 @@ def build_instructions(recipe: dict | None, mode: str, lite: bool = False, profi
         core,
         f"# PERSONALITY MODE: {mode.upper()}\n{personality}",
         NAME_RULE,
+        *([lesson_rule(recipe)] if recipe and recipe.get("lesson") else []),
         SWAP_RULE,
         *([profile_line(profile)] if profile_line(profile) else []),
         *([] if lite else ["# ROAST & CATCHPHRASE LIBRARY (riff on these, don't just repeat them)\n" + roast_text]),
@@ -337,6 +347,17 @@ def vision_models():
             return {"try_order": vision.candidates(client), "current": vision.key_status()["vision_model"]}
     except (vision.httpx.HTTPError, vision.VisionError) as e:
         raise HTTPException(502, f"Couldn't list Gemini models: {e}") from None
+
+
+@app.get("/api/lessons")
+def list_lessons():
+    """Cooking-school lessons (remy-brain/lessons/*.json): title, summary, what Remy scores."""
+    out = []
+    for path in sorted(LESSONS_DIR.glob("*.json")):
+        r = _read_json(path)
+        out.append({"id": r["id"], "title": r["title"], "summary": r.get("summary", ""),
+                    "steps": len(r.get("steps", [])), "score_on": r.get("score_on", [])})
+    return out
 
 
 @app.get("/api/allergens")

@@ -197,6 +197,11 @@ export function createActions({ emit, request, alive, now = Date.now }) {
           return { ok: true, ...timer, message: `Countdown started on the cooking screen. Announce it once, out loud, saying what it's for: "${announce(label, minutes)}"` };
         }
         case 'clear_recipe': return clearRecipe();
+        case 'lesson_score': {
+          const score = Math.max(1, Math.min(10, Math.round(args.score)));
+          emit('lesson_score', { score, comment: String(args.comment || '').slice(0, 200) });
+          return { ok: true, message: `Lesson score ${score}/10 shown on screen. Say it once.` };
+        }
         case 'cancel_timer': emit('timer_cancel', { id: args.id }); timers.delete(args.id); break;
         case 'update_step':
           if (!recipe || args.current_step < 0 || args.current_step >= recipe.steps.length) throw new Error('Choose a valid step from the loaded recipe.');

@@ -105,3 +105,10 @@ html[data-mode="cooking"] .cook-tools { flex-wrap: wrap; }
 .x-toggle.on { background: var(--butter); box-shadow: 2px 2px 0 var(--ink); }
 .x-setup-link { border-color: var(--ink); color: var(--ink); }
 .x-warn { display: block; color: #c0392b; font-weight: 700; }
+
+/* ---- recipes / lessons tabs ---- */
+.x-tabs { display: flex; gap: 6px; margin-bottom: 12px; background: #fff; border: 2.5px solid var(--ink); border-radius: 14px; padding: 4px; }
+.x-tab { flex: 1; border: 0; border-radius: 10px; background: transparent; color: var(--ink); font-weight: 800; font-size: 15px; padding: 8px; }
+.x-tab.on { background: var(--butter); }
+.hidden { display: none !important; }
+.x-lesson-best { padding: 0 14px; }

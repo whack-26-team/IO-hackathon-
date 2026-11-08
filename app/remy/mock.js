@@ -25,7 +25,7 @@ const AI_RECIPE = {
     note: "Steaming hot all the way through, no pink." }],
 };
 
-export function createMockRemy({ mode }) {
+export function createMockRemy({ mode, recipe: preloaded = null }) {
   const handlers = {};
   const timeouts = [];
   const emit = (type, data) => (handlers[type] || []).forEach((h) => h(data));
@@ -56,6 +56,7 @@ export function createMockRemy({ mode }) {
 
   async function loadRecipe() {
     if (useAiRecipe) return { recipe: AI_RECIPE, source: "ai", checked_by_human: false };
+    if (preloaded?.steps) return { recipe: preloaded, source: "remy", checked_by_human: !!preloaded.checked_by_human };
     const r = await (await fetch("/api/recipes/rigatoni")).json();
     return { recipe: r, source: "remy", checked_by_human: r.checked_by_human };
   }
@@ -83,6 +84,7 @@ export function createMockRemy({ mode }) {
     [26, () => emit("roast", { text: lines[2], level: 3 })],
     [34, () => emit("step", { current_step: 1, step_complete: true, next_instruction: recipe.steps[2]?.instruction })],
     [36, () => say("tip", { text: "Garlic's going too fast. Pull it off now!", severity: "urgent" })],
+    [40, () => { if (recipe?.lesson) say("lesson_score", { score: 7, comment: "Solid claw, a bit slow. Practice makes dinner." }); }],
   ];
 
   return {
