@@ -230,7 +230,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .no-recipe { text-align: center; font-size: 17px; font-weight: 700; padding: 14px; animation: pulse 2.5s infinite; }
 .recipe { max-height: 32dvh; overflow: auto; }
 .recipe > summary { list-style: none; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px;
-  position: sticky; top: -10px; background: inherit; padding: 2px 0 6px; }
+  /* stays on top while the panel scrolls: solid, full width, above the steps (z-index) */
+  position: sticky; top: -10px; z-index: 2; background: var(--ink); margin: -10px -14px 0; padding: 12px 14px 6px;
+  border-radius: 16px 16px 0 0; box-shadow: 0 6px 6px -4px rgba(0, 0, 0, .6); }
 .recipe > summary::-webkit-details-marker { display: none; }
 .recipe-title { font-weight: 800; font-size: 17px; flex: 1 1 100%; }
 .step-summary { font-weight: 800; color: var(--butter); }
