@@ -231,7 +231,7 @@ const timers = createTimers($("timers"), (type, data) => {
 
 // ---------- session recap (shown on the goodbye screen) ----------
 let stats;
-function resetStats() { stats = { timers: new Set(), timersDone: 0, alerts: 0, roasts: 0, stepsDone: 0, recipe: null, highlights: [] }; }
+function resetStats() { stats = { timers: new Set(), timersDone: 0, alerts: 0, roasts: 0, stepsDone: 0, recipe: null, highlights: [], plate: null }; }
 // Best moments of the session (roasts, safety saves, timers) for the highlights reel. Text only.
 function highlight(kind, text) { if (text && stats.highlights.length < 30) stats.highlights.push({ kind, text: String(text).slice(0, 160) }); }
 resetStats();
@@ -241,6 +241,8 @@ function recapScore() {
   const steps = state.recipe?.steps?.length || 0;
   let score = 7 + (stats.timersDone > 0 ? 1 : 0) + (steps && stats.stepsDone >= steps / 2 ? 1 : 0)
     - Math.min(stats.roasts, 3) - Math.min(stats.alerts, 2) * 1.5;
+  score = Math.max(1, Math.min(10, score));
+  if (stats.plate) score = (score + stats.plate) / 2;   // "Rate my plate" counts for half
   return Math.max(1, Math.min(10, Math.round(score)));
 }
 const SCORE_LINES = {
@@ -250,7 +252,7 @@ const SCORE_LINES = {
 };
 function statsSummary() {
   return { dish: stats.recipe, timers: stats.timers.size, timersDone: stats.timersDone, alerts: stats.alerts,
-    roasts: stats.roasts, stepsDone: stats.stepsDone, score: recapScore(), highlights: [...stats.highlights] };
+    roasts: stats.roasts, stepsDone: stats.stepsDone, plate: stats.plate, score: recapScore(), highlights: [...stats.highlights] };
 }
 // Score card: dish, big score, Remy's line, one small icon row
 function renderRecap() {
@@ -261,6 +263,7 @@ function renderRecap() {
   $("recap-line").textContent = sentence.replace(/^\d+\/10\.\s*/, "");
   $("recap-score").textContent = sentence;
   const items = [["⏱", stats.timers.size, "timers"], ["🛟", stats.alerts, "safety saves"], ["🔥", stats.roasts, "roasts"]];
+  if (stats.plate) items.push(["🍽", `${stats.plate}/10`, "plate score"]);
   $("recap").replaceChildren(...items.map(([icon, n, label]) => {
     const s = Object.assign(document.createElement("span"), { className: "recap-item", textContent: `${icon} ${n}` });
     s.title = `${n} ${label}`; s.setAttribute("aria-label", `${n} ${label}`);
@@ -522,7 +525,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v94`,
+      `version  v95`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
@@ -544,7 +547,14 @@ const remyApp = {
     return true;
   },
   setMode,
-  say(text) { showBubble({ text, severity: "info" }); if (!state.live) sayLocally(text); },
+  // Show a Remy bubble; with { voice: true } he also says it (real Remy in his own voice, else the phone's)
+  say(text, { voice = false } = {}) {
+    showBubble({ text, severity: "info" });
+    if (!state.live) sayLocally(text);
+    else if (voice) state.remy?.send("say", { text });
+  },
+  // Rate my plate result: counts for half the final score and is a highlight
+  setPlate(score, verdict) { if (score) { stats.plate = score; highlight("plate", verdict); } },
   openSheet(el) {
     const host = $("slot-sheets");
     const backdrop = Object.assign(document.createElement("div"), { className: "sheet-backdrop" });

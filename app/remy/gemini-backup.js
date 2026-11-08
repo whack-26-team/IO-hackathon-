@@ -130,6 +130,7 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', video, canvas
       if (!active) return false;
       if (type === 'mode_changed' && ['gentle', 'honest', 'savage'].includes(data.mode)) { mode = data.mode; return true; }
       if (type === 'goodbye' && typeof data.text === 'string') { say(data.text); return true; }
+      if (type === 'say' && typeof data.text === 'string') { say(data.text); return true; }
       if (['timer_check', 'timer_done'].includes(type) && typeof data.id === 'string') {
         const event = actions.timerEvent(type, data);
         turn('', `[${type === 'timer_done' ? 'TIMER DONE' : 'TIMER CHECK'}] ${JSON.stringify(event)}`);
