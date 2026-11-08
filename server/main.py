@@ -9,7 +9,6 @@ What it does:
   * POST /api/recipes/ai     -> safety-check a recipe Remy wrote itself (create_recipe)
   * POST /api/chat           -> backup Remy: Gemini writes his reply when ElevenLabs is down
   * GET  /api/qr?text=       -> QR code (SVG) for one of REMY's own links (judge page)
-  * POST /api/vision/plate   -> rate my plate: score + one-line verdict from a photo
   * GET  /api/recipes/{id}   -> one full recipe
   * POST /api/brain          -> Remy's instructions + actions for ANY voice route
   * POST /api/session        -> a short-lived pass for the live OpenAI call,
@@ -321,22 +320,6 @@ def chat_reply(req: ChatRequest, request: Request):
                           caller=caller.strip())
     except chat.ChatError as e:
         raise HTTPException(e.status, e.message) from None
-
-
-class PlateRequest(BaseModel):
-    image: str                       # photo of the finished plate (JPEG, base64 or data: URL)
-    dish: str = ""
-    mode: str = "honest"
-
-
-@app.post("/api/vision/plate")
-def vision_plate(req: PlateRequest, request: Request):
-    """Rate my plate: score 1-10 on looks only, plus a one-line verdict in Remy's attitude."""
-    caller = (request.headers.get("x-forwarded-for") or (request.client.host if request.client else "?")).split(",")[0]
-    try:
-        return vision.rate_plate(req.image, req.dish, req.mode, caller=caller.strip() + ":plate")
-    except vision.VisionError as e:
-        raise HTTPException(e.status, str(e)) from None
 
 
 @app.get("/api/vision/models")
