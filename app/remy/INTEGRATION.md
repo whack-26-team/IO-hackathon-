@@ -26,8 +26,11 @@ rules are **not** repeated there: the server sends the latest ones at the start 
 duplicate rules were removed. That is a character count, not a measured credit saving.
 The source-only HTML comment at the top of `agent-prompt.md` is not in the dashboard.
 If you edit either copy, keep the other in step.
-The dashboard's first message is "Hey, I'm Remy. What are we making or practising today?" so it fits
-both cooking and lessons. The agent's First message override is off, so the app does not replace it.
+The dashboard's first message is `{{remy_opening}}`. The app sends a short greeting for each
+mode as a dynamic variable, including an immediate food jab in Savage. Dashboard previews
+fall back to the Honest greeting. First message override stays off; the message is personalized
+through a dynamic variable. The first message is interruptible, and the app keeps the mic open
+while Remy speaks so the cook can cut in.
 
 The published agent uses Realtime Mini and Oliver - Clean, British and Steady as its only voice.
 Gentle, Honest and Savage change delivery, not voice. Lessons use a neutral coaching mode and hide
