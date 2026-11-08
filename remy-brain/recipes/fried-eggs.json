@@ -1,0 +1,69 @@
+{
+  "id": "fried-eggs",
+  "title": "Fried eggs",
+  "summary": "Crispy edges, runny yolk, about 5 minutes.",
+  "aliases": [
+    "fried eggs",
+    "fried egg",
+    "sunny side up",
+    "sunny side up eggs",
+    "egg on toast fried",
+    "fried egg on toast"
+  ],
+  "source": "Written for REMY by Claude, timers from cook-times.json (eggs). Waiting for Matthew's review.",
+  "checked_by_human": false,
+  "serves": 1,
+  "total_minutes": 6,
+  "equipment": [
+    "Non-stick frying pan",
+    "Spatula",
+    "Small bowl"
+  ],
+  "notes": "Runny yolks are a personal choice. For anyone vulnerable (pregnant, elderly, very young, unwell), cook until yolk and white are firm: see food-safety.json. For a firm yolk, cover the pan for the last minute or flip the egg ('over hard').",
+  "ingredients": [
+    "2 eggs",
+    "1 tbsp oil or butter",
+    "Pinch of salt and black pepper",
+    "Toast to serve (optional)"
+  ],
+  "steps": [
+    {
+      "instruction": "Heat the oil in the frying pan on medium heat.",
+      "looks_right": [
+        "oil shimmering, moving easily when the pan is tilted"
+      ],
+      "looks_wrong": [
+        "oil smoking (too hot: take the pan off for a moment)"
+      ],
+      "done_when": "The oil shimmers."
+    },
+    {
+      "instruction": "Crack each egg into a small bowl first, then slide it gently into the pan.",
+      "looks_right": [
+        "the white turning opaque at the edges straight away",
+        "yolk whole and round"
+      ],
+      "looks_wrong": [
+        "shell in the egg (scoop it out with a bigger bit of shell)",
+        "white spitting and browning fast (heat too high)"
+      ],
+      "timer": {
+        "label": "Fried eggs",
+        "minutes": 3,
+        "check_at": 2.5,
+        "from": "eggs/fried_sunny_side_up"
+      },
+      "done_when": "The white is fully set with no clear, jelly-like bits near the yolk, and the edges are lightly golden."
+    },
+    {
+      "instruction": "Season, then lift the eggs out with the spatula and serve straight away.",
+      "looks_right": [
+        "set white, glossy yolk"
+      ],
+      "looks_wrong": [
+        "clear, runny white around the yolk (needs another minute)"
+      ],
+      "done_when": "On the plate."
+    }
+  ]
+}

@@ -32,6 +32,7 @@ function scoringHelp(h) {
   const ul = h("ul", "x-scoring-list", "");
   for (const [icon, text] of STAR_RULES) { const li = h("li", "", ""); li.append(sticker(icon, { fill: icon === "i-star" ? "#ffd166" : undefined }), h("span", "", text)); ul.append(li); }
   d.append(h("p", "x-note", "Up to 5 stars, one for each:"), ul,
+    h("p", "x-note", "Stop before the last step of a recipe and it's 1 star (2 if you got halfway)."),
     h("p", "x-note", "Cooking school lessons: Remy marks your technique and turns it into stars."));
   return d;
 }
