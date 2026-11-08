@@ -551,3 +551,12 @@ body.x-speaking .speech:not(.quiet):not(.roast) .cook-face { animation: talk-bob
 @media (prefers-reduced-motion: reduce) {
   .speech:not(.quiet) .bubble, body.x-speaking .speech .bubble::before, body.x-speaking .speech .cook-face, .alert-card { animation: none !important; }
 }
+
+/* idle hang-up warning: a ticket-style banner under the top bar with a big "I'm here!" */
+.idle-banner { position: absolute; z-index: 9; left: 12px; right: 12px; top: calc(66px + var(--safe-top)); display: flex; align-items: center; gap: 10px;
+  background: var(--butter); color: var(--ink); border: 3px solid var(--ink); border-radius: 16px; box-shadow: 4px 4px 0 var(--ink);
+  padding: 10px 12px; font-family: "Baloo 2", var(--font); font-weight: 700; font-size: 15px; line-height: 1.2; animation: alert-slam .35s cubic-bezier(.3, 1.7, .5, 1); }
+.idle-banner > span { flex: 1; }
+.idle-stay { flex: none; border: 2.5px solid var(--ink); border-radius: 12px; background: var(--tomato); color: var(--cream); box-shadow: 3px 3px 0 var(--ink);
+  font-family: "Baloo 2", var(--font); font-weight: 700; font-size: 17px; padding: 8px 12px; }
+.idle-stay:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }

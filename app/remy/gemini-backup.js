@@ -117,6 +117,7 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', profile = nul
   function heard(text) {
     text = (text || '').trim();
     if (!text || !active) return;
+    emit('heard', { text });   // the cook spoke (the app's idle hang-up listens for this)
     const started = actions.hear(text); // "pasta's in" starts the timer straight away
     if (started?.command) notes.push(`[APP HANDLED: ${started.command}] ${started.note} Acknowledge in five words or fewer; don't repeat it.`);
     if (started?.cleared) notes.push('[RECIPE CLEARED BY APP] The cook asked to clear the recipe; it is gone from the screen. Confirm briefly and ask what they want to cook next.');
