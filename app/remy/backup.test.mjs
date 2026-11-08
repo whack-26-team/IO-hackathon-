@@ -68,6 +68,9 @@ test('backup Remy: greets, finds the recipe, speaks, and starts the timer when t
   assert.equal(events.find(([t]) => t === 'timer_start')[1].seconds, 660);
   assert.match(calls.filter(([p]) => p === '/api/chat')[3][1].note, /TIMER STARTED BY APP/);
   assert.equal(said[3], '11-minute timer for the rigatoni pasta.');
+  speak('Remy?'); for (let i = 0; i < 4; i++) await tick();
+  assert.equal(said.at(-1), 'Yes, chef?');
+  assert.equal(calls.filter(([p]) => p === '/api/chat').length, 4, 'wake call needs no Gemini request');
   assert.equal(remy.send('goodbye', { text: 'Plate it.' }), true); await tick();
   assert.equal(said.at(-1), 'Plate it.');
   await remy.stop();

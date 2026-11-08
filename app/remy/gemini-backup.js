@@ -6,6 +6,7 @@
 // Open the app with ?backup=1 to use it straight away.
 import { createActions } from './actions.js';
 import { createVision } from './vision.js';
+import { isWakeCall } from './wake.js';
 
 export function createGeminiRemy({ recipe = null, mode = 'honest', profile = null, video, canvas,
   fetcher = fetch, now = Date.now, schedule = setTimeout, cancel = clearTimeout }) {
@@ -118,6 +119,7 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', profile = nul
     text = (text || '').trim();
     if (!text || !active) return;
     emit('heard', { text });   // the cook spoke (the app's idle hang-up listens for this)
+    if (isWakeCall(text) && !busy && !speakingNow) { void say('Yes, chef?'); return; }
     const started = actions.hear(text); // "pasta's in" starts the timer straight away
     if (started?.command) notes.push(`[APP HANDLED: ${started.command}] ${started.note} Acknowledge in five words or fewer; don't repeat it.`);
     if (started?.cleared) notes.push('[RECIPE CLEARED BY APP] The cook asked to clear the recipe; it is gone from the screen. Confirm briefly and ask what they want to cook next.');
@@ -197,7 +199,7 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', profile = nul
       if (!(globalThis.SpeechRecognition || globalThis.webkitSpeechRecognition)) {
         emit('tip', { text: "This browser can't listen for speech, so backup Remy can only watch and talk. Try Safari or Chrome.", severity: 'warning' });
       }
-      vision = createVision({ video, canvas, request, actions, emit, now, schedule, cancel, alive: () => active, getMode: () => mode,
+      vision = createVision({ video, canvas, request, actions, emit, now, schedule, cancel, alive: () => active,
         context: text => { notes.push(text); notes = notes.slice(-4); },
         speak: (text, urgent) => turn('', text) });
       vision.start();

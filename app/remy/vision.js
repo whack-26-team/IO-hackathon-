@@ -1,6 +1,6 @@
 // Owner: Ahmed. One request at a time; stale pictures cannot revive an old session.
-export function createVision({ video, canvas, request, actions, context, speak, emit, alive, getMode = () => 'honest', now = Date.now, schedule = setTimeout, cancel = clearTimeout }) {
-  let running = false, timer, failures = 0, generation = 0, seen = new Map(), previousDone = false, lastSceneJab = -Infinity;
+export function createVision({ video, canvas, request, actions, context, speak, emit, alive, now = Date.now, schedule = setTimeout, cancel = clearTimeout }) {
+  let running = false, timer, failures = 0, generation = 0, seen = new Map(), previousDone = false, cameraSetupAsked = false;
   let lastKey = null, lastSent = 0; // last camera note sent to Remy (see below)
   const recent = (key, interval) => { const last = seen.get(key); if (last !== undefined && now() - last < interval) return true; seen.set(key, now()); return false; };
   async function look() {
@@ -41,10 +41,8 @@ export function createVision({ video, canvas, request, actions, context, speak, 
         }
         return;
       }
-      let mistakeSpoken = false;
       for (const issue of result.issues || []) {
         if (issue.confidence >= 0.6 && !recent(`issue:${issue.type}`, 30000)) {
-          mistakeSpoken = true;
           actions.cameraEvent?.(issue);
           const lesson = !!actions.snapshot?.().recipe?.lesson;
           speak('[CAMERA EVENT] ' + JSON.stringify({ issue, instruction: lesson
@@ -53,14 +51,11 @@ export function createVision({ video, canvas, request, actions, context, speak, 
           break;
         }
       }
-      // Savage can heckle an ordinary visible dish without pretending it is a mistake.
-      if (!mistakeSpoken && getMode() === 'savage' && !actions.snapshot?.().recipe?.lesson &&
-          result.can_see_cooking === true && result.observations?.length && now() - lastSceneJab >= 45000) {
-        lastSceneJab = now();
-        speak('[SAVAGE SCENE] ' + JSON.stringify({ summary: result.summary, observations: result.observations.slice(0, 2),
-          instruction: 'One quick original jab about the visible food or scene, even if it is fine. No claimed mistake, no roast tool, no extra steps or timer.' }));
+      if (result.can_see_cooking === true) cameraSetupAsked = false;
+      if (result.can_see_cooking === false && result.camera_tip && !cameraSetupAsked) {
+        cameraSetupAsked = true;
+        speak('[CAMERA SETUP] ' + JSON.stringify({ camera_tip: result.camera_tip }));
       }
-      if (result.can_see_cooking === false && result.camera_tip && !recent('camera-tip', 45000)) speak('[CAMERA SETUP] ' + JSON.stringify({ camera_tip: result.camera_tip }));
       if (result.step_done === true && !previousDone && step) speak('[POSSIBLE STEP COMPLETE] Check the latest evidence against done_when before updating the step.');
       previousDone = result.step_done === true;
     } catch {

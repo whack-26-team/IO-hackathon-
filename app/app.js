@@ -699,7 +699,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
       `camera   ${state.cameraInfo ? `${state.cameraInfo.label} ${state.cameraInfo.width}x${state.cameraInfo.height} zoom ${state.cameraInfo.zoom} (${state.cameraInfo.tried})${state.cameraInfo.zoomed ? " zoomed to 1x" : ""}${state.cameraInfo.retried ? " RETRIED (was black)" : ""} track ${state.stream?.getVideoTracks()[0]?.readyState || "-"}` : "not started"}`,
-      `version  v134`,
+      `version  v135`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
@@ -899,18 +899,3 @@ $("paused-go").addEventListener("click", wakeRemy);
 $("paused-stop").addEventListener("click", () => stopCooking());
 document.addEventListener("visibilitychange", () => { if (document.hidden) pauseRemy(); });
 addEventListener("pagehide", pauseRemy);
-
-// ---------- Savage heckles: insults even without a mistake ----------
-// Every 60-100 s in Savage, when nothing else is happening (Remy quiet for 15 s, no alert, not
-// paused or about to hang up), the app asks Remy for one short jab. Shown as a roast, not counted.
-const heckle = { next: 0, lastSpoke: 0 };
-const HECKLE_TEST = Number(new URLSearchParams(location.search).get("heckle")) || 0;   // ?heckle=8: every ~8 s (testing)
-const scheduleHeckle = () => { heckle.next = Date.now() + (HECKLE_TEST ? HECKLE_TEST * 1000 : 60000 + Math.random() * 40000); };
-setInterval(() => {
-  if (!state.cooking || !state.remy || state.mode !== "savage" || state.paused || alertShowing() || idle.warned) { scheduleHeckle(); return; }
-  if (state.lastStatus?.status === "remy-speaking") { heckle.lastSpoke = Date.now(); return; }
-  if (!heckle.next) scheduleHeckle();
-  if (Date.now() < heckle.next || Date.now() - heckle.lastSpoke < (HECKLE_TEST ? 1000 : 15000)) return;
-  scheduleHeckle();
-  state.remy.send("heckle");
-}, 1000);
