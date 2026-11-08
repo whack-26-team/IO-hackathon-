@@ -47,8 +47,11 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', profile = nul
         u.lang = 'en-GB'; u.voice = pickVoice();
         u.rate = mode === 'savage' ? 1.12 : mode === 'gentle' ? 0.95 : 1.02;
         u.pitch = mode === 'savage' ? 0.9 : 1;
-        const done = () => { speakingNow = false; if (active) { status('live', blockedTries > 0 ? 'Can’t hear you: turn on Dictation' : 'Listening (backup voice)'); listen(); } resolve(); };
+        let finished = false;
+        const done = () => { if (finished) return; finished = true; clearTimeout(watchdog); speakingNow = false; if (active) { status('live', blockedTries > 0 ? 'Can’t hear you: turn on Dictation' : 'Listening (backup voice)'); listen(); } resolve(); };
         u.onend = done; u.onerror = done;
+        // if the phone blocks the line it never says "finished": don't wait forever, go back to listening
+        const watchdog = setTimeout(done, 4000 + text.length * 90);
         synth.speak(u);
       } catch { speakingNow = false; resolve(); }
     });
