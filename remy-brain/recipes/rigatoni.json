@@ -2,12 +2,22 @@
   "id": "rigatoni",
   "title": "Rigatoni with tomato & garlic",
   "summary": "A simple weeknight pasta, ready in 20 minutes. Great for the auto pasta timer.",
-  "aliases": ["rigatoni", "rigatoni with tomato", "tomato pasta", "pasta with tomato sauce", "arrabbiata", "pasta sauce"],
+  "aliases": [
+    "rigatoni",
+    "rigatoni with tomato",
+    "arrabbiata"
+  ],
   "source": "Written for REMY by Claude, timers from cook-times.json. Checked by Matthew on 2026-11-07.",
   "checked_by_human": true,
   "serves": 2,
   "total_minutes": 20,
-  "equipment": ["Large pot", "Frying pan or saucepan", "Colander", "Wooden spoon", "Mug (to save pasta water)"],
+  "equipment": [
+    "Large pot",
+    "Frying pan or saucepan",
+    "Colander",
+    "Wooden spoon",
+    "Mug (to save pasta water)"
+  ],
   "ingredients": [
     "200g dried rigatoni (or penne)",
     "2 litres water + 20g (about 1 heaped tbsp) salt",
@@ -22,14 +32,25 @@
   "steps": [
     {
       "instruction": "Fill a large pot with about 2 litres of water, cover it, and bring it to a rolling boil on high. Then add the salt.",
-      "looks_right": ["big bubbles breaking the surface all over", "lots of steam"],
-      "looks_wrong": ["only tiny bubbles on the bottom (not boiling yet)", "a small pot with too little water"],
+      "looks_right": [
+        "big bubbles breaking the surface all over",
+        "lots of steam"
+      ],
+      "looks_wrong": [
+        "only tiny bubbles on the bottom (not boiling yet)",
+        "a small pot with too little water"
+      ],
       "done_when": "The water is at a big rolling boil and salted."
     },
     {
       "instruction": "Tip in the rigatoni and stir straight away so it doesn't stick. The timer starts as soon as it goes in.",
-      "looks_right": ["pasta moving freely in the bubbling water"],
-      "looks_wrong": ["pasta clumped together or stuck to the bottom", "foam about to boil over (turn the heat down a little)"],
+      "looks_right": [
+        "pasta moving freely in the bubbling water"
+      ],
+      "looks_wrong": [
+        "pasta clumped together or stuck to the bottom",
+        "foam about to boil over (turn the heat down a little)"
+      ],
       "timer": {
         "label": "Rigatoni",
         "minutes": 11,
@@ -40,8 +61,14 @@
     },
     {
       "instruction": "While the pasta cooks, warm the olive oil in a pan on medium-low and add the sliced garlic. Keep it gentle: garlic burns fast.",
-      "looks_right": ["garlic sizzling gently in the oil", "garlic turning pale golden at the edges"],
-      "looks_wrong": ["garlic going brown or black (it'll taste bitter: start again)", "garlic frying hard and fast (heat too high: turn it down)"],
+      "looks_right": [
+        "garlic sizzling gently in the oil",
+        "garlic turning pale golden at the edges"
+      ],
+      "looks_wrong": [
+        "garlic going brown or black (it'll taste bitter: start again)",
+        "garlic frying hard and fast (heat too high: turn it down)"
+      ],
       "timer": {
         "label": "Garlic",
         "minutes": 1.5,
@@ -51,8 +78,14 @@
     },
     {
       "instruction": "Pour in the tomatoes and chilli flakes, add a pinch of salt, and let it bubble gently while the pasta finishes.",
-      "looks_right": ["gentle bubbling", "the sauce thickening and turning a deeper red"],
-      "looks_wrong": ["sauce spitting everywhere (turn it down)", "sauce catching and sticking on the bottom"],
+      "looks_right": [
+        "gentle bubbling",
+        "the sauce thickening and turning a deeper red"
+      ],
+      "looks_wrong": [
+        "sauce spitting everywhere (turn it down)",
+        "sauce catching and sticking on the bottom"
+      ],
       "timer": {
         "label": "Sauce",
         "minutes": 10,
@@ -62,14 +95,25 @@
     },
     {
       "instruction": "When the pasta timer says check, taste a piece. It should be al dente: tender with a little bite. Scoop out a mug of the pasta water, then drain the pasta.",
-      "looks_right": ["tubes holding their shape", "the bite shows no chalky white core"],
-      "looks_wrong": ["swollen, splitting or falling apart (overcooked)", "chalky white centre (needs another minute)"],
+      "looks_right": [
+        "tubes holding their shape",
+        "the bite shows no chalky white core"
+      ],
+      "looks_wrong": [
+        "swollen, splitting or falling apart (overcooked)",
+        "chalky white centre (needs another minute)"
+      ],
       "done_when": "The pasta passes the bite test and is drained, with a mug of pasta water saved. Ask the cook to bite a piece or hold one up to the camera."
     },
     {
       "instruction": "Tip the pasta into the sauce with a splash of the saved pasta water and toss well over the heat for a minute. Tear in the basil, taste, and season.",
-      "looks_right": ["glossy sauce clinging to every tube"],
-      "looks_wrong": ["watery sauce pooling at the bottom (keep tossing over the heat)", "dry, sticky pasta (add more pasta water)"],
+      "looks_right": [
+        "glossy sauce clinging to every tube"
+      ],
+      "looks_wrong": [
+        "watery sauce pooling at the bottom (keep tossing over the heat)",
+        "dry, sticky pasta (add more pasta water)"
+      ],
       "done_when": "The pasta is glossy and coated. Serve with Parmesan on top."
     }
   ]

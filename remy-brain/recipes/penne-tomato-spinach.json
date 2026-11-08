@@ -30,7 +30,14 @@
     "pasta and spinach",
     "penne with spinach",
     "penne tomato",
-    "penne with tomato"
+    "penne with tomato",
+    "tomato pasta",
+    "pasta with tomato sauce",
+    "pasta sauce",
+    "pasta with tomato",
+    "tomato sauce pasta",
+    "pasta in tomato sauce",
+    "tomato and pasta"
   ],
   "source": "Pranav's requested recipe, 2026-11-08. Pasta, sauce and spinach timers from cook-times.json; not yet kitchen-tested. Checked by Matthew on 2026-11-08.",
   "checked_by_human": true,
