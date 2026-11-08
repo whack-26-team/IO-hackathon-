@@ -1,0 +1,74 @@
+{
+  "id": "penne-tomato-spinach",
+  "title": "Penne with fresh tomato and spinach sauce",
+  "summary": "Garlic-free penne with chopped fresh tomatoes and wilted spinach.",
+  "aliases": [
+    "penne pasta with tomato and spinach sauce",
+    "penne with tomato and spinach",
+    "tomato spinach penne",
+    "fresh tomato and spinach pasta",
+    "garlic-free tomato spinach penne"
+  ],
+  "source": "Pranav's requested recipe, 2026-11-08. Pasta, sauce and spinach timers from cook-times.json; not yet kitchen-tested.",
+  "checked_by_human": false,
+  "serves": 2,
+  "total_minutes": 25,
+  "equipment": ["Chopping board", "Knife", "Large pot", "Frying pan or saucepan", "Colander", "Mug"],
+  "notes": "Chop the fresh tomatoes first. There is no garlic. The pasta packet time wins over the table's 11-minute penne default. Remy should give one step at a time and keep knife guidance plain if a hazard appears.",
+  "ingredients": [
+    "200g dried penne",
+    "4 medium ripe tomatoes (about 400g)",
+    "100g fresh spinach",
+    "1 tbsp olive oil",
+    "About 2 litres water and 20g salt for the pasta",
+    "Salt and black pepper for the sauce",
+    "Optional: chilli flakes and grated Parmesan"
+  ],
+  "steps": [
+    {
+      "instruction": "Chop the tomatoes into small pieces first. Keep your fingertips tucked and clear of the blade.",
+      "looks_right": ["tomatoes cut into small pieces on a stable board", "guiding fingertips tucked away from the cutting edge"],
+      "looks_wrong": ["whole tomatoes still on the board", "fingertips visibly ahead of or under the cutting edge (safety alert first)"],
+      "done_when": "All four tomatoes are chopped into small pieces and the knife is set down."
+    },
+    {
+      "instruction": "Bring about 2 litres of water to a rolling boil in a large pot, then add the pasta salt.",
+      "looks_right": ["large bubbles breaking across the water surface"],
+      "looks_wrong": ["water only simmering with small bubbles", "pot too small for the penne to move freely"],
+      "done_when": "The water is at a rolling boil and salted."
+    },
+    {
+      "instruction": "Add the penne and stir so it does not stick. Start its timer when the water returns to the boil; use the packet time if it differs.",
+      "timer": {"label": "Penne", "minutes": 11, "check_at": 10, "from": "pasta_dried_minutes_al_dente/penne/default"},
+      "looks_right": ["penne moving freely in boiling water"],
+      "looks_wrong": ["penne clumped together", "foam rising to the rim (turn the heat down a little)"],
+      "done_when": "The penne is in the boiling water, stirred, and its timer is running."
+    },
+    {
+      "instruction": "Warm the olive oil in a pan, add the chopped tomatoes and simmer gently. Stir and season with salt, pepper and optional chilli.",
+      "timer": {"label": "Tomato sauce", "minutes": 10, "from": "sauces/tomato_sauce_simmer"},
+      "looks_right": ["tomatoes breaking down into a thick, gently bubbling sauce"],
+      "looks_wrong": ["sauce catching on the bottom", "tomatoes still watery at the timer check (keep simmering and check texture)"],
+      "done_when": "The tomatoes have broken down and the sauce is thick enough to coat the penne; taste and adjust seasoning."
+    },
+    {
+      "instruction": "Stir the spinach into the tomato sauce until wilted.",
+      "timer": {"label": "Spinach", "minutes": 1, "from": "veg_minutes/spinach_wilt_pan"},
+      "looks_right": ["spinach leaves collapsed into the sauce"],
+      "looks_wrong": ["spinach still piled on top and unwilted"],
+      "done_when": "The spinach is wilted through the sauce."
+    },
+    {
+      "instruction": "At the penne timer check, taste a piece. When it has a little bite but no chalky centre, save a mug of pasta water and drain it.",
+      "looks_right": ["penne holding its shape", "a bitten piece has no chalky white centre"],
+      "looks_wrong": ["chalky centre (cook longer and taste again)", "penne swollen and splitting (drain promptly)"],
+      "done_when": "The cook confirms the bite is right; the penne is drained and a mug of pasta water is saved."
+    },
+    {
+      "instruction": "Toss the penne through the tomato and spinach sauce. Add a splash of saved pasta water if needed, then serve with optional Parmesan.",
+      "looks_right": ["sauce clinging to the penne without pooling at the bottom"],
+      "looks_wrong": ["dry penne (add a little saved pasta water)", "watery sauce pooling under the pasta (toss and reduce briefly)"],
+      "done_when": "The penne is evenly coated and served."
+    }
+  ]
+}
