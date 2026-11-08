@@ -69,6 +69,12 @@ export function createActions({ emit, request, alive, now = Date.now }) {
       || (live.length === 1 ? live[0] : null);
   }
   function goToStep(index) {
+    // "next" / "done" on the last step: the recipe is finished (counts for the stars)
+    if (index >= recipe.steps.length) {
+      step = recipe.steps.length;
+      emit('step', { current_step: recipe.steps.length - 1, step_complete: true, next_instruction: null });
+      return;
+    }
     step = Math.max(0, Math.min(recipe.steps.length - 1, index));
     // same shape as Remy's update_step: "step k-1 complete" moves the screen to step k
     emit('step', step === 0 ? { current_step: 0, step_complete: false, next_instruction: recipe.steps[0].instruction }
@@ -92,7 +98,11 @@ export function createActions({ emit, request, alive, now = Date.now }) {
       return done('time left', 'Time left shown on screen.');
     }
     if (!recipe) return null;
-    if (/\b(next( step)?|what'?s next|go on|done with this)\b/.test(rest)) { goToStep(step + 1); return done('next step', `Now on step ${step + 1}.`); }
+    const question = /^(is|are|has|have|how|when|what'?s? (?:about|if)|do|does|should|can|will)\b/.test(rest) || /\?\s*$/.test(rest);
+    if (/\b(next( step)?|what'?s next|go on)\b/.test(rest) || (!question && /^(?:i'?m |we'?re |all |that'?s )?(done|finished|plated)\b|\bdone with this\b/.test(rest))) {
+      goToStep(step + 1);
+      return step >= recipe.steps.length ? done('recipe finished', 'All steps done: the recipe is finished. Congratulate them in one line.') : done('next step', `Now on step ${step + 1}.`);
+    }
     if (/\b(back|previous( step)?|last step|go back)\b/.test(rest)) { goToStep(step - 1); return done('previous step', `Back to step ${step + 1}.`); }
     if (/\b(repeat|say that again|again|what('?s| is) (the|this) step|what do i do)\b/.test(rest)) {
       emit('command', { name: 'repeat', text: recipe.steps[step].instruction });

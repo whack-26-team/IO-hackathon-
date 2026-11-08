@@ -24,15 +24,15 @@ function toggles(app, key, options) {
 }
 
 // How Remy scores a cook (same rules as recapStars() in app.js). Folded away so it isn't clutter.
-const STAR_RULES = [["i-star", "Turning up: every cook gets one"], ["i-book", "Cooking a recipe (not freestyle)"],
-  ["i-check", "Getting through it: half the steps done or a timer finished"], ["i-flame", "Two roasts or fewer"], ["i-buoy", "No safety alerts"]];
+const STAR_RULES = [["i-star", "Turning up: every cook gets one"], ["i-book", "Getting through the first half of the recipe"],
+  ["i-check", "Finishing it: the last step done (say \"Remy, done\")"], ["i-flame", "Finished with two roasts or fewer"], ["i-buoy", "Finished with no safety alerts"]];
 function scoringHelp(h) {
   const d = document.createElement("details"); d.className = "x-scoring";
   const sum = h("summary", "", ""); sum.append(sticker("i-star", { fill: "#ffd166" }), document.createTextNode("How Remy scores your cooks")); d.append(sum);
   const ul = h("ul", "x-scoring-list", "");
   for (const [icon, text] of STAR_RULES) { const li = h("li", "", ""); li.append(sticker(icon, { fill: icon === "i-star" ? "#ffd166" : undefined }), h("span", "", text)); ul.append(li); }
   d.append(h("p", "x-note", "Up to 5 stars, one for each:"), ul,
-    h("p", "x-note", "Stop before the last step of a recipe and it's 1 star (2 if you got halfway)."),
+    h("p", "x-note", "Didn't finish? 2 stars at most. No recipe on screen? 2 at most (a finished timer counts)."),
     h("p", "x-note", "Cooking school lessons: Remy marks your technique and turns it into stars."));
   return d;
 }
