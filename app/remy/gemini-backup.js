@@ -12,7 +12,7 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', profile = nul
   fetcher = fetch, now = Date.now, schedule = setTimeout, cancel = clearTimeout }) {
   const handlers = {};
   const emit = (type, data) => (handlers[type] || []).forEach(h => h(data));
-  let active = false, busy = false, speakingNow = false, vision = null, recognizer = null, restartTimer;
+  let active = false, busy = false, speakingNow = false, ending = false, vision = null, recognizer = null, restartTimer;
   const history = [];              // [{role:'user'|'remy', text}]
   let notes = [];                  // app notes waiting for the next reply (camera, timers, results)
   let queued = null;               // a turn waiting while Gemini is busy
@@ -117,7 +117,7 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', profile = nul
 
   function heard(text) {
     text = (text || '').trim();
-    if (!text || !active) return;
+    if (!text || !active || ending) return;
     emit('heard', { text });   // the cook spoke (the app's idle hang-up listens for this)
     if (isWakeCall(text) && !busy && !speakingNow) { void say('Yes, chef?'); return; }
     const started = actions.hear(text); // "pasta's in" starts the timer straight away
@@ -144,7 +144,7 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', profile = nul
         mode, history: history.slice(-16), note, ...(profile ? { profile } : {}),
         ...(r?.id && !String(r.id).startsWith('ai-') ? { recipe_id: r.id } : r ? { recipe: r } : {}),
       });
-      if (!active) return;
+      if (!active || ending) return;
       if (data.say) history.push({ role: 'remy', text: data.say });
       const results = [];
       for (const a of data.actions || []) results.push({ action: a.name, result: await actions.call(a.name, a.args || {}) });
@@ -174,6 +174,8 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', profile = nul
     on(type, fn) { (handlers[type] ||= []).push(fn); },
     send(type, data = {}) {
       if (!active) return false;
+      if (type === 'ending') { ending = true; vision?.stop(); queued = null; notes = []; return true; }
+      if (ending && type !== 'goodbye') return false;
       if (type === 'mode_changed' && ['gentle', 'honest', 'savage', 'lesson'].includes(data.mode)) { mode = data.mode; return true; }
       if (type === 'goodbye' && typeof data.text === 'string') { say(data.text); return true; }
       if (type === 'say' && typeof data.text === 'string') { say(data.text); return true; }

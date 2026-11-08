@@ -71,6 +71,8 @@ test('backup Remy: greets, finds the recipe, speaks, and starts the timer when t
   speak('Remy?'); for (let i = 0; i < 4; i++) await tick();
   assert.equal(said.at(-1), 'Yes, chef?');
   assert.equal(calls.filter(([p]) => p === '/api/chat').length, 4, 'wake call needs no Gemini request');
+  assert.equal(remy.send('ending'), true);
+  assert.equal(remy.send('say', { text: 'Extra line' }), false);
   assert.equal(remy.send('goodbye', { text: 'Plate it.' }), true); await tick();
   assert.equal(said.at(-1), 'Plate it.');
   await remy.stop();

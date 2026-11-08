@@ -72,7 +72,7 @@ function visionFixture(response, { mode = 'honest', activeRecipe = recipe } = {}
   const vision=createVision({video:{videoWidth:1280,videoHeight:720,readyState:2},canvas:{getContext:()=>({drawImage(){}}),toDataURL:()=> 'data:image/jpeg;base64,abc'},
     request:async(...args)=>{requests.push(args);return response(...args);},actions:{currentStep:()=>activeRecipe.steps[0],snapshot:()=>({recipe:activeRecipe})},
     context:t=>context.push(t),speak:(t,u)=>speech.push({t,u}),emit:(type,data)=>events.push({type,data}),alive:()=>true,getMode:()=>mode,
-    now:()=>clock,schedule:fn=>{tasks.push(fn);return fn;},cancel:()=>{}});
+    now:()=>clock,schedule:(fn,ms)=>{fn.delay=ms;tasks.push(fn);return fn;},cancel:()=>{}});
   return {vision,tasks,events,context,speech,requests,setTime:t=>clock=t};
 }
 test('camera sends the current recipe step as an object accepted by the vision API',async()=>{
@@ -81,6 +81,7 @@ test('camera sends the current recipe step as an object accepted by the vision A
   assert.equal(f.requests[0][0],'/api/vision/look');
   assert.deepEqual(f.requests[0][1].step,recipe.steps[0]);
   assert.equal(typeof f.requests[0][1].step,'object');
+  assert.equal(f.tasks[0].delay,2200, 'next picture follows after 2.2 seconds');
   f.vision.stop();
 });
 test('camera safety is immediate, and repeated frames do not repeat ordinary warnings',async()=>{
@@ -138,6 +139,14 @@ test('wake call is one reply and the mic is muted while Remy speaks',async()=>{
   assert.equal(f.context.filter(x=>x.includes('[WAKE CALL]')).length,1);
   f.options.onModeChange({mode:'listening'});
   assert.deepEqual(f.micMuted,[true,false]);
+  await f.remy.stop();
+});
+test('ending stops background prompts but lets the goodbye finish',async()=>{
+  const f=voiceFixture(); await f.remy.start();
+  assert.equal(f.remy.send('ending'),true);
+  assert.equal(f.remy.send('say',{text:'A random extra line'}),false);
+  assert.equal(f.remy.send('goodbye',{text:'Bye, chef.'}),true);
+  assert.equal(f.sent.length,1); assert.match(f.sent[0],/GOODBYE/);
   await f.remy.stop();
 });
 test('runtime full brain and client tool are delivered; timer expiry triggers spoken instruction',async()=>{

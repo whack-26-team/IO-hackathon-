@@ -46,7 +46,7 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', profile =
   schedule = setTimeout, cancel = clearTimeout, onTranscript = () => {},
 } = {}) {
   const handlers = {}, pending = new Set();
-  let conversation, vision, brain, active = false, connecting = false, generation = 0;
+  let conversation, vision, brain, active = false, connecting = false, ending = false, generation = 0;
   let capTimer, queueTimer, reconnectTimer, deadline = 0, attempts = 0;
   let speaking = false, lastUserAt = 0, lastSentAt = 0, safetyUntil = 0, queue = [];
   const emit = (type, data) => (handlers[type] || []).forEach(fn => fn(data));
@@ -179,6 +179,7 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', profile =
         onMessage: ({ source, message }) => {
           if (run !== generation || !alive()) return;
           if (source === 'user') {
+            if (ending) return;
             if (speaking) return; // a late transcript of Remy's own voice is not a cook command
             if (isWakeCall(message)) context('[WAKE CALL] The cook only called your name. Reply exactly "Yes, chef?" once, then wait.');
             const started = actions.hear(message);
@@ -264,6 +265,8 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', profile =
       await connect();
     },
     send(type, data = {}) {
+      if (type === 'ending') { ending = true; vision?.stop(); queue = []; cancel(queueTimer); return true; }
+      if (ending && type !== 'goodbye') return false;
       if (type === 'servings' && Number.isFinite(data.serves)) {
         context(`[SERVINGS] Now cooking for ${data.serves}; amounts on screen are scaled. Cooking times stay the same.`);
         return true;

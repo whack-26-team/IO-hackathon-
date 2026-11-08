@@ -64,7 +64,8 @@ export function createVision({ video, canvas, request, actions, context, speak, 
       context('[CAMERA UNAVAILABLE] Do not claim to see the current pan. Ask the cook when needed.');
       if (!recent('error', 30000)) emit('tip', { text: 'Camera analysis unavailable. Voice still works; describe the pan to Remy.', severity: 'warning' });
     } finally {
-      if (running && run === generation && alive()) timer = schedule(look, Math.min(30000, 3000 * 2 ** Math.min(failures, 3)));
+      if (running && run === generation && alive()) timer = schedule(look,
+        failures ? Math.min(30000, 3000 * 2 ** Math.min(failures, 3)) : 2200);
     }
   }
   return { start() { if (!running) { running = true; generation++; void look(); } }, stop() { running = false; generation++; cancel(timer); } };
