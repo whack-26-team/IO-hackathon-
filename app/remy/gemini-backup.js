@@ -207,7 +207,9 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', profile = nul
       vision.start();
       status('live', 'Listening (backup voice)');
       listen();
-      turn('', '[APP] The cook just started. Greet them in one short line and ask what they are cooking.');
+      turn('', mode === 'savage'
+        ? '[APP] The cook just started. Greet them, ask what they are cooking, and add one sharp, original jab about a bland dinner. Do not claim you saw a mistake. Keep it short.'
+        : '[APP] The cook just started. Greet them in one short line and ask what they are cooking.');
     },
     async stop() {
       active = false;
