@@ -346,3 +346,14 @@ html[data-mode="gentle"] .score-card { background: #f4f9fe; }
 .servings button:disabled { opacity: .35; }
 .servings b { min-width: 18px; text-align: center; font-size: 18px; }
 .servings small { opacity: .7; font-weight: 500; font-size: 12px; }
+
+/* A ticket that's finished (or cancelled) rips off the rail and falls away */
+.timer.rip { pointer-events: none; transform-origin: 15% 0; animation: rip .75s cubic-bezier(.45, 0, .8, .2) forwards; }
+@keyframes rip {
+  0%   { transform: rotate(var(--tilt, 1deg)); }
+  14%  { transform: translateY(4px) rotate(-7deg); }          /* yank */
+  26%  { transform: translateY(2px) rotate(5deg); }           /* tear */
+  36%  { transform: translateY(6px) rotate(-3deg); clip-path: inset(3px 0 0 0); }  /* top strip left on the rail */
+  100% { transform: translateY(115vh) rotate(32deg); opacity: .85; clip-path: inset(3px 0 0 0); }
+}
+@media (prefers-reduced-motion: reduce) { .timer.rip { animation: none; opacity: 0; } }
