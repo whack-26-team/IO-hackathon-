@@ -17,25 +17,67 @@ function wrapText(ctx, text, maxWidth) {
   return lines;
 }
 
+// A sticker icon from the app's SVG pieces (timer, life ring, flame), as an image for the canvas
+function iconImage(id) {
+  const defs = document.querySelector("svg defs");
+  if (!defs) return Promise.resolve(null);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" width="200" height="200"><defs>${defs.innerHTML}</defs><use href="#${id}" xlink:href="#${id}"/></svg>`;
+  const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
+  return loadImage(url).finally(() => setTimeout(() => URL.revokeObjectURL(url), 1000));
+}
+// Remy's face for the card, drawn from the app's own cartoon (the same SVG pieces as on screen)
+function faceImage(id, wide) {
+  const defs = document.querySelector("svg defs");
+  if (!defs) return Promise.resolve(null);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="${wide ? "-32 -14 164 120" : "-18 -12 136 116"}" width="820" height="${wide ? 600 : 700}"><defs>${defs.innerHTML}</defs><use href="#${id}" xlink:href="#${id}"/></svg>`;
+  const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
+  return loadImage(url).finally(() => setTimeout(() => URL.revokeObjectURL(url), 1000));
+}
+// A chunky cartoon star (ink outline, butter fill; empty ones faded)
+function star(ctx, x, y, r, on, mode) {
+  ctx.beginPath();
+  for (let i = 0; i < 10; i++) {
+    const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r;
+    ctx.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr);
+  }
+  ctx.closePath(); ctx.lineJoin = "round";
+  if (on) { ctx.save(); ctx.translate(6, 6); ctx.fillStyle = "#1a1a1a"; ctx.fill(); ctx.restore(); }
+  ctx.fillStyle = on ? "#ffd166" : (mode === "savage" ? "rgba(255,255,255,.18)" : "rgba(0,0,0,.1)"); ctx.fill();
+  if (on) { ctx.strokeStyle = "#1a1a1a"; ctx.lineWidth = 7; ctx.stroke(); }
+}
+const FACE = { gentle: "f-gentle", honest: "f-proud", savage: "f-savage" };
+
 export async function makeCard(app) {
   const s = app.stats(); const mode = app.mode;
-  const score = document.getElementById("recap-score")?.textContent || `${s.stars}/5 stars`;
+  const line = document.getElementById("recap-line")?.textContent || "";
+  // the card uses the app's fonts: make sure they're loaded before drawing
+  await Promise.all(['150px "Leckerli One"', '52px "Caveat Brush"', '700 60px "Baloo 2"'].map((f) => document.fonts?.load(f).catch(() => {})));
+  const BOX = '"Baloo 2", system-ui, sans-serif';
   const c = document.createElement("canvas"); c.width = 1080; c.height = 1350;
   const ctx = c.getContext("2d");
   ctx.fillStyle = BG[mode] || BG.honest; ctx.fillRect(0, 0, c.width, c.height);
   ctx.fillStyle = FG[mode] || FG.honest; ctx.textAlign = "center";
-  ctx.font = "800 120px system-ui, sans-serif"; ctx.fillText("REMY", 540, 190);
-  ctx.font = "600 44px system-ui, sans-serif"; ctx.fillText("your live AI chef", 540, 255);
-  const face = await loadImage("icon.png");
-  if (face) ctx.drawImage(face, 340, 310, 400, 400);
-  ctx.font = "800 64px system-ui, sans-serif";
-  wrapText(ctx, s.dish || "Freestyle cook", 940).slice(0, 2).forEach((l, i) => ctx.fillText(l, 540, 800 + i * 76));
-  ctx.font = "600 46px system-ui, sans-serif";
-  const n = (k, one, many) => `${k} ${k === 1 ? one : many}`;
-  ctx.fillText(`⏱ ${n(s.timers, "timer", "timers")}   🛟 ${n(s.alerts, "save", "saves")}   🔥 ${n(s.roasts, "roast", "roasts")}`, 540, 990);
-  ctx.font = "800 72px system-ui, sans-serif";
-  wrapText(ctx, score, 960).slice(0, 2).forEach((l, i) => ctx.fillText(l, 540, 1120 + i * 84));
-  ctx.font = "500 36px system-ui, sans-serif"; ctx.globalAlpha = 0.7;
+  ctx.font = '150px "Leckerli One", system-ui, sans-serif'; ctx.fillText("REMY", 540, 200);
+  ctx.font = '56px "Caveat Brush", system-ui, sans-serif'; ctx.globalAlpha = 0.75; ctx.fillText("your live AI chef", 540, 275); ctx.globalAlpha = 1;
+  const shocked = mode === "savage" && s.stars === 5;
+  const faceId = shocked ? "f-shock" : (FACE[mode] || FACE.honest);
+  const face = (await faceImage(faceId, mode === "savage")) || (await loadImage("icon.png"));
+  if (face) { const w = 420, h = w * face.height / face.width; ctx.drawImage(face, 540 - w / 2, 300, w, h); }
+  ctx.font = `700 60px ${BOX}`;
+  wrapText(ctx, s.dish || "Freestyle cook", 940).slice(0, 2).forEach((l, i) => ctx.fillText(l, 540, 760 + i * 70));
+  for (let i = 0; i < 5; i++) star(ctx, 540 + (i - 2) * 130, 900, 56, i < s.stars, mode);
+  ctx.fillStyle = FG[mode] || FG.honest;
+  ctx.font = `700 64px ${BOX}`;
+  wrapText(ctx, line, 960).slice(0, 2).forEach((l, i) => ctx.fillText(l, 540, 1060 + i * 74));
+  // timer / life ring / flame stickers with their counts
+  ctx.font = `700 52px ${BOX}`;
+  const icons = await Promise.all(["i-timer", "i-buoy", "i-flame"].map(iconImage));
+  [s.timers, s.alerts, s.roasts].forEach((k, i) => {
+    const x = 540 + (i - 1) * 230;
+    if (icons[i]) ctx.drawImage(icons[i], x - 92, 1160, 84, 84);
+    ctx.textAlign = "left"; ctx.fillText(String(k), x + 2, 1222); ctx.textAlign = "center";
+  });
+  ctx.font = '38px "Caveat Brush", system-ui, sans-serif'; ctx.globalAlpha = 0.65;
   ctx.fillText("remy-2wc2.onrender.com", 540, 1300);
   return new Promise((resolve) => c.toBlob(resolve, "image/png"));
 }

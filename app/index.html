@@ -20,8 +20,8 @@
   <link rel="preconnect" href="https://esm.sh" crossorigin>
   <link rel="preconnect" href="https://api.elevenlabs.io" crossorigin>
   <link rel="preconnect" href="https://livekit.rtc.elevenlabs.io" crossorigin>
-  <link rel="stylesheet" href="style.css?v=115">
-  <link rel="stylesheet" href="extras/extras.css?v=115">
+  <link rel="stylesheet" href="style.css?v=116">
+  <link rel="stylesheet" href="extras/extras.css?v=116">
 </head>
 <body>
   <!-- the start screen's colour, overhanging every edge of the screen -->
@@ -45,13 +45,13 @@
       <g id="f-proud"><use href="#head"/><path d="M30 62 Q37 58 44 62" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M56 62 Q63 58 70 62" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M33 73 Q38 68 43 73" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M57 73 Q62 68 67 73" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/><path d="M38 84 Q50 96 62 84 Z" fill="#fff" stroke="#1a1a1a" stroke-width="3"/></g>
 
       <!-- accessories: a halo for Gentle, steam from the ears for Savage -->
-      <filter id="halo-glow" x="-60%" y="-300%" width="220%" height="700%"><feGaussianBlur stdDeviation="5"/></filter>
+      <filter id="halo-glow" x="-60%" y="-300%" width="220%" height="700%"><feGaussianBlur stdDeviation="3.5"/></filter>
       <g id="acc-halo">
         <!-- soft golden glow that pulses, and the halo floats a little -->
         <animateTransform attributeName="transform" type="translate" values="0 0; 0 -2.5; 0 0" dur="2.4s" repeatCount="indefinite"/>
-        <ellipse cx="50" cy="2" rx="30" ry="10" fill="none" stroke="#ffc93c" stroke-width="18" filter="url(#halo-glow)" opacity=".35">
-          <animate attributeName="opacity" values=".3;1;.3" dur="2.4s" repeatCount="indefinite"/>
-          <animate attributeName="stroke-width" values="14;22;14" dur="2.4s" repeatCount="indefinite"/>
+        <ellipse cx="50" cy="2" rx="27" ry="8" fill="none" stroke="#ffc93c" stroke-width="9" filter="url(#halo-glow)" opacity=".25">
+          <animate attributeName="opacity" values=".2;.55;.2" dur="2.4s" repeatCount="indefinite"/>
+          <animate attributeName="stroke-width" values="8;12;8" dur="2.4s" repeatCount="indefinite"/>
         </ellipse>
         <ellipse cx="50" cy="2" rx="26" ry="7" fill="none" stroke="#1a1a1a" stroke-width="7"/>
         <ellipse cx="50" cy="2" rx="26" ry="7" fill="none" stroke="#ffd166" stroke-width="3.5">
@@ -65,6 +65,8 @@
         <circle r="4" fill="#fff" stroke="#1a1a1a" stroke-width="3" opacity="0"><animateMotion path="M17 73 C8 62 -2 50 -18 28" dur="1.65s" begin="0.00s" repeatCount="indefinite"/><animate attributeName="r" values="3;6;9" dur="1.65s" begin="0.00s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.7;1" dur="1.65s" begin="0.00s" repeatCount="indefinite"/></circle><circle r="4" fill="#fff" stroke="#1a1a1a" stroke-width="3" opacity="0"><animateMotion path="M17 73 C8 62 -2 50 -18 28" dur="1.65s" begin="0.55s" repeatCount="indefinite"/><animate attributeName="r" values="3;6;9" dur="1.65s" begin="0.55s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.7;1" dur="1.65s" begin="0.55s" repeatCount="indefinite"/></circle><circle r="4" fill="#fff" stroke="#1a1a1a" stroke-width="3" opacity="0"><animateMotion path="M17 73 C8 62 -2 50 -18 28" dur="1.65s" begin="1.10s" repeatCount="indefinite"/><animate attributeName="r" values="3;6;9" dur="1.65s" begin="1.10s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.7;1" dur="1.65s" begin="1.10s" repeatCount="indefinite"/></circle><circle r="4" fill="#fff" stroke="#1a1a1a" stroke-width="3" opacity="0"><animateMotion path="M83 73 C92 62 102 50 118 28" dur="1.65s" begin="0.27s" repeatCount="indefinite"/><animate attributeName="r" values="3;6;9" dur="1.65s" begin="0.27s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.7;1" dur="1.65s" begin="0.27s" repeatCount="indefinite"/></circle><circle r="4" fill="#fff" stroke="#1a1a1a" stroke-width="3" opacity="0"><animateMotion path="M83 73 C92 62 102 50 118 28" dur="1.65s" begin="0.82s" repeatCount="indefinite"/><animate attributeName="r" values="3;6;9" dur="1.65s" begin="0.82s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.7;1" dur="1.65s" begin="0.82s" repeatCount="indefinite"/></circle><circle r="4" fill="#fff" stroke="#1a1a1a" stroke-width="3" opacity="0"><animateMotion path="M83 73 C92 62 102 50 118 28" dur="1.65s" begin="1.37s" repeatCount="indefinite"/><animate attributeName="r" values="3;6;9" dur="1.65s" begin="1.37s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.7;1" dur="1.65s" begin="1.37s" repeatCount="indefinite"/></circle>
         <g stroke="#1a1a1a" stroke-width="3" stroke-linecap="round" fill="none"><path d="M-16 56 L-22 58"/><path d="M-18 46 L-25 46"/><path d="M116 56 L122 58"/><path d="M118 46 L125 46"/></g>
       </g>
+      <!-- Savage, shocked (5 stars): brows up, wide eyes, jaw dropped, still steaming -->
+      <g id="f-shock"><use href="#acc-steam"/><use href="#head"/><path d="M28 58 Q37 52 45 58" fill="none" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round"/><path d="M55 58 Q63 52 72 58" fill="none" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round"/><circle cx="38" cy="71" r="6" fill="#fff" stroke="#1a1a1a" stroke-width="3"/><circle cx="62" cy="71" r="6" fill="#fff" stroke="#1a1a1a" stroke-width="3"/><circle cx="38" cy="72" r="2.4" fill="#1a1a1a"/><circle cx="62" cy="72" r="2.4" fill="#1a1a1a"/><ellipse cx="50" cy="90" rx="7" ry="6.5" fill="#1a1a1a"/></g>
       <g id="f-gentle"><use href="#f-proud"/><use href="#acc-halo"/></g>
       <g id="f-savage"><use href="#acc-steam"/><use href="#f-fury"/></g>
       <!-- alarmed: no comedy, wide eyes, flat mouth (safety alerts only) -->
@@ -95,6 +97,22 @@
       <g id="blink-fury">
         <ellipse cx="38" cy="73" rx="6" ry="5" fill="#ffd9a8"/><ellipse cx="62" cy="73" rx="6" ry="5" fill="#ffd9a8"/>
         <path d="M33 74 L43 74 M57 74 L67 74" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/>
+      </g>
+      <!-- goodbye card stickers: kitchen timer, life ring, flame (same ink + flat fills) -->
+      <g id="i-timer" stroke="#1a1a1a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M74 30 L82 22" fill="none"/>
+        <rect x="42" y="12" width="16" height="11" rx="3" fill="#e8432c"/>
+        <circle cx="50" cy="57" r="33" fill="#ffd166"/><circle cx="50" cy="57" r="23" fill="#fff" stroke-width="5"/>
+        <path d="M50 57 V41 M50 57 L61 63" fill="none" stroke-width="5"/>
+      </g>
+      <g id="i-buoy">
+        <circle cx="50" cy="52" r="27" fill="none" stroke="#1a1a1a" stroke-width="30"/>
+        <circle cx="50" cy="52" r="27" fill="none" stroke="#fff" stroke-width="20"/>
+        <circle cx="50" cy="52" r="27" fill="none" stroke="#e8432c" stroke-width="20" stroke-dasharray="21.2 21.2" transform="rotate(-22 50 52)"/>
+      </g>
+      <g id="i-flame" stroke="#1a1a1a" stroke-width="6" stroke-linejoin="round">
+        <path d="M50 10 C58 30 78 40 78 63 C78 81 65 92 50 92 C35 92 22 81 22 63 C22 48 33 42 35 28 C42 37 44 44 44 50 C49 39 51 26 50 10 Z" fill="#e8432c"/>
+        <path d="M50 54 C57 62 63 68 63 76 C63 84 57 88 50 88 C43 88 37 84 37 76 C37 68 46 63 50 54 Z" fill="#ffd166" stroke-width="5"/>
       </g>
       <!-- blink: skin patches + closed-eye lines drawn over the open eyes of f-sus / f-watch -->
       <g id="blink-eyes">
@@ -179,6 +197,12 @@
 
   <!-- COOKING SCREEN -->
   <section id="cook-screen" class="screen hidden">
+    <!-- shown while Remy's voice connects: he bounces in, a line per attitude -->
+    <div id="getting-ready" class="getting-ready hidden" aria-live="polite">
+      <svg id="gr-face" class="gr-face" viewBox="-18 -12 136 116" aria-hidden="true"><use href="#f-sus"/></svg>
+      <b id="gr-line"></b>
+      <span class="gr-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    </div>
     <video id="camera" autoplay playsinline muted></video>
     <canvas id="frame-canvas" hidden></canvas>
 
@@ -250,6 +274,6 @@
   <!-- Bottom sheets opened by extras (app.openSheet) -->
   <div id="slot-sheets"></div>
 
-  <script type="module" src="app.js?v=115"></script>
+  <script type="module" src="app.js?v=116"></script>
 </body>
 </html>

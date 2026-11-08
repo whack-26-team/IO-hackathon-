@@ -14,8 +14,8 @@
     "vegetable stew",
     "french vegetable stew"
   ],
-  "source": "Based on TheMealDB #52908 (from BBC Good Food), rewritten step by step for REMY with timers from cook-times.json. Waiting for Matthew's review.",
-  "checked_by_human": false,
+  "source": "Based on TheMealDB #52908 (from BBC Good Food), rewritten step by step for REMY with timers from cook-times.json. Checked by Matthew.",
+  "checked_by_human": true,
   "serves": 4,
   "total_minutes": 60,
   "equipment": [
