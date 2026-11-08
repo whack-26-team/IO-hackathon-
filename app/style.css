@@ -332,3 +332,7 @@ html[data-mode="gentle"] .score-card { background: #f4f9fe; }
   background: var(--cream); color: var(--ink); border: var(--line); border-bottom: 0; border-radius: 22px 22px 0 0;
   padding: 18px 18px calc(18px + var(--safe-bottom)); animation: sheet-up .22s ease-out; }
 @keyframes sheet-up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* Diet / allergy flags in the recipe panel (⚙️ Settings) */
+.diet-warning { background: #ffb4a3; color: var(--ink); border-radius: 10px; padding: 6px 10px; margin: 6px 0; font-weight: 700; font-size: 14px; }
+#ingredients-list li.flagged { color: #ff9b85; font-weight: 800; }

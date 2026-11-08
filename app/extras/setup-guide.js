@@ -29,10 +29,12 @@ function card(app) {
   return wrap;
 }
 
-export function initSetupCard(app, menu) {
-  menu.add("❓", "How to set up", () => app.openSheet(card(app)));
+// Opens from ⚙️ Settings ("How to set up your phone"); shows itself the first time only.
+export function initSetupCard(app) {
   if (!app.history.get("setupSeen", false)) {
     app.history.set("setupSeen", true);
     setTimeout(() => { if (!app.cooking) app.openSheet(card(app)); }, 400);
   }
 }
+
+export const openSetupCard = (app) => app.openSheet(card(app));

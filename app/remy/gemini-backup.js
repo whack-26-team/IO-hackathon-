@@ -7,7 +7,7 @@
 import { createActions } from './actions.js';
 import { createVision } from './vision.js';
 
-export function createGeminiRemy({ recipe = null, mode = 'honest', video, canvas,
+export function createGeminiRemy({ recipe = null, mode = 'honest', profile = null, video, canvas,
   fetcher = fetch, now = Date.now, schedule = setTimeout, cancel = clearTimeout }) {
   const handlers = {};
   const emit = (type, data) => (handlers[type] || []).forEach(h => h(data));
@@ -101,7 +101,7 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', video, canvas
       notes = [];
       const r = snap.recipe;
       const data = await request('/api/chat', {
-        mode, history: history.slice(-16), note,
+        mode, history: history.slice(-16), note, ...(profile ? { profile } : {}),
         ...(r?.id && !String(r.id).startsWith('ai-') ? { recipe_id: r.id } : r ? { recipe: r } : {}),
       });
       if (!active) return;
@@ -143,7 +143,7 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', video, canvas
       active = true;
       status('connecting', 'Starting Remy’s backup voice…');
       try {
-        const brain = await request('/api/brain', { mode, lite: true, ...(recipe?.id ? { recipe_id: recipe.id } : {}) });
+        const brain = await request('/api/brain', { mode, lite: true, ...(recipe?.id ? { recipe_id: recipe.id } : {}), ...(profile ? { profile } : {}) });
         actions.configure(brain);
       } catch (error) {
         status('error', `Backup Remy couldn't start (${String(error?.message || error).slice(0, 80)}).`);
