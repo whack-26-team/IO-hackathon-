@@ -6,7 +6,7 @@ export const SDK_URL = 'https://esm.sh/@elevenlabs/client@1.35.0?bundle';
 // short-lived session provider before opening the app beyond the hackathon team.
 export const AGENT_ID = 'agent_5701m6w7gjqef74bxt3pvrdwbxy7';
 
-export function createElevenLabsRemy({ recipe = null, mode = 'honest', stream, video, canvas,
+export function createElevenLabsRemy({ recipe = null, mode = 'honest', profile = null, stream, video, canvas,
   agentId = AGENT_ID, sessionProvider, loadSDK = () => import(SDK_URL),
   fetcher = fetch, page = document, now = Date.now,
   schedule = setTimeout, cancel = clearTimeout, onTranscript = () => {},
@@ -115,7 +115,7 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', stream, v
         // Lite by default (Matthew, to save ElevenLabs credits): Remy's instructions leave out the big
         // roast/insult library, so every reply costs fewer tokens. ?full=1 on the page address = everything.
         const lite = !(typeof location !== 'undefined' && new URLSearchParams(location.search).has('full'));
-        brain = await request('/api/brain', { mode, ...(recipe?.id ? { recipe_id: recipe.id } : {}), ...(lite ? { lite: true } : {}) });
+        brain = await request('/api/brain', { mode, ...(recipe?.id ? { recipe_id: recipe.id } : {}), ...(lite ? { lite: true } : {}), ...(profile ? { profile } : {}) });
         if (!brain.instructions || !Array.isArray(brain.tools)) throw new Error('Server did not provide Remy’s instructions.');
         actions.configure(brain);
       }

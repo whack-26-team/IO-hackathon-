@@ -1,5 +1,6 @@
 // Recipe browser (#120): 📖 corner button -> all our recipes, ⭐ favourites, "Surprise me".
 // Picking one starts cooking with it already loaded.
+import { loadAllergens, clashes } from "../allergens.js";
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
 
 async function browserSheet(app) {
@@ -9,6 +10,8 @@ async function browserSheet(app) {
   try { recipes = await (await fetch("/api/recipes")).json(); } catch { wrap.append(el("p", "x-empty", "Couldn't load recipes. Check your internet.")); return wrap; }
 
   const favs = () => app.history.get("favourites", []);
+  await loadAllergens();
+  const settings = app.history.settings();
   const cook = (id) => { app.closeSheet(); app.startCooking({ recipeId: id }); };
 
   const surprise = el("button", "x-surprise", "🎲 Surprise me");
@@ -23,7 +26,9 @@ async function browserSheet(app) {
     for (const r of sorted) {
       const li = el("li", "x-row x-recipe");
       const main = el("button", "x-row-main x-recipe-open");
+      const warn = clashes(r.ingredients || [], settings).reasons;
       main.append(el("b", "", r.title), el("small", "", `${r.checked_by_human ? "✓ Checked · " : ""}${r.steps} steps${r.summary ? ` · ${r.summary}` : ""}`));
+      if (warn.length) main.append(el("small", "x-warn", `⚠ May contain: ${warn.join(", ")}`));
       main.addEventListener("click", () => cook(r.id));
       const star = el("button", "x-star" + (f.includes(r.id) ? " on" : ""), f.includes(r.id) ? "★" : "☆");
       star.setAttribute("aria-label", "Favourite");

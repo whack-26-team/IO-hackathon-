@@ -117,7 +117,20 @@ def roasts_for_mode(data: dict, mode: str) -> dict:
     return out
 
 
-def build_instructions(recipe: dict | None, mode: str, lite: bool = False) -> str:
+def profile_line(profile: dict | None) -> str:
+    """One short line about the cook's diet/allergies (only when they set some in ⚙️ Settings)."""
+    if not isinstance(profile, dict):
+        return ""
+    diet = [str(d)[:20] for d in (profile.get("diet") or [])][:4]
+    allergies = [str(a)[:20] for a in (profile.get("allergies") or [])][:8]
+    if not diet and not allergies:
+        return ""
+    bits = ([f"Diet: {', '.join(diet)}."] if diet else []) + ([f"Allergies: {', '.join(allergies)}."] if allergies else [])
+    return ("# ABOUT THE COOK\n" + " ".join(bits) + " Steer away from those ingredients and suggest swaps. "
+            "You can't detect allergens: when one might be involved, tell them to check every label.")
+
+
+def build_instructions(recipe: dict | None, mode: str, lite: bool = False, profile: dict | None = None) -> str:
     """Glue Pranav's personality files + Matthew's recipe/knowledge into one prompt."""
     core = _read_text(BRAIN_DIR / "instructions.md")
     personality = _read_text(BRAIN_DIR / "personality" / f"{mode}.md")
@@ -130,6 +143,7 @@ def build_instructions(recipe: dict | None, mode: str, lite: bool = False) -> st
         core,
         f"# PERSONALITY MODE: {mode.upper()}\n{personality}",
         NAME_RULE,
+        *([profile_line(profile)] if profile_line(profile) else []),
         *([] if lite else ["# ROAST & CATCHPHRASE LIBRARY (riff on these, don't just repeat them)\n" + roast_text]),
         ("# TODAY'S RECIPE\n" + json.dumps(recipe, ensure_ascii=False)) if recipe else NO_RECIPE_YET,
         "# COOKING TIMES (use these for start_timer, never guess)\n" + cook_times,
@@ -167,6 +181,7 @@ def list_recipes():
             "summary": r.get("summary", ""),
             "checked_by_human": r.get("checked_by_human", False),
             "steps": len(r.get("steps", [])),
+            "ingredients": r.get("ingredients", []),   # so the browser can flag diet/allergy clashes
         })
     return out
 
@@ -200,6 +215,7 @@ class SessionRequest(BaseModel):
     recipe_id: str | None = None   # None = Remy asks the cook what to make
     mode: str = "honest"
     lite: bool = False             # ?lite=1 on the page: no roast library (connection test)
+    profile: dict | None = None    # {diet: [...], allergies: [...]} from ⚙️ Settings
 
 
 @app.post("/api/brain")
@@ -213,7 +229,7 @@ def get_brain(req: SessionRequest):
         raise HTTPException(400, f"mode must be one of {MODES}")
     recipe = load_recipe(req.recipe_id) if req.recipe_id else None
     return {
-        "instructions": build_instructions(recipe, req.mode, req.lite),
+        "instructions": build_instructions(recipe, req.mode, req.lite, req.profile),
         "tools": load_tools(),
         "recipe": recipe,
         "mode": req.mode,
@@ -290,6 +306,7 @@ class ChatRequest(BaseModel):
     recipe: dict | None = None      # a recipe Remy wrote himself (not saved on the server)
     history: list = []
     note: str = ""
+    profile: dict | None = None
 
 
 @app.post("/api/chat")
@@ -300,7 +317,7 @@ def chat_reply(req: ChatRequest, request: Request):
     recipe = req.recipe if isinstance(req.recipe, dict) else (load_recipe(req.recipe_id) if req.recipe_id else None)
     caller = (request.headers.get("x-forwarded-for") or (request.client.host if request.client else "?")).split(",")[0]
     try:
-        return chat.reply(build_instructions(recipe, req.mode, lite=True), load_tools(), req.history, req.note,
+        return chat.reply(build_instructions(recipe, req.mode, lite=True, profile=req.profile), load_tools(), req.history, req.note,
                           caller=caller.strip())
     except chat.ChatError as e:
         raise HTTPException(e.status, e.message) from None
@@ -332,6 +349,12 @@ def vision_models():
             return {"try_order": vision.candidates(client), "current": vision.key_status()["vision_model"]}
     except (vision.httpx.HTTPError, vision.VisionError) as e:
         raise HTTPException(502, f"Couldn't list Gemini models: {e}") from None
+
+
+@app.get("/api/allergens")
+def allergens():
+    """Diet/allergy keyword lists for the screen's ⚠ highlighting (remy-brain/knowledge/allergens.json)."""
+    return _read_json(BRAIN_DIR / "knowledge" / "allergens.json")
 
 
 @app.get("/api/qr")

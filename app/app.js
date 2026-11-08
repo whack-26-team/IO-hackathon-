@@ -11,6 +11,8 @@ import { initModeSwitch } from "./extras/mode-switch.js"; // tap the badge mid-c
 import { initSetupGuide } from "./extras/setup-guide.js"; // first-time setup card (Felix)
 import { initExtras } from "./extras/index.js"; // all other extras (Felix)
 import * as history from "./history.js"; // scores/settings, kept only on this phone
+import { loadAllergens, clashes } from "./allergens.js"; // diet/allergy ⚠ in the recipe panel
+loadAllergens();
 
 const $ = (id) => document.getElementById(id);
 const state = { recipe: null, mode: "honest", remy: null, stream: null, cooking: false, live: false, preRecipeId: null };
@@ -124,8 +126,10 @@ $("start-btn").addEventListener("click", async () => {
     if (preRecipe?.steps) showRecipe({ recipe: preRecipe, source: "remy", checked_by_human: preRecipe.checked_by_human });
     else preRecipe = null;
   }
+  const settings = history.settings();
   state.remy = factory({
     recipe: preRecipe,
+    profile: { diet: settings.diet || [], allergies: settings.allergies || [] },  // ⚙️ Settings: one short line for Remy
     mode: state.mode,
     stream: state.stream,
     video: $("camera"),
@@ -432,13 +436,20 @@ function showRecipe(data) {
     safety.appendChild(li);
   }
 
+  // Diet / allergies from ⚙️ Settings: flag matching ingredients (a helper only: check labels)
+  const { flagged, reasons } = clashes(recipe.ingredients || [], history.settings());
+  const warn = $("diet-warning");
+  warn.classList.toggle("hidden", !reasons.length);
+  warn.textContent = reasons.length ? `⚠ May contain: ${reasons.join(", ")}. Remy can't detect allergens: check every label.` : "";
   const ing = $("ingredients-list");
   ing.innerHTML = "";
-  for (const i of recipe.ingredients || []) {
+  (recipe.ingredients || []).forEach((i, n) => {
     const li = document.createElement("li");
-    li.textContent = i;
+    li.textContent = flagged.has(n) ? `⚠ ${i}` : i;
+    if (flagged.has(n)) li.classList.add("flagged");
     ing.appendChild(li);
-  }
+  });
+  if (reasons.length) document.querySelector("#recipe-panel .ingredients")?.setAttribute("open", "");
   renderSteps(0, false);
 }
 
@@ -535,7 +546,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v97`,
+      `version  v98`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
