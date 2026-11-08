@@ -20,8 +20,8 @@
   <link rel="preconnect" href="https://esm.sh" crossorigin>
   <link rel="preconnect" href="https://api.elevenlabs.io" crossorigin>
   <link rel="preconnect" href="https://livekit.rtc.elevenlabs.io" crossorigin>
-  <link rel="stylesheet" href="style.css?v=108">
-  <link rel="stylesheet" href="extras/extras.css?v=108">
+  <link rel="stylesheet" href="style.css?v=109">
+  <link rel="stylesheet" href="extras/extras.css?v=109">
 </head>
 <body>
   <!-- the start screen's colour, overhanging every edge of the screen -->
@@ -60,7 +60,7 @@
       </g>
       <g id="acc-steam">
         <!-- cartoon steam: puffs grow as they blow out of each ear, plus little speed lines -->
-        <g fill="#1a1a1a" stroke="#1a1a1a" stroke-width="7"><circle cx="17" cy="73" r="4.5"/><circle cx="9" cy="64" r="6"/><circle cx="13" cy="59" r="5"/><circle cx="-2" cy="50" r="8"/><circle cx="-10" cy="43" r="7.5"/><circle cx="2" cy="40" r="7"/><circle cx="-6" cy="33" r="6"/></g><g fill="#fff"><circle cx="17" cy="73" r="4.5"/><circle cx="9" cy="64" r="6"/><circle cx="13" cy="59" r="5"/><circle cx="-2" cy="50" r="8"/><circle cx="-10" cy="43" r="7.5"/><circle cx="2" cy="40" r="7"/><circle cx="-6" cy="33" r="6"/></g><g fill="#1a1a1a" stroke="#1a1a1a" stroke-width="7"><circle cx="83" cy="73" r="4.5"/><circle cx="91" cy="64" r="6"/><circle cx="87" cy="59" r="5"/><circle cx="102" cy="50" r="8"/><circle cx="110" cy="43" r="7.5"/><circle cx="98" cy="40" r="7"/><circle cx="106" cy="33" r="6"/></g><g fill="#fff"><circle cx="83" cy="73" r="4.5"/><circle cx="91" cy="64" r="6"/><circle cx="87" cy="59" r="5"/><circle cx="102" cy="50" r="8"/><circle cx="110" cy="43" r="7.5"/><circle cx="98" cy="40" r="7"/><circle cx="106" cy="33" r="6"/></g>
+        <g transform="translate(17 73)"><g><animateTransform attributeName="transform" type="scale" values="0.82;1.12;0.82" dur="1.1s" begin="0s" repeatCount="indefinite"/><g transform="translate(-17 -73)"><g fill="#1a1a1a" stroke="#1a1a1a" stroke-width="7"><circle cx="17" cy="73" r="4.5"/><circle cx="9" cy="64" r="6"/><circle cx="13" cy="59" r="5"/><circle cx="-2" cy="50" r="8"/><circle cx="-10" cy="43" r="7.5"/><circle cx="2" cy="40" r="7"/><circle cx="-6" cy="33" r="6"/></g><g fill="#fff"><circle cx="17" cy="73" r="4.5"/><circle cx="9" cy="64" r="6"/><circle cx="13" cy="59" r="5"/><circle cx="-2" cy="50" r="8"/><circle cx="-10" cy="43" r="7.5"/><circle cx="2" cy="40" r="7"/><circle cx="-6" cy="33" r="6"/></g></g></g></g><g transform="translate(83 73)"><g><animateTransform attributeName="transform" type="scale" values="0.82;1.12;0.82" dur="1.1s" begin="0.55s" repeatCount="indefinite"/><g transform="translate(-83 -73)"><g fill="#1a1a1a" stroke="#1a1a1a" stroke-width="7"><circle cx="83" cy="73" r="4.5"/><circle cx="91" cy="64" r="6"/><circle cx="87" cy="59" r="5"/><circle cx="102" cy="50" r="8"/><circle cx="110" cy="43" r="7.5"/><circle cx="98" cy="40" r="7"/><circle cx="106" cy="33" r="6"/></g><g fill="#fff"><circle cx="83" cy="73" r="4.5"/><circle cx="91" cy="64" r="6"/><circle cx="87" cy="59" r="5"/><circle cx="102" cy="50" r="8"/><circle cx="110" cy="43" r="7.5"/><circle cx="98" cy="40" r="7"/><circle cx="106" cy="33" r="6"/></g></g></g></g>
         <g stroke="#1a1a1a" stroke-width="3" stroke-linecap="round" fill="none"><path d="M-16 56 L-22 58"/><path d="M-18 46 L-25 46"/><path d="M116 56 L122 58"/><path d="M118 46 L125 46"/></g>
       </g>
       <g id="f-gentle"><use href="#f-proud"/><use href="#acc-halo"/></g>
@@ -99,6 +99,7 @@
 
   <!-- START SCREEN: the whole page changes with the attitude (class mode-gentle / mode-honest / mode-savage) -->
   <section id="start-screen" class="screen mode-honest">
+    <div id="embers" class="embers" aria-hidden="true"></div>
     <div class="wordmark">REM<span class="hat-y">Y<svg class="name-hat" viewBox="12 8 76 44" aria-hidden="true"><use href="#head"/></svg></span><small>your live AI chef</small></div>
 
     <div class="hero">
@@ -241,6 +242,6 @@
   <!-- Bottom sheets opened by extras (app.openSheet) -->
   <div id="slot-sheets"></div>
 
-  <script type="module" src="app.js?v=108"></script>
+  <script type="module" src="app.js?v=109"></script>
 </body>
 </html>
