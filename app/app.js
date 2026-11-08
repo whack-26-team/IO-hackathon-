@@ -49,6 +49,8 @@ function applyMode(mode) {
   typeGreeting(m.greeting);
   const face = $("hero-face");
   setUse(face, m.face);
+  // Savage's steam blows out past his ears: give it room
+  face.setAttribute("viewBox", mode === "savage" ? "-32 -14 164 120" : "-18 -12 136 116");
   // Remy reacts to the attitude: Gentle's halo floats in, Honest smirks (Savage keeps the plain pop)
   face.classList.remove("react-gentle", "react-honest", "react-savage"); void face.offsetWidth;
   face.classList.add(`react-${mode}`);
@@ -72,12 +74,14 @@ function typeGreeting(text) {
     if (i >= text.length) { clearInterval(typeGreeting.t); g.classList.remove("typing"); }
   }, 28);
 }
-// Remy blinks now and then (only faces with open eyes)
+// Remy blinks now and then (faces with open eyes; Savage gets an angry blink)
 (function blinkLoop() {
   setTimeout(() => {
     const face = $("hero-face");
     const id = face.querySelector("use").getAttribute("href");
-    if (!calm() && !$("start-screen").classList.contains("hidden") && (id === "#f-sus" || id === "#f-watch")) {
+    const lids = id === "#f-savage" ? "#blink-fury" : "#blink-eyes";
+    if (!calm() && !$("start-screen").classList.contains("hidden") && (id === "#f-sus" || id === "#f-watch" || id === "#f-savage")) {
+      face.querySelector(".blinker").setAttribute("href", lids);
       face.classList.add("blink"); setTimeout(() => face.classList.remove("blink"), 140);
     }
     blinkLoop();
@@ -633,7 +637,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v112`,
+      `version  v113`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);

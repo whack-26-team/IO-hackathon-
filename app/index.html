@@ -15,13 +15,13 @@
   <link rel="icon" href="icon-192.png">
   <meta name="theme-color" content="#fff4e0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Leckerli+One&family=Lilita+One&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
   <!-- open connections early so real Remy starts faster -->
   <link rel="preconnect" href="https://esm.sh" crossorigin>
   <link rel="preconnect" href="https://api.elevenlabs.io" crossorigin>
   <link rel="preconnect" href="https://livekit.rtc.elevenlabs.io" crossorigin>
-  <link rel="stylesheet" href="style.css?v=112">
-  <link rel="stylesheet" href="extras/extras.css?v=112">
+  <link rel="stylesheet" href="style.css?v=113">
+  <link rel="stylesheet" href="extras/extras.css?v=113">
 </head>
 <body>
   <!-- the start screen's colour, overhanging every edge of the screen -->
@@ -61,6 +61,8 @@
       <g id="acc-steam">
         <!-- cartoon steam: puffs grow as they blow out of each ear, plus little speed lines -->
         <g transform="translate(17 73)"><g><animateTransform attributeName="transform" type="scale" values="0.82;1.12;0.82" dur="1.1s" begin="0s" repeatCount="indefinite"/><g transform="translate(-17 -73)"><g fill="#1a1a1a" stroke="#1a1a1a" stroke-width="7"><circle cx="17" cy="73" r="4.5"/><circle cx="9" cy="64" r="6"/><circle cx="13" cy="59" r="5"/><circle cx="-2" cy="50" r="8"/><circle cx="-10" cy="43" r="7.5"/><circle cx="2" cy="40" r="7"/><circle cx="-6" cy="33" r="6"/></g><g fill="#fff"><circle cx="17" cy="73" r="4.5"/><circle cx="9" cy="64" r="6"/><circle cx="13" cy="59" r="5"/><circle cx="-2" cy="50" r="8"/><circle cx="-10" cy="43" r="7.5"/><circle cx="2" cy="40" r="7"/><circle cx="-6" cy="33" r="6"/></g></g></g></g><g transform="translate(83 73)"><g><animateTransform attributeName="transform" type="scale" values="0.82;1.12;0.82" dur="1.1s" begin="0.55s" repeatCount="indefinite"/><g transform="translate(-83 -73)"><g fill="#1a1a1a" stroke="#1a1a1a" stroke-width="7"><circle cx="83" cy="73" r="4.5"/><circle cx="91" cy="64" r="6"/><circle cx="87" cy="59" r="5"/><circle cx="102" cy="50" r="8"/><circle cx="110" cy="43" r="7.5"/><circle cx="98" cy="40" r="7"/><circle cx="106" cy="33" r="6"/></g><g fill="#fff"><circle cx="83" cy="73" r="4.5"/><circle cx="91" cy="64" r="6"/><circle cx="87" cy="59" r="5"/><circle cx="102" cy="50" r="8"/><circle cx="110" cy="43" r="7.5"/><circle cx="98" cy="40" r="7"/><circle cx="106" cy="33" r="6"/></g></g></g></g>
+        <!-- extra puffs that blow out of each ear and drift away -->
+        <circle r="4" fill="#fff" stroke="#1a1a1a" stroke-width="3" opacity="0"><animateMotion path="M17 73 C8 62 -2 50 -18 28" dur="1.65s" begin="0.00s" repeatCount="indefinite"/><animate attributeName="r" values="3;6;9" dur="1.65s" begin="0.00s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.7;1" dur="1.65s" begin="0.00s" repeatCount="indefinite"/></circle><circle r="4" fill="#fff" stroke="#1a1a1a" stroke-width="3" opacity="0"><animateMotion path="M17 73 C8 62 -2 50 -18 28" dur="1.65s" begin="0.55s" repeatCount="indefinite"/><animate attributeName="r" values="3;6;9" dur="1.65s" begin="0.55s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.7;1" dur="1.65s" begin="0.55s" repeatCount="indefinite"/></circle><circle r="4" fill="#fff" stroke="#1a1a1a" stroke-width="3" opacity="0"><animateMotion path="M17 73 C8 62 -2 50 -18 28" dur="1.65s" begin="1.10s" repeatCount="indefinite"/><animate attributeName="r" values="3;6;9" dur="1.65s" begin="1.10s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.7;1" dur="1.65s" begin="1.10s" repeatCount="indefinite"/></circle><circle r="4" fill="#fff" stroke="#1a1a1a" stroke-width="3" opacity="0"><animateMotion path="M83 73 C92 62 102 50 118 28" dur="1.65s" begin="0.27s" repeatCount="indefinite"/><animate attributeName="r" values="3;6;9" dur="1.65s" begin="0.27s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.7;1" dur="1.65s" begin="0.27s" repeatCount="indefinite"/></circle><circle r="4" fill="#fff" stroke="#1a1a1a" stroke-width="3" opacity="0"><animateMotion path="M83 73 C92 62 102 50 118 28" dur="1.65s" begin="0.82s" repeatCount="indefinite"/><animate attributeName="r" values="3;6;9" dur="1.65s" begin="0.82s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.7;1" dur="1.65s" begin="0.82s" repeatCount="indefinite"/></circle><circle r="4" fill="#fff" stroke="#1a1a1a" stroke-width="3" opacity="0"><animateMotion path="M83 73 C92 62 102 50 118 28" dur="1.65s" begin="1.37s" repeatCount="indefinite"/><animate attributeName="r" values="3;6;9" dur="1.65s" begin="1.37s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.15;.7;1" dur="1.65s" begin="1.37s" repeatCount="indefinite"/></circle>
         <g stroke="#1a1a1a" stroke-width="3" stroke-linecap="round" fill="none"><path d="M-16 56 L-22 58"/><path d="M-18 46 L-25 46"/><path d="M116 56 L122 58"/><path d="M118 46 L125 46"/></g>
       </g>
       <g id="f-gentle"><use href="#f-proud"/><use href="#acc-halo"/></g>
@@ -88,6 +90,11 @@
         <path d="M50 28 V82" fill="none"/>
         <path d="M30 38 H42 M30 48 H42 M58 38 H70 M58 48 H68" stroke-width="3.5"/>
         <path d="M62 24 V44 L66 40 L70 44 V22" fill="#e8432c" stroke-width="4"/>
+      </g>
+      <!-- angry blink for Savage (f-fury eyes): skin patches + short flat lines, brows stay -->
+      <g id="blink-fury">
+        <ellipse cx="38" cy="73" rx="6" ry="5" fill="#ffd9a8"/><ellipse cx="62" cy="73" rx="6" ry="5" fill="#ffd9a8"/>
+        <path d="M33 74 L43 74 M57 74 L67 74" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round"/>
       </g>
       <!-- blink: skin patches + closed-eye lines drawn over the open eyes of f-sus / f-watch -->
       <g id="blink-eyes">
@@ -243,6 +250,6 @@
   <!-- Bottom sheets opened by extras (app.openSheet) -->
   <div id="slot-sheets"></div>
 
-  <script type="module" src="app.js?v=112"></script>
+  <script type="module" src="app.js?v=113"></script>
 </body>
 </html>
