@@ -3,7 +3,8 @@
 // Real Remy = ElevenLabs voice. If ElevenLabs fails (can't connect, out of credits, keeps
 // dropping), this switches to the backup Remy by itself: the phone's own speech recognition and
 // voice, with Gemini writing his replies (gemini-backup.js). Timers, recipe and steps stay.
-// ?backup=1 on the page address = use the backup straight away (saves ElevenLabs credits).
+// Saving ElevenLabs credits for the pitch: the backup (Gemini) voice is the default. ElevenLabs only
+// runs with ?full=1 (the pitch) or ?eleven=1 on the page address; ?backup=1 always forces the backup.
 import { createElevenLabsRemy } from './elevenlabs.js';
 import { createGeminiRemy } from './gemini-backup.js';
 
@@ -11,8 +12,13 @@ export { createElevenLabsRemy };
 import { preloadSDK, prefetchBrain } from './elevenlabs.js';
 
 // Faster start: warm up real Remy while the start screen is open (best effort; skipped for ?backup=1)
+const params = () => new URLSearchParams(typeof location !== 'undefined' ? location.search : '');
+// true = start on the Gemini backup voice (everything except ?full=1 / ?eleven=1)
+export const useBackupVoice = () => typeof location !== 'undefined'
+  && (params().has('backup') || !(params().has('full') || params().has('eleven')));
+
 export function preloadLive({ mode, profile } = {}) {
-  if (typeof location !== 'undefined' && new URLSearchParams(location.search).has('backup')) return;
+  if (useBackupVoice()) return;   // not using ElevenLabs: don't warm it up (no credits spent)
   preloadSDK().catch(() => {});
   prefetchBrain({ mode, profile });
 }
@@ -20,7 +26,7 @@ export function preloadLive({ mode, profile } = {}) {
 const EVENTS = ['status', 'voice', 'recipe', 'recipe_clear', 'tip', 'roast', 'alert', 'step', 'timer_start', 'timer_cancel', 'timer_adjust', 'command', 'lesson_score'];
 
 export function createLiveRemy(options, { primary = createElevenLabsRemy, backup = createGeminiRemy,
-  forceBackup = typeof location !== 'undefined' && new URLSearchParams(location.search).has('backup') } = {}) {
+  forceBackup = useBackupVoice() } = {}) {
   const handlers = {};
   const emit = (type, data) => (handlers[type] || []).forEach(h => h(data));
   let current = null, onBackup = false, stopped = false, mode = options.mode;
