@@ -12,30 +12,6 @@ export function initJudgeMode() {
   document.getElementById("start-screen")?.append(tag);
 }
 
-// Highlights: on the goodbye screen, the session's best moments play one at a time (text only).
-const ICON = { roast: "🔥", alert: "🛟", timer: "⏱" };
-export function initHighlights(app) {
-  let ticker = null;
-  app.on("goodbye", ({ stats }) => {
-    const slot = document.getElementById("slot-goodbye");
-    slot.querySelector(".x-highlights")?.remove();
-    clearInterval(ticker);
-    // the best bits: safety saves and roasts first, then timers; at most 6
-    const lines = [...stats.highlights].sort((a, b) => "alert roast timer".indexOf(a.kind) - "alert roast timer".indexOf(b.kind)).slice(0, 6);
-    if (!lines.length) return;
-    const box = document.createElement("div"); box.className = "x-highlights";
-    const label = document.createElement("small"); label.textContent = "Highlights";
-    const line = document.createElement("div"); line.className = "x-highlight";
-    box.append(label, line);
-    slot.prepend(box);
-    let i = 0;
-    const show = () => {
-      const h = lines[i++ % lines.length];
-      line.textContent = `${ICON[h.kind] || "•"} ${h.text}`;
-      line.classList.remove("x-in"); void line.offsetWidth; line.classList.add("x-in");
-    };
-    show();
-    ticker = setInterval(show, 1800);
-  });
-  app.on("start", () => clearInterval(ticker));
-}
+// Highlights now live in 🏆 Your cooks (each past cook shows its best moment), so the goodbye
+// page stays clean. Kept as a no-op so older callers don't break.
+export function initHighlights() {}

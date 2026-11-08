@@ -47,6 +47,8 @@ function cooksSheet(app) {
     const left = el("div", "x-row-main");
     left.append(el("b", "", `${MODE_ICON[c.mode] || ""} ${c.dish || "Freestyle cook"}`),
       el("small", "", `${new Date(c.at).toLocaleDateString(undefined, { day: "numeric", month: "short" })} · ${c.timers || 0} timers · ${c.roasts || 0} roasts${c.alerts ? ` · ${c.alerts} safety` : ""}`));
+    const best = (c.highlights || []).find((h) => h.kind === "alert") || (c.highlights || []).find((h) => h.kind === "roast");
+    if (best) left.append(el("small", "x-row-moment", `${best.kind === "alert" ? "🛟" : "🔥"} “${best.text}”`));
     li.append(left, el("span", "x-score", `${c.score ?? "–"}/10`));
     list.append(li);
   }
@@ -64,15 +66,14 @@ function cooksSheet(app) {
 export function initCooks(app, menu) {
   menu.add("🏆", "Your cooks", () => app.openSheet(cooksSheet(app)));
 
-  // New badges pop up on the goodbye screen
+  // New badges: one small pill on the goodbye screen; tapping it opens Your cooks
   app.on("goodbye", () => {
     const slot = document.getElementById("slot-goodbye");
-    slot.querySelector(".x-new-badges")?.remove();
+    slot.querySelector(".x-badges-pill")?.remove();
     const fresh = checkNewBadges(app);
     if (!fresh.length) return;
-    const box = el("div", "x-new-badges");
-    box.append(el("span", "x-new-badges-title", fresh.length === 1 ? "New badge!" : `${fresh.length} new badges!`));
-    for (const a of fresh) box.append(el("span", "x-new-badge", `${a.icon} ${a.name}`));
-    slot.prepend(box);
+    const pill = el("button", "x-badges-pill", fresh.length === 1 ? `${fresh[0].icon} New badge: ${fresh[0].name}` : `🏅 ${fresh.length} new badges`);
+    pill.addEventListener("click", (e) => { e.stopPropagation(); app.keepGoodbye(); app.openSheet(cooksSheet(app)); });
+    slot.prepend(pill);
   });
 }

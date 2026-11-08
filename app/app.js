@@ -252,16 +252,20 @@ function statsSummary() {
   return { dish: stats.recipe, timers: stats.timers.size, timersDone: stats.timersDone, alerts: stats.alerts,
     roasts: stats.roasts, stepsDone: stats.stepsDone, score: recapScore(), highlights: [...stats.highlights] };
 }
+// Score card: dish, big score, Remy's line, one small icon row
 function renderRecap() {
-  const chips = [
-    stats.recipe && `🍽 ${stats.recipe}`,
-    `⏱ ${stats.timers.size} timer${stats.timers.size === 1 ? "" : "s"}`,
-    stats.alerts && `🛟 ${stats.alerts} safety save${stats.alerts === 1 ? "" : "s"}`,
-    `🔥 ${stats.roasts} roast${stats.roasts === 1 ? "" : "s"}`,
-  ].filter(Boolean);
-  const box = $("recap");
-  box.replaceChildren(...chips.map((t) => Object.assign(document.createElement("span"), { className: "recap-chip", textContent: t })));
-  $("recap-score").textContent = (SCORE_LINES[state.mode] || SCORE_LINES.honest)(recapScore());
+  const score = recapScore();
+  const sentence = (SCORE_LINES[state.mode] || SCORE_LINES.honest)(score);   // "3/10. We'll call it practice."
+  $("recap-dish").textContent = stats.recipe || "Freestyle cook";
+  $("recap-num").textContent = `${score}/10`;
+  $("recap-line").textContent = sentence.replace(/^\d+\/10\.\s*/, "");
+  $("recap-score").textContent = sentence;
+  const items = [["⏱", stats.timers.size, "timers"], ["🛟", stats.alerts, "safety saves"], ["🔥", stats.roasts, "roasts"]];
+  $("recap").replaceChildren(...items.map(([icon, n, label]) => {
+    const s = Object.assign(document.createElement("span"), { className: "recap-item", textContent: `${icon} ${n}` });
+    s.title = `${n} ${label}`; s.setAttribute("aria-label", `${n} ${label}`);
+    return s;
+  }));
 }
 
 function wireRemy(remy) {
@@ -518,7 +522,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v93`,
+      `version  v94`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
