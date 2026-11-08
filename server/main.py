@@ -390,6 +390,12 @@ def push_key():
     return {"enabled": push.enabled(), "key": push.public_key()}
 
 
+@app.get("/api/push/recent")
+def push_recent():
+    """Last few alerts the server sent: how late each left the server (no phone details)."""
+    return {"recent": push.sent_log[-10:], "waiting": len(push._timers)}
+
+
 @app.post("/api/push/timer")
 def push_timer(req: PushTimer):
     """Schedule, move or cancel a lock-screen alert for one timer (server/push.py)."""
