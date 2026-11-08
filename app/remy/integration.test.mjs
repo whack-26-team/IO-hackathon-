@@ -173,8 +173,9 @@ test('the cook can interrupt while Remy speaks',async()=>{
 test('Savage gets an immediate food jab without changing the other greetings',async()=>{
   const f=voiceFixture(null,null,'savage'); await f.remy.start();
   assert.equal(f.options.dynamicVariables.remy_opening,FIRST_MESSAGES.savage);
-  assert.match(FIRST_MESSAGES.savage,/fucking leaves/);
-  assert.doesNotMatch(FIRST_MESSAGES.gentle,/fucking leaves/);
+  assert.match(FIRST_MESSAGES.savage,/sad leaves/);                       // rude from the first line...
+  assert.doesNotMatch(FIRST_MESSAGES.savage,/fuck|shit|bollocks|bloody/i);  // ...but no swearing in it
+  assert.doesNotMatch(FIRST_MESSAGES.gentle,/sad leaves/);
   await f.remy.stop();
 });
 test('ending stops background prompts but lets the goodbye finish',async()=>{
