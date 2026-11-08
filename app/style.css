@@ -455,3 +455,9 @@ html[data-mode="gentle"] .score-card { background: #f4f9fe; }
 html[data-mode="savage"] .recap-num .star:not(.on) { color: rgba(255, 255, 255, .25); }
 @keyframes star-pop { 0% { transform: scale(0) rotate(-40deg); opacity: 0; } 100% { transform: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .recap-num .star { animation: none; } }
+
+/* Fonts: REMY in Leckerli One (cartoon script); words inside the boxes in Lilita One */
+.wordmark { font-family: "Leckerli One", var(--font); font-weight: 400; letter-spacing: 0; }
+.wordmark small { font-family: var(--font); font-weight: 600; }
+.greeting, .mode-bar b, .go, #bubble-text, .goodbye-bubble, .recap-line, .recap-dish, .current-step-text {
+  font-family: "Lilita One", var(--font); font-weight: 400; letter-spacing: .3px; }
