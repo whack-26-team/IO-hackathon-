@@ -20,6 +20,8 @@ test('agent prompt keeps one voice and receives core rules once from the server'
   assert.ok(prompt.includes('{{session_brain}}')); assert.ok(prompt.includes('remy_action'));
   assert.ok(prompt.includes('single selected voice'));
   assert.ok(!prompt.includes('<Savage>'));
+  // every action Remy can call is named in the dashboard prompt
+  for (const t of JSON.parse(await readFile(new URL('../../remy-brain/actions.json', import.meta.url), 'utf8')).tools) assert.ok(prompt.includes(t.name), t.name);
   // the core rules must not be repeated in the dashboard prompt (they'd be paid for twice on every reply)
   assert.ok(!prompt.includes(core.split('\n').find(l=>l.startsWith('# ')))); assert.ok(!prompt.includes('## Order of priorities'));
 });
