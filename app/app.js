@@ -272,7 +272,7 @@ function renderRecap() {
 }
 
 function wireRemy(remy) {
-  for (const type of ["status", "recipe", "recipe_clear", "tip", "roast", "alert", "step", "timer_start", "timer_cancel"]) remy.on(type, (d) => fire(type, d));
+  for (const type of ["status", "recipe", "recipe_clear", "timer_adjust", "command", "tip", "roast", "alert", "step", "timer_start", "timer_cancel"]) remy.on(type, (d) => fire(type, d));
   remy.on("status", setStatus);
   remy.on("recipe", (d) => { showRecipe(d); stats.recipe = d.recipe?.title || stats.recipe; });
   // "Clear the recipe": take it off the screen (timers keep running)
@@ -294,6 +294,16 @@ function wireRemy(remy) {
     if (!alertShowing()) showBubble({ text: `⏱ ${timerPhrase(d.label, d.seconds / 60, state.recipe)}`, severity: "info" });
   });
   remy.on("timer_cancel", (d) => timers.cancel(d));
+  // Hands-free commands (actions.js): "add a minute to the pasta", "how long left?", "repeat that"
+  remy.on("timer_adjust", (d) => timers.adjust(d.id, d.seconds));
+  remy.on("command", (d) => {
+    if (d.name === "repeat" && d.text) showBubble({ text: d.text, severity: "info" });
+    if (d.name === "time_left") {
+      const r = timers.remaining(d.id);
+      const mmss = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+      showBubble({ text: r ? `⏱ ${r.label}: ${r.left > 0 ? `${mmss(r.left)} left` : "done!"}` : "⏱ No timers running.", severity: "info" });
+    }
+  });
 }
 
 // ---------- status pill + "Remy is speaking" ----------
@@ -525,7 +535,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v96`,
+      `version  v97`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);

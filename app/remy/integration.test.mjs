@@ -223,3 +223,22 @@ test('saying clear the recipe takes it off the screen; so does the clear_recipe 
   assert.equal((await actions.call('clear_recipe',{})).cleared, true);
   assert.equal(events.filter(e=>e.type==='recipe_clear').length, 2);
 });
+
+test('hands-free commands: next/back/repeat, timer cancel/adjust/time left, only after his name',async()=>{
+  const events=[]; const actions=createActions({emit:(type,data)=>events.push({type,data}),request:async()=>({}),alive:()=>true});
+  const r={id:'r',title:'R',steps:[{instruction:'Boil'},{instruction:'Pasta in',timer:{label:'Rigatoni',minutes:11,check_at:10}},{instruction:'Drain'}]};
+  actions.configure({tools:[],recipe:r});
+  assert.equal(actions.hear('next step please'), null);                       // no "Remy" -> not a command
+  assert.equal(actions.hear('Remy, next step').command,'next step'); assert.equal(actions.snapshot().current_step,1);
+  assert.equal(actions.hear('Remy back').command,'previous step'); assert.equal(actions.snapshot().current_step,0);
+  assert.equal(actions.hear('Remy, repeat that').command,'repeat step'); assert.equal(events.at(-1).data.text,'Boil');
+  actions.hear('Remy, next step'); actions.hear("pasta's in");               // timer starts
+  assert.equal(actions.hear('Remy, add a minute to the rigatoni').command,'adjust timer');
+  assert.deepEqual(events.find(e=>e.type==='timer_adjust').data,{id:'rigatoni',seconds:60});
+  assert.equal(actions.hear('Remy take two minutes off').command,'adjust timer');
+  assert.equal(events.filter(e=>e.type==='timer_adjust').at(-1).data.seconds,-120);
+  assert.equal(actions.hear('Remy, how long left on the pasta?').command,'time left');
+  assert.equal(events.at(-1).data.id,'rigatoni');
+  assert.equal(actions.hear('Remy, cancel the rigatoni timer').command,'cancel timer');
+  assert.deepEqual(events.at(-1),{type:'timer_cancel',data:{id:'rigatoni'}});
+});

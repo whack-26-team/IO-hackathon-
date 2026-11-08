@@ -126,5 +126,11 @@ export function createTimers(container, emit, beep = () => {}) {
     for (const id of [...timers.keys()]) cancel({ id });
   }
 
-  return { start, cancel, adjust, clearAll };
+  // Seconds left on a timer (by id, or the first running one) -> { label, left } or null
+  function remaining(id) {
+    const t = (id && timers.get(id)) || [...timers.values()].find((x) => !x.done) || null;
+    return t ? { label: t.label, left: Math.max(0, Math.ceil((t.endAt - Date.now()) / 1000)) } : null;
+  }
+
+  return { start, cancel, adjust, clearAll, remaining };
 }
