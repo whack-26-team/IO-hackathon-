@@ -83,6 +83,7 @@ export function createGeminiRemy({ recipe = null, mode = 'honest', video, canvas
     text = (text || '').trim();
     if (!text || !active) return;
     const started = actions.hear(text); // "pasta's in" starts the timer straight away
+    if (started?.cleared) notes.push('[RECIPE CLEARED BY APP] The cook asked to clear the recipe; it is gone from the screen. Confirm briefly and ask what they want to cook next.');
     if (started?.seconds) notes.push(`[TIMER STARTED BY APP] ${started.label}, ${started.seconds / 60} minutes. Announce it once: "${started.announce}" Do not call start_timer for it.`);
     turn(text);
   }

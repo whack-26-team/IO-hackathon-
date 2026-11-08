@@ -245,6 +245,16 @@
           "id"
         ]
       }
+    },
+    {
+      "type": "function",
+      "name": "clear_recipe",
+      "description": "Remove the current recipe from the screen when the cook asks to clear, cancel or scrap it without naming a new dish. Timers keep running. Then ask what they want to cook next.",
+      "parameters": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
     }
   ]
 }
