@@ -91,6 +91,10 @@ check, ask what they'd like to cook (they can also tell you what ingredients the
    corrected), mention any estimates, and give the attached safe temperatures."""
 
 
+SWAP_RULE = """# MISSING AN INGREDIENT
+Suggest one sensible swap. If it changes the recipe, call create_recipe with the adapted recipe
+(same steps and timers where they still apply) so the screen shows it."""
+
 NAME_RULE = """# YOUR NAME
 The cook calls you Remy. Whenever they say "Remy" (on its own, or to start a sentence), answer
 straight away, e.g. "Yes, chef?" or "I'm here.", then help with whatever they ask. Never ignore
@@ -142,6 +146,7 @@ def build_instructions(recipe: dict | None, mode: str, lite: bool = False, profi
         core,
         f"# PERSONALITY MODE: {mode.upper()}\n{personality}",
         NAME_RULE,
+        SWAP_RULE,
         *([profile_line(profile)] if profile_line(profile) else []),
         *([] if lite else ["# ROAST & CATCHPHRASE LIBRARY (riff on these, don't just repeat them)\n" + roast_text]),
         ("# TODAY'S RECIPE\n" + json.dumps(recipe, ensure_ascii=False)) if recipe else NO_RECIPE_YET,

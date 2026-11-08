@@ -33,7 +33,9 @@ export function createLiveRemy(options, { primary = createElevenLabsRemy, backup
     const old = current;
     try { old?.stop(); } catch { /* already stopped */ }
     console.warn('[Remy] switching to backup voice:', reason);
-    emit('tip', { text: "Remy's main voice is down, so he's using his backup voice.", severity: 'info' });
+    // say WHY, so a screenshot tells us what to fix (credits, network, mic...)
+    const why = String(reason || '').match(/\(([^)]*)\)/)?.[1] || String(reason || '').slice(0, 90);
+    emit('tip', { text: `Remy's main voice is down${why ? ` (${why})` : ''}, so he's using his backup voice.`, severity: 'info' });
     current = backup({ ...options, mode });
     attach(current, false);
     current.start();
