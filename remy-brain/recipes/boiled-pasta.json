@@ -30,7 +30,7 @@
     "Wooden spoon or tongs",
     "Mug (to save pasta water)"
   ],
-  "notes": "REMY: before starting the timer, ASK which pasta shape it is and use step 3's timer_by_shape (from cook-times.json). Say the timer out loud and that the packet time wins: 'Penne, 11 minutes. Shout if your packet says different.' If the shape isn't listed, ask for the packet time and use that. Never guess.",
+  "notes": "REMY: before starting the timer, ASK which pasta shape it is and use step 3's timer_by_shape (from cook-times.json). Say the timer out loud: 'Penne, 11 minutes.' Mention the packet time only once, and only if you picked the time ('Shout if your packet says different.'). If the cook gave a time, just use it and confirm it. If the shape isn't listed, ask for the packet time and use that. Never guess.",
   "ingredients": [
     "200g dried pasta, any shape (about 100g per person)",
     "2 litres water (about 1 litre per 100g)",

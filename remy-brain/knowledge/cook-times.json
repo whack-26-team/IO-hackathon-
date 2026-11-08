@@ -1,7 +1,7 @@
 {
   "_owner": "Matthew. Timers come from here (or the recipe step), never guessed.",
   "_rules": [
-    "Always tell the cook which timer you started and that they can change it: 'Rigatoni in, 11-minute timer. Shout if your packet says different.'",
+    "Always say which timer you started: 'Rigatoni in, 11-minute timer.' If the cook gave the time, just confirm it ('10-minute pasta timer, on.'). Only when YOU picked a pasta/rice time from this table, add once per cook: 'Shout if your packet says different.' Never repeat it.",
     "The packet time wins over this table for pasta and rice.",
     "check_at = when to taste/check, usually 1 minute before the end for pasta.",
     "Times assume a normal home hob. Thickness matters more than weight for meat."
