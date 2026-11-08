@@ -51,14 +51,14 @@ export async function makeCard(app) {
   const s = app.stats(); const mode = app.mode;
   const line = document.getElementById("recap-line")?.textContent || "";
   // the card uses the app's fonts: make sure they're loaded before drawing
-  await Promise.all(['150px "Leckerli One"', '52px "Caveat Brush"', '700 60px "Baloo 2"'].map((f) => document.fonts?.load(f).catch(() => {})));
+  await Promise.all(['150px "Leckerli One"', '700 52px "Grandstander"', '700 60px "Baloo 2"'].map((f) => document.fonts?.load(f).catch(() => {})));
   const BOX = '"Baloo 2", system-ui, sans-serif';
   const c = document.createElement("canvas"); c.width = 1080; c.height = 1350;
   const ctx = c.getContext("2d");
   ctx.fillStyle = BG[mode] || BG.honest; ctx.fillRect(0, 0, c.width, c.height);
   ctx.fillStyle = FG[mode] || FG.honest; ctx.textAlign = "center";
   ctx.font = '150px "Leckerli One", system-ui, sans-serif'; ctx.fillText("REMY", 540, 200);
-  ctx.font = '56px "Caveat Brush", system-ui, sans-serif'; ctx.globalAlpha = 0.75; ctx.fillText("your live AI chef", 540, 275); ctx.globalAlpha = 1;
+  ctx.font = '700 50px "Grandstander", system-ui, sans-serif'; ctx.globalAlpha = 0.75; ctx.fillText("your live AI chef", 540, 275); ctx.globalAlpha = 1;
   const shocked = mode === "savage" && s.stars === 5;
   const faceId = shocked ? "f-shock" : (FACE[mode] || FACE.honest);
   const face = (await faceImage(faceId, mode === "savage")) || (await loadImage("icon.png"));
@@ -77,7 +77,7 @@ export async function makeCard(app) {
     if (icons[i]) ctx.drawImage(icons[i], x - 92, 1160, 84, 84);
     ctx.textAlign = "left"; ctx.fillText(String(k), x + 2, 1222); ctx.textAlign = "center";
   });
-  ctx.font = '38px "Caveat Brush", system-ui, sans-serif'; ctx.globalAlpha = 0.65;
+  ctx.font = '700 34px "Grandstander", system-ui, sans-serif'; ctx.globalAlpha = 0.65;
   ctx.fillText("remy-2wc2.onrender.com", 540, 1300);
   return new Promise((resolve) => c.toBlob(resolve, "image/png"));
 }
