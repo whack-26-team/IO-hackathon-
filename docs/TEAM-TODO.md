@@ -40,7 +40,7 @@ Same rule as above.
 
 - [ ] `app/remy/agent-prompt.md`, priority 1: remove "smoking oil" and say "fire or flames".
 - [ ] The ElevenLabs agent's prompt in the ElevenLabs dashboard, if it's a copy of `agent-prompt.md`: same change.
-- [ ] `app/remy/mock.js` (around line 81): Pretend Remy's alert "Pan is smoking! Take it off the heat." → a different danger, e.g. "Fingers! Tuck them into a claw grip."
+- [x] `app/remy/mock.js`: Pretend Remy's alert is now the knife alert (done by Matthew)
 
 ### 2. Savage swears occasionally (decided 2026-11-07)
 - [ ] If the ElevenLabs agent has its own copy of the Savage personality (not loaded from `/api/brain`), update it to match `remy-brain/personality/savage.md`: occasional swearing in roasts, aimed at the food, never in safety alerts
@@ -57,17 +57,14 @@ Same rule as above.
 
 ---
 
-## Felix (`app/demo/`, `app/extras/`, `docs/pitch/`)
+## Felix (`app/demo/`, `app/extras/`, `app/school/`, `docs/pitch/`)
 
-New tasks while Matthew is on a break: **issue #83**. Read `docs/DEMO.md` first.
-
-- [ ] Demo mode: make `app/demo/demo-remy.js` (opened with `?demo=1`) play the beats of `docs/DEMO.md`
-- [ ] Pitch slides in `docs/pitch/` (6 slides max, plus a PDF)
-- [ ] Rehearse the demo on your iPhone, post the timings on #83
-- [ ] Record the backup video once demo mode works (shared drive, link on #83)
-- [ ] Change attitude mid-cook by tapping the badge (`app/extras/mode-switch.js`)
-- [ ] First-time setup card (`app/extras/setup-guide.js`)
-- [ ] Backup video on a laptop with a video file as the camera (steps in #83)
+**Felix isn't building right now. Matthew is building all of these** (issues reassigned to him):
+- [x] Extras kit (#111), screen awake, your cooks, badges, weekly challenge, share card (#112–#116)
+- [x] Judge mode + highlights, watch my pan, look & feel, recipe browser (#117–#120)
+- [ ] Cooking school screen (#121), with Pranav's lesson files (#124)
+- [ ] Two-player cook-off (#122)
+- [ ] Demo mode `?demo=1`, mid-cook attitude switch, setup card, backup video (#83)
 
 ---
 

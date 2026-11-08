@@ -78,7 +78,7 @@ export function createMockRemy({ mode }) {
     [20, () => say("roast", { text: lines[1], level: 2 })],
     // "Remy, make it 8 minutes": real Remy re-sends timer_start with the SAME id and new time
     [23, () => say("timer_start", { id: "garlic", label: "Garlic", seconds: 60, check_at: 40 })],
-    [25, () => say("alert", { text: "Pan is smoking! Take it off the heat." }, 3)],
+    [25, () => say("alert", { text: "Fingers! Tuck them into a claw grip." }, 3)],
     // a roast arriving during the alert: the screen must hold it until the alert is gone
     [26, () => emit("roast", { text: lines[2], level: 3 })],
     [34, () => emit("step", { current_step: 1, step_complete: true, next_instruction: recipe.steps[2]?.instruction })],

@@ -29,6 +29,10 @@ import { initWakeLock } from "./wake.js";
 import { initCooks } from "./cooks.js";
 import { initChallenge } from "./challenge.js";
 import { initShare } from "./share.js";
+import { initJudgeMode, initHighlights } from "./judge.js";
+import { initWatchMyPan } from "./watch.js";
+import { initFeel } from "./feel.js";
+import { initRecipeBrowser } from "./recipes.js";
 
 // The start screen must never scroll: if an extra makes it overflow on this phone, hide the
 // optional bits (the challenge chip) instead.
@@ -49,6 +53,11 @@ export function initExtras(app) {
   const menu = createMenu();
   start("wake lock", () => initWakeLock(app));
   start("your cooks", () => initCooks(app, menu));
+  start("recipes", () => initRecipeBrowser(app, menu));
+  start("highlights", () => initHighlights(app));   // before share, so highlights sit above the Share button
   start("share", () => initShare(app));
+  start("judge mode", () => initJudgeMode());
+  start("watch my pan", () => initWatchMyPan(app));
+  start("look & feel", () => initFeel(app));
   start("challenge", async () => { await initChallenge(app); keepStartOnOneScreen(); });
 }

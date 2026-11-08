@@ -8,6 +8,7 @@ What it does:
   * GET  /api/recipes/find?q=steak -> find a recipe by what the cook said (Remy's find_recipe)
   * POST /api/recipes/ai     -> safety-check a recipe Remy wrote itself (create_recipe)
   * POST /api/chat           -> backup Remy: Gemini writes his reply when ElevenLabs is down
+  * GET  /api/qr?text=       -> QR code (SVG) for one of REMY's own links (judge page)
   * GET  /api/recipes/{id}   -> one full recipe
   * POST /api/brain          -> Remy's instructions + actions for ANY voice route
   * POST /api/session        -> a short-lived pass for the live OpenAI call,
@@ -316,11 +317,31 @@ def vision_models():
         raise HTTPException(502, f"Couldn't list Gemini models: {e}") from None
 
 
+@app.get("/api/qr")
+def qr_code(text: str):
+    """A QR code (SVG) for a link, e.g. the judge page's 'scan to try REMY'. Only our own site's links."""
+    if len(text) > 300 or not text.startswith(("https://remy-2wc2.onrender.com", "http://localhost", "http://127.0.0.1")):
+        raise HTTPException(400, "QR codes are only made for REMY's own links.")
+    import io
+    import qrcode
+    import qrcode.image.svg
+    buf = io.BytesIO()
+    qrcode.make(text, image_factory=qrcode.image.svg.SvgPathFillImage, border=2).save(buf)
+    from fastapi.responses import Response
+    return Response(buf.getvalue(), media_type="image/svg+xml")
+
+
 # ---------- the app itself ----------
 
 @app.get("/")
 def index():
     return FileResponse(APP_DIR / "index.html")
+
+
+@app.get("/judge")
+def judge_page():
+    """Big 'scan to try REMY' QR code for the judging table (app/extras/judge.html)."""
+    return FileResponse(APP_DIR / "extras" / "judge.html")
 
 
 @app.middleware("http")
