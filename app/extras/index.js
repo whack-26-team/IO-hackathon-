@@ -1,32 +1,54 @@
-// Owner: Felix. Entry point for every "extra" feature (score log, achievements, weekly challenge,
-// share card, judge mode, watch my pan, look & feel, recipe browser, cooking school, cook-off).
+// Owner: Felix (built by Matthew while Felix is busy). Entry point for every "extra" feature.
 //
 // app.js calls initExtras(app) once when the page loads. Build each feature in its own file in
 // app/extras/ and start it from here. You never need to edit app.js, index.html or style.css:
 //
 // SLOTS (empty containers in index.html, fill them with your own elements):
-//   #slot-start-chip   start screen, just above "Start cooking" (e.g. weekly challenge)
-//   #slot-start-menu   start screen, just below "Start cooking" (menu row: 📖 🎓 🏆 ⚙️)
+//   #slot-start-chip   start screen, just above "Start cooking" (weekly challenge)
+//   #slot-start-menu   start screen menu (icon buttons in the top corners, see menu.js)
 //   #slot-cook-tools   cooking screen, small buttons above the recipe panel (e.g. 👀, 📸)
-//   #slot-goodbye      goodbye screen, under the recap (e.g. new badges, Share button)
+//   #slot-goodbye      goodbye screen, under the recap (new badges, Share button)
 //   The start screen must NEVER scroll: keep slots slim and check small phones (375×553).
 //
 // THE APP OBJECT:
 //   app.on(event, fn)   events: "start" {mode, recipe}, "stop", "goodbye" {stats},
-//                       "recipe", "tip", "roast", "alert", "step", "timer_start",
+//                       "recipe", "recipe_clear", "tip", "roast", "alert", "step", "timer_start",
 //                       "timer_check", "timer_done", "status" (same data as docs/CONTRACT.md)
 //   app.stats()         {dish, timers, timersDone, alerts, roasts, stepsDone, score, highlights[]}
 //   app.startCooking({ recipeId, mode })   start a cook with a recipe already chosen
 //   app.setMode(mode)   switch attitude mid-cook (Savage: ask 18+ first)
 //   app.say(text)       show a Remy bubble (and speak it with Pretend Remy)
 //   app.openSheet(el) / app.closeSheet()   a bottom sheet over the screen (scrolls inside)
+//   app.keepGoodbye() / app.backToStart()  hold the goodbye screen / leave it now
 //   app.history         on-phone store: get/set, cooks(), addCook(), settings(), clearAll()
 //   app.mode, app.cooking
 //
 // Styles go in app/extras/extras.css (loaded after style.css).
-// Every finished cook is already saved with app.history.addCook() by app.js, so the score log
-// just reads app.history.cooks().
+import { createMenu } from "./menu.js";
+import { initWakeLock } from "./wake.js";
+import { initCooks } from "./cooks.js";
+import { initChallenge } from "./challenge.js";
+import { initShare } from "./share.js";
+
+// The start screen must never scroll: if an extra makes it overflow on this phone, hide the
+// optional bits (the challenge chip) instead.
+function keepStartOnOneScreen() {
+  const screen = document.getElementById("start-screen");
+  const chip = document.getElementById("slot-start-chip");
+  const fit = () => {
+    chip.style.display = "";
+    if (screen.scrollHeight > screen.clientHeight + 1) chip.style.display = "none";
+  };
+  fit();
+  addEventListener("resize", fit);
+  return fit;
+}
 
 export function initExtras(app) {
-  void app; // nothing yet: Felix adds features here
+  const start = (name, fn) => { try { return fn(); } catch (e) { console.error(`[extras] ${name}`, e); } };
+  const menu = createMenu();
+  start("wake lock", () => initWakeLock(app));
+  start("your cooks", () => initCooks(app, menu));
+  start("share", () => initShare(app));
+  start("challenge", async () => { await initChallenge(app); keepStartOnOneScreen(); });
 }

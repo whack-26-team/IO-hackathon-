@@ -25,10 +25,10 @@ PR = os.environ["PR_NUMBER"]
 # Who may change what without a review. Matthew (team lead) and Claude (works for
 # Matthew) may change anything, so their PRs only need passing checks + no secrets.
 OWNERS = {
-    "felix": ["app/"],
+    "felix": ["app/", "docs/pitch/"],
     "ahmed": ["app/remy/", "server/second_opinion.py"],
     "pranav": ["remy-brain/instructions.md", "remy-brain/actions.json",
-               "remy-brain/personality/", "tests/"],
+               "remy-brain/personality/", "remy-brain/lessons/", "tests/"],
     "matthew": [""],
     "claude": [""],
 }

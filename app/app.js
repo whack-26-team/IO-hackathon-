@@ -157,8 +157,8 @@ function stopCooking() {
   }
   timers.clearAll();
   clearTimeout(showBubble.t);
+  pendingRoast = null; // first, so hiding the alert doesn't show a held-back roast after Stop
   hideAlert();
-  pendingRoast = null;
   quietRemy();
   $("cook-screen").classList.add("hidden");
   document.documentElement.dataset.mode = state.mode; // the attitude's page colour behind the goodbye
@@ -338,9 +338,9 @@ function showBubble({ text, severity = "info", level }) {
 // Safety beats comedy: a roast that arrives during a safety alert waits until it's gone.
 let pendingRoast = null;
 function showRoast({ text, level = 1 }) {
+  if (alertShowing()) { pendingRoast = { text, level }; return; }  // counted when it's actually shown
   stats.roasts++;
   highlight("roast", text);
-  if (alertShowing()) { pendingRoast = { text, level }; return; }
   showBubble({ text, severity: "roast", level: Math.min(Math.max(level, 1), 3) });
 }
 
@@ -518,7 +518,7 @@ if (new URLSearchParams(location.search).has("debug")) {
       `web app  standalone=${navigator.standalone} display-mode=${matchMedia("(display-mode: standalone)").matches}`,
       `safe     top ${p.paddingTop} bottom ${p.paddingBottom} left ${p.paddingLeft} right ${p.paddingRight}`,
       `backdrop top ${Math.round(bd.top)} bottom ${Math.round(bd.bottom)}`,
-      `version  v90`,
+      `version  v92`,
     ].join("\n");
   };
   show(); addEventListener("resize", show); setInterval(show, 1000);
@@ -551,6 +551,8 @@ const remyApp = {
     return sheet;
   },
   closeSheet() { $("slot-sheets").replaceChildren(); },
+  keepGoodbye() { clearTimeout(showGoodbye.t); },   // stop the goodbye screen returning to start by itself (e.g. while sharing)
+  backToStart: () => backToStart(),
   history,
   get mode() { return state.mode; },
   get cooking() { return state.cooking; },
