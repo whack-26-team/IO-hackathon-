@@ -49,6 +49,7 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', profile =
   let capTimer, queueTimer, reconnectTimer, deadline = 0, attempts = 0;
   let speaking = false, lastUserAt = 0, lastSentAt = 0, safetyUntil = 0, queue = [];
   const emit = (type, data) => (handlers[type] || []).forEach(fn => fn(data));
+  let heckleAt = 0;   // when the app last asked for a Savage heckle
   const status = (value, message) => emit('status', { status: value, message });
   const alive = () => active && !page.hidden;
   const context = text => { if (conversation && alive()) conversation.sendContextualUpdate(text); };
@@ -189,7 +190,8 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', profile =
             if (!started) actions.autoRecipe(message).then((auto) => { if (auto?.note && run === generation && alive()) speak(auto.note, false, true); });
           }
           // Remy answered a camera mistake in words only: show it as a roast anyway (Gentle: a tip)
-          if (source === 'ai' && message) {
+          if (source === 'ai' && message && heckleAt && now() - heckleAt < 15000) { heckleAt = 0; emit('roast', { text: message, level: 1, heckle: true }); }
+          else if (source === 'ai' && message) {
             const unhandled = actions.takeUnhandledCamera?.();
             if (unhandled) emit(mode === 'gentle' ? 'tip' : 'roast', mode === 'gentle' ? { text: message, severity: 'warning' } : { text: message, level: 1, mistake: unhandled.type });
           }
@@ -258,6 +260,8 @@ export function createElevenLabsRemy({ recipe = null, mode = 'honest', profile =
         context(`[SERVINGS] Now cooking for ${data.serves}; amounts on screen are scaled. Cooking times stay the same.`);
         return true;
       }
+      // Savage: the app asks for an unprompted jab now and then (no mistake needed); his next line shows as a heckle
+      if (type === 'heckle') { heckleAt = now(); return speak("[HECKLE] No mistake right now. Throw ONE short original Savage jab (max 15 words) at the cook's pace, technique, the dish or the kitchen; swearing and a playful nickname are fine. Don't claim a mistake, don't call roast, then carry on.", false, true); }
       // The screen wants Remy to say one exact line (e.g. the Rate my plate verdict)
       if (type === 'say' && typeof data.text === 'string') {
         return speak(`[SAY THIS] Say this line once, out loud, exactly as written, then stop: "${data.text.slice(0, 220)}" No actions.`, false, true);
